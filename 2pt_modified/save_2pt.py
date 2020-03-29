@@ -144,15 +144,14 @@ def setup(options):
     def get_arr(x):
         a = options[option_section, x]
         if not isinstance(a, np.ndarray):
-            a = np.array([a])
+            a = np.array([a]) 
         return a
 
     if config['make_covariance']:
         #Read in noise ingredients
         #Convert per arcmin^2 quantities to per radian^2
-        config["number_density_shear_arcmin2"] = get_arr(
-            "number_density_shear_arcmin2")
-        config["number_density_lss_arcmin2"] = get_arr("number_density_lss_arcmin2")
+        config["number_density_shear_arcmin2"] = get_arr("number_density_shear_arcmin2")
+        config["number_density_lss_arcmin2"] =  get_arr("number_density_lss_arcmin2")
         config["number_density_shear_rad2"] = perarcmin2_to_perrad2(config["number_density_shear_arcmin2"])
         config["number_density_lss_rad2"] = perarcmin2_to_perrad2(config["number_density_lss_arcmin2"])        
         config['sigma_e'] = get_arr("sigma_e")
@@ -312,6 +311,8 @@ def execute(block, config):
                                  zip(config['sigma_e'],config['number_density_shear_rad2']) ])
                     elif cl_spec.types[0].name == "galaxy_position_fourier":
                         noise = [ 1./n for n in config['number_density_lss_rad2'] ]
+                    elif cl_spec.types[0].name == "cmb_kappa_emode_fourier": #added by Lukas
+                        noise = [ 3.e-8 ]
                     else:
                         print("Tried to, but can't generate noise for spectrum %s"%cl_section)
                         raise ValueError
