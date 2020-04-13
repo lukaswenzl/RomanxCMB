@@ -317,9 +317,7 @@ def execute(block, config):
                         print("Tried to, but can't generate noise for spectrum %s"%cl_section)
                         raise ValueError
                     cl_spec.set_noise(noise)
-
                 cl_specs.append( cl_spec )
-
         cl_cov = ClCov(cl_specs, fsky=config['fsky'])
 
         if real_space:

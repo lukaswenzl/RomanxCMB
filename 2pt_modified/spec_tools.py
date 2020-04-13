@@ -323,6 +323,7 @@ class ClCov( object ):
         c_ij_12 = self.theory_spectra[ self.names.index(name1) ]
         c_kl_34 = self.theory_spectra[ self.names.index(name2) ]
 
+
         cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals,
             noise_only=noise_only )
         n_modes = self.fsky * (2*ell_vals+1)
@@ -359,7 +360,6 @@ class ClCov( object ):
                 c_ells.append(s.get_noise_spec_values( bin1, bin2, ells ))
             else:
                 c_ells.append(s.get_obs_spec_values( bin1, bin2, ells ))
-        #print(ret)
         return c_ells[0]*c_ells[1] + c_ells[2]*c_ells[3]
 
     def get_binned_cl_cov( self, ell_lims, noise_only=False):
@@ -440,6 +440,7 @@ class ClCov( object ):
         print("slog det:", np.linalg.slogdet(covmat))
         print("condition number:", np.linalg.cond(covmat))
         print(covmat)
+
         return covmat, cl_lengths
 
 
