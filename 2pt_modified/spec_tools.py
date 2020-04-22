@@ -242,7 +242,10 @@ class TheorySpectrum(object):
         noise = np.zeros_like(angle)
         if self.is_auto:
             if bin1==bin2:
-                noise = self.noise_var_per_mode[bin1-1] * np.ones_like(angle)
+                if(self.name == "cmbkappa_cl"):
+                    noise = self.noise_var_per_mode[bin1-1](angle)
+                else:
+                    noise = self.noise_var_per_mode[bin1-1] * np.ones_like(angle)
                 return noise
         return noise
 
@@ -306,11 +309,15 @@ class ClCov( object ):
     """
     Class for computing cl covariance
     """
-    def __init__(self, theory_spectra, fsky=1.):
+    def __init__(self, theory_spectra, fsky=1., fsky_cmb=-1):
         self.theory_spectra = theory_spectra
         self.types = [ t.types for t in self.theory_spectra ]
         self.names = [t.name for t in self.theory_spectra ]
         self.fsky = fsky
+        if (fsky_cmb == -1):
+            self.fsky_cmb = self.fsky
+        else:
+            self.fsky_cmb = fsky_cmb
 
     def get_cov_diag_ijkl( self, name1, name2, ij, kl, ell_max, ell_min=0, noise_only=False):
         # From Joachimi & Bridle 2010 0911.2454
@@ -326,7 +333,11 @@ class ClCov( object ):
 
         cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals,
             noise_only=noise_only )
-        n_modes = self.fsky * (2*ell_vals+1)
+        if(name1 == "cmbkappa_cl" and name2 == "cmbkappa_cl"):
+            print("We are assuming fsky_cmb is larger than fsky so it only is viable for the cmblensing auto covariance.")
+            n_modes = self.fsky_cmb * (2*ell_vals+1)
+        else:
+            n_modes = self.fsky * (2*ell_vals+1)
         cov_diag  = ( cl2_sum ) / n_modes
         return cov_diag
 
@@ -438,7 +449,8 @@ class ClCov( object ):
 
         print("Completed covariance")
         print("slog det:", np.linalg.slogdet(covmat))
-        print("condition number:", np.linalg.cond(covmat))
+        print("Turned of calculation of condidtion number, because it takes too long.")
+        #print("condition number:", np.linalg.cond(covmat)) CHANGE BACK Lukas
         print(covmat)
 
         return covmat, cl_lengths

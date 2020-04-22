@@ -16,6 +16,8 @@ from twopoint_cosmosis import type_table
 import gaussian_covariance
 from spec_tools import TheorySpectrum, SpectrumInterp, real_space_cov, perarcmin2_to_perrad2, ClCov, arcmin_to_rad, convert_angle
 
+#cosmolike_interface
+import cosmolike_metadata
 
 def get_scales( x_min, x_max, nbins, logspaced=True, integer_lims=False, two_thirds_midpoint=False):
     """
@@ -131,6 +133,7 @@ def setup(options):
         ell_min = options.get_int(option_section, "ell_min")
         ell_max = options.get_int(option_section, "ell_max")
         n_ell = options.get_int(option_section, "n_ell")
+        config["n_ell"] = n_ell
         ell_lims, ell_mids = get_ell_scales( ell_min, ell_max, n_ell,
             logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint)
         config['angle_lims'] = ell_lims
@@ -156,6 +159,9 @@ def setup(options):
         config["number_density_lss_rad2"] = perarcmin2_to_perrad2(config["number_density_lss_arcmin2"])        
         config['sigma_e'] = get_arr("sigma_e")
         config['fsky'] = options[option_section, "fsky"] 
+        config['fsky_cmblensing'] = options.get_double(option_section, "fsky_cmblensing",config["fsky"])
+        config['cmblensing_noisecurve'] = options.get_string(option_section, "cmblensing_noisecurve","")
+
         config['upsample_cov'] = options.get_int(option_section, "upsample_cov", 10)
         if config['upsample_cov'] < 2:
             config['upsample_cov'] = None
@@ -190,6 +196,12 @@ def setup(options):
                 bin_cuts.append((name, b1, b2))
     config['bin_cuts'] = bin_cuts
     config['scale_cuts'] = scale_cuts
+
+    ##capability to cut bin combinations based on an input file
+    config['cosmolike_metadata_file'] = options.get_string(option_section, "cosmolike_metadata_file", "")
+    ## capability to load an external cosmolike covariance matrix
+    config['cosmolike_covariance'] = options.get_string(option_section, "cosmolike_covariance", "")
+
 
     return config
 
@@ -312,13 +324,19 @@ def execute(block, config):
                     elif cl_spec.types[0].name == "galaxy_position_fourier":
                         noise = [ 1./n for n in config['number_density_lss_rad2'] ]
                     elif cl_spec.types[0].name == "cmb_kappa_emode_fourier": #added by Lukas
-                        noise = [ 3.e-8 ]
+                        class Noise_cmb():
+                            def __init__(self, filename):
+                                self.cov=np.loadtxt(filename)
+                            def __call__(self, l):
+                                return np.interp(l, self.cov[:,0], self.cov[:,1])
+                        noise_cmb = Noise_cmb(config["cmblensing_noisecurve"])
+                        noise = [noise_cmb]#[ 3.e-8 ]
                     else:
                         print("Tried to, but can't generate noise for spectrum %s"%cl_section)
                         raise ValueError
                     cl_spec.set_noise(noise)
                 cl_specs.append( cl_spec )
-        cl_cov = ClCov(cl_specs, fsky=config['fsky'])
+        cl_cov = ClCov(cl_specs, fsky=config['fsky'], fsky_cmb=config['fsky_cmblensing'])
 
         if real_space:
 
@@ -339,10 +357,27 @@ def execute(block, config):
                                                          xi_lengths, covmat )
 
         else:
+            #build gaussian covariance
+            #note there is no check here if the covariance matrix is saved in the right order...
             covmat, cl_lengths = cl_cov.get_binned_cl_cov(config['angle_lims'])
+
             assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
             covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list],
                                                          [len(s.value) for s in spec_meas_list], covmat )
+    elif(config["cosmolike_metadata_file"] != "" and config["cosmolike_covariance"] != ""):
+        #loading external covariance matrix from cosmolike
+        bin_cuts = cosmolike_metadata.give_cuts(config["cosmolike_metadata_file"], spec_meas_list, config["n_ell"])
+        for (name, b1, b2) in bin_cuts:
+            print("cutting %d,%d from %s"%(b1,b2,name))
+            spec_index = config['output_extensions'].index(name)
+            spec_meas_list[spec_index].cut_bin_pair( (b1,b2), complain=True )
+            cl_theory_spec_list[spec_index].cut_bin_pair( (b1,b2) )
+
+        #load external covariance
+        covmat = cosmolike_metadata.rearrange_cov(config["cosmolike_covariance"],spec_meas_list,"modules/WFIRSTxCMB/cosmolike_data/cov_indices_testruns_apr9.txt", config["n_ell"])
+        
+        assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
+        covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list], [len(s.value) for s in spec_meas_list], covmat )
     else:
         covmat_info = None
 
@@ -353,9 +388,14 @@ def execute(block, config):
 
     data = twopoint.TwoPointFile(spec_meas_list, kernels, windows, covmat_info)
 
-    # Apply cuts
+    # Apply additional cuts
     scale_cuts = config['scale_cuts']
-    bin_cuts = config['bin_cuts']
+    #load bin cuts in case I want to test the gaussian covariance from cosmosis
+    if(config["cosmolike_metadata_file"] != "" and config["cosmolike_covariance"] == ""):
+        print("loading metadata file to apply bin cuts")
+        bin_cuts = cosmolike_metadata.give_cuts(config["cosmolike_metadata_file"], spec_meas_list, config["n_ell"])
+    else:#or apply manual bin cuts
+        bin_cuts = config['bin_cuts']
     if scale_cuts or bin_cuts:
         data.mask_scales(scale_cuts, bin_cuts)
 

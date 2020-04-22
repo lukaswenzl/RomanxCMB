@@ -316,6 +316,7 @@ class SpectrumMeasurement(object):
             raise ValueError("""You tried to cut bin pair %d,%d from spectrum named %s
                              but it doesn't exist""" % (b1, b2, self.name))
         elif mask.sum() > 0:
+            self.bin_pairs.remove(bin_pair) #python list! can not easily use the mask
             self.apply_mask(~mask)
 
     def auto_bins(self):
