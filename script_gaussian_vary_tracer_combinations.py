@@ -1,6 +1,6 @@
 #written for v0.1
 #run with 
-#python modules/WFIRSTxCMB/script_gaussian_vary_tracer_combinations.py
+#time python modules/WFIRSTxCMB/script_gaussian_vary_tracer_combinations.py
 
 import os
 
