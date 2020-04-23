@@ -4,7 +4,7 @@
 
 import os
 
-n_processors = 15
+n_processors = "15"
 output_folder = "script_gaussian_vary_tracer_combinations/"
 import os
 if not os.path.exists(output_folder):
