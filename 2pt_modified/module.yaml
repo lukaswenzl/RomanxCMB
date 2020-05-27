@@ -25,6 +25,7 @@ explanation: |
     This module looks up theory measurements in specific sections depending what kind
     of measurement is used. To add more data types to the file please see type_table.txt.
 
+    up to date with hash "be8bbe7" of cosmosis-standard-library
 
 
     "

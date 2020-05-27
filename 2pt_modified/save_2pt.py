@@ -72,12 +72,19 @@ def setup(options):
     #First of all get the angular scales/binning
     logspaced = options.get_bool(option_section, "logspaced", True)
     make_covariance = options.get_bool(option_section, "make_covariance", False)
+    copy_covariance = options.get_string(option_section, "copy_covariance", "")
     angle_units = options.get_string(option_section, "angle_units", "")
     two_thirds_midpoint = options.get_bool(option_section, "two_thirds_midpoint", False)
 
-    config = { "make_covariance": make_covariance,
-               "logspaced": logspaced, 
-               "angle_units": angle_units }
+    if copy_covariance and make_covariance:
+        raise ValueError("You can only set one of make_covariance and copy_covariance")
+
+    config = {
+        "make_covariance": make_covariance,
+        "copy_covariance": copy_covariance,
+        "logspaced": logspaced, 
+        "angle_units": angle_units
+    }
 
     def read_list(key):
         s = options.get_string(option_section, key)
@@ -147,17 +154,23 @@ def setup(options):
     def get_arr(x):
         a = options[option_section, x]
         if not isinstance(a, np.ndarray):
-            a = np.array([a]) 
+            a = np.array([a])
         return a
 
     if config['make_covariance']:
         #Read in noise ingredients
         #Convert per arcmin^2 quantities to per radian^2
-        config["number_density_shear_arcmin2"] = get_arr("number_density_shear_arcmin2")
-        config["number_density_lss_arcmin2"] =  get_arr("number_density_lss_arcmin2")
+        config["number_density_shear_arcmin2"] = get_arr(
+            "number_density_shear_arcmin2")
+        config["number_density_lss_arcmin2"] = get_arr("number_density_lss_arcmin2")
         config["number_density_shear_rad2"] = perarcmin2_to_perrad2(config["number_density_shear_arcmin2"])
         config["number_density_lss_rad2"] = perarcmin2_to_perrad2(config["number_density_lss_arcmin2"])        
-        config['sigma_e'] = get_arr("sigma_e")
+        if (options.has_value(option_section, 'sigma_e') 
+            and not options.has_value(option_section, 'sigma_e_total')):
+            raise ValueError("""The parameter sigma_e should now be specified as sigma_e_total instead.
+The input value should be sigma_e_total = sqrt(2) * sigma_e_per_component""")
+
+        config['sigma_e_total'] = get_arr("sigma_e_total")
         config['fsky'] = options[option_section, "fsky"] 
         config['fsky_cmblensing'] = options.get_double(option_section, "fsky_cmblensing",config["fsky"])
         config['cmblensing_noisecurve'] = options.get_string(option_section, "cmblensing_noisecurve","")
@@ -216,6 +229,7 @@ def execute(block, config):
     overwrite = config['overwrite']
 
     make_covariance = config['make_covariance']
+    copy_covariance = config['copy_covariance']
 
     print("Saving two-point data to {}".format(filename))
 
@@ -231,7 +245,7 @@ def execute(block, config):
     #If we're generating the covariance for real space spectra, also 
     #generate a TheorySpectrum for the corresponding Cl.
     print("Generating twopoint file with the following spectra:")
-    print(config['spectrum_sections'])
+    print("    ", config['spectrum_sections'])
     for i_spec in range( len(config["spectrum_sections"]) ):
         spectrum_section = config["spectrum_sections"][i_spec]
         output_extension = config["output_extensions"][i_spec]
@@ -320,22 +334,26 @@ def execute(block, config):
                 if (cl_spec.types[0] == cl_spec.types[1]):
                     if cl_spec.types[0].name == "galaxy_shear_emode_fourier":
                         noise = ([ (s**2 / 2 / n) for (s,n) in 
-                                 zip(config['sigma_e'],config['number_density_shear_rad2']) ])
+                                 zip(config['sigma_e_total'],config['number_density_shear_rad2']) ])
                     elif cl_spec.types[0].name == "galaxy_position_fourier":
                         noise = [ 1./n for n in config['number_density_lss_rad2'] ]
                     elif cl_spec.types[0].name == "cmb_kappa_emode_fourier": #added by Lukas
                         class Noise_cmb():
                             def __init__(self, filename):
-                                self.cov=np.loadtxt(filename)
+                                data=np.loadtxt(filename)   
+                                self.ell = data[:,0]
+                                self.noise = data[:,1]
                             def __call__(self, l):
-                                return np.interp(l, self.cov[:,0], self.cov[:,1])
+                                return np.interp(l, self.ell, self.noise)
                         noise_cmb = Noise_cmb(config["cmblensing_noisecurve"])
                         noise = [noise_cmb]#[ 3.e-8 ]
                     else:
                         print("Tried to, but can't generate noise for spectrum %s"%cl_section)
                         raise ValueError
                     cl_spec.set_noise(noise)
+
                 cl_specs.append( cl_spec )
+
         cl_cov = ClCov(cl_specs, fsky=config['fsky'], fsky_cmb=config['fsky_cmblensing'])
 
         if real_space:
@@ -360,7 +378,6 @@ def execute(block, config):
             #build gaussian covariance
             #note there is no check here if the covariance matrix is saved in the right order...
             covmat, cl_lengths = cl_cov.get_binned_cl_cov(config['angle_lims'])
-
             assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
             covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list],
                                                          [len(s.value) for s in spec_meas_list], covmat )
@@ -378,6 +395,19 @@ def execute(block, config):
         
         assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
         covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list], [len(s.value) for s in spec_meas_list], covmat )
+    elif copy_covariance:
+        parent_file = twopoint.TwoPointFile.from_fits(copy_covariance)
+        # check that covariances match
+        for s1, s2 in zip(spec_meas_list, parent_file.spectra):
+            if s1.name != s2.name:
+                raise ValueError("Different spectrum order in parent file")
+            if len(s1) != len(s2):
+                raise ValueError("Different spectrum lengths in parent file")
+            if not ((s1.bin1 == s2.bin1).all() and (s1.bin2 == s2.bin2).all()):
+                raise ValueError("Different tomo bin order in parent file")
+            if not (s1.angular_bin == s2.angular_bin).all():
+                raise ValueError("Different angular bin order in parent file")
+        covmat_info = parent_file.covmat_info
     else:
         covmat_info = None
 

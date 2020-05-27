@@ -313,7 +313,7 @@ class SpectrumMeasurement(object):
         b1, b2 = bin_pair
         mask = (self.bin1 == b1) * (self.bin2 == b2)
         if (mask.sum() == 0) and complain:
-            raise ValueError("""You tried to cut bin pair %d,%d from spectrum named %s
+            raise ValueError("""You tried to cut bin pair %d,%d from spectrum named %s 
                              but it doesn't exist""" % (b1, b2, self.name))
         elif mask.sum() > 0:
             self.bin_pairs.remove(bin_pair) #python list! can not easily use the mask
@@ -520,7 +520,7 @@ class CovarianceMatrixInfo(object):
     @classmethod
     def from_spec_lists(cls, spec_lists, cov_name, mode='full'):
         """Often the covariance will be computed by measuring the statistic(s) in question
-        on many simulated realisations of the dataset. This function takes a list of such
+        on many simulated realisations of the dataset. This function takes a list of such 
         measurements, *each one a list SpectrumMeasurement objects*, computes the mean and covariance, and
         returns the mean as a list of SpectrumMeasurements, and the covariance as a CovarianceMatrixInfo
         object. mode should be one of full, subsample or jackknife"""
@@ -669,7 +669,6 @@ class TwoPointFile(object):
         mask_points = np.array(indices)
         masks = []
         for s in self.spectra:
-            print("len", len(s))
             mask = np.ones(len(s), dtype=bool)
             if s.name == spectrum_name:
                 mask[mask_points] = False
@@ -878,7 +877,7 @@ class TwoPointFile(object):
 
     def plots(self, root, colormap='viridis', savepdf=False, latex=True, plot_spectrum=True, plot_kernel=True, plot_cov=True, cov_vmin=None, save_pickle=False, load_pickle=False, remove_pickle=True, label_legend='', blind_yaxis=False, callback=None):
         """
-        Makes plot of each for your spectra, kernels and covariance. Allows you to compare the spectra of different files.
+        Makes plot of each for your spectra, kernels and covariance. Allows you to compare the spectra of different files. 
         Options:
         - root: Name of the output plots.
         - colormap: Colormap used for the plots.
@@ -891,7 +890,7 @@ class TwoPointFile(object):
         - load_pickle: if true, it will continue the plot starting from a pickle file.
         - remove_pickle: set to true if you want to keep this file to edit your plot afterwards.
         - label_legend: name that will appear in the legend when comparing different files.
-        - blind_axis: True if you want to remove the y-axis labels.
+        - blind_axis: True if you want to remove the y-axis labels. 
         """
 
         import matplotlib.pyplot as plt
@@ -1094,7 +1093,7 @@ class TwoPointFile(object):
 
 class SpectrumCovarianceBuilder(object):
     """
-    This class helps you ensure that the ordering between a set of data points and
+    This class helps you ensure that the ordering between a set of data points and 
     their covariance is consistently maintained.  You add data points to it one by one.,
     in the order that they appear in the covariance.
 
@@ -1203,7 +1202,7 @@ class SpectrumCovarianceBuilder(object):
             spectra.append(spectrum)
 
         reordered_covariance = covariance[master_index_vector][:, master_index_vector]
-        covmat_info = CovarianceMatrixInfo("COVMAT", [s.name for s in spectra],
+        covmat_info = CovarianceMatrixInfo("COVMAT", [s.name for s in spectra], 
                                            [len(s) for s in spectra], reordered_covariance)
 
         return spectra, covmat_info

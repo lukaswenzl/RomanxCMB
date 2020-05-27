@@ -1,9 +1,9 @@
-from __future__ import print_function
+from __future__ import print_function, division
 import numpy as np
 import twopoint
 from twopoint_cosmosis import type_table
 from scipy.interpolate import interp1d
-#We need to use the legendre module in
+#We need to use the legendre module in 
 #cosmosis-standard-library/shear/cl_to_xi_fullsky
 import sys
 import os
@@ -73,7 +73,7 @@ class TheorySpectrum(object):
     """Tomographic theory spectrum
     noise_var is a the noise variance per mode for each redshift bin
     """
-    def __init__( self, name, types, nbin_a, nbin_b, angle_vals,
+    def __init__( self, name, types, nbin_a, nbin_b, angle_vals, 
         spec_interps, is_auto, noise_var_per_mode=None):
         self.name = name
         self.types = types
@@ -124,7 +124,7 @@ class TheorySpectrum(object):
         type_names, type_info = type_names_list[type_index], type_info_list[type_index]
 
         bin_format = type_info[-1]
-        types = (  getattr(twopoint.Types, type_names[0]),
+        types = (  getattr(twopoint.Types, type_names[0]), 
                    getattr(twopoint.Types, type_names[1])  )
 
         # for cross correlations we must save bin_ji as well as bin_ij.
@@ -159,7 +159,7 @@ class TheorySpectrum(object):
                 # Convert arcmin to radians for the interpolation
                 spec_interps[ (i, j) ] = SpectrumInterp( sep_values, spec )
 
-        return cls( spectrum_name, types, nbin_a, nbin_b, sep_values,
+        return cls( spectrum_name, types, nbin_a, nbin_b, sep_values, 
             spec_interps, is_auto )
 
     def get_spectrum_measurement( self, angle_vals, kernels, output_name,
@@ -179,7 +179,7 @@ class TheorySpectrum(object):
         else:
             angle_min, angle_max = None, None
         n_angle_sample = len(angle_vals)
-
+ 
         #If real-space, get angle_vals in radians for interpolation
         if angle_units is not None:
             angle_vals_with_units = angle_vals * twopoint.ANGULAR_UNITS[angle_units]
@@ -217,7 +217,7 @@ class TheorySpectrum(object):
 
         # Build the output object type reqired.
         s = twopoint.SpectrumMeasurement(output_name, bins, self.types, kernels, windows,
-                                         angular_bin, value, angle=angle,
+                                         angular_bin, value, angle=angle, 
                                          angle_unit=angle_units, angle_min=angle_min,
                                          angle_max=angle_max )
         return s
@@ -281,7 +281,7 @@ def get_types(cl_name):
         if cl_name == type_info[0]:
             break
     bin_format = type_info[-1]
-    types = (  getattr(twopoint.Types, type_names[0]),
+    types = (  getattr(twopoint.Types, type_names[0]), 
                getattr(twopoint.Types, type_names[1])  )
     return types
 
@@ -290,7 +290,7 @@ def downsample_block( angle_lims_orig, angle_mids_orig, cov_orig, n_out ):
     #weight by dtheta*angle_mid (weighting by n_pairs geometric expectation)
     dtheta = angle_lims_orig[1:]-angle_lims_orig[:-1]
     assert cov_orig.shape[0]%n_out == 0
-    norig_per_nout = cov_orig.shape[0]/n_out
+    norig_per_nout = cov_orig.shape[0]//n_out
     cov_out = np.zeros( (n_out, n_out) )
     angle_mids_out = np.zeros( n_out )
     weights = angle_mids_orig * dtheta
@@ -330,16 +330,21 @@ class ClCov( object ):
         c_ij_12 = self.theory_spectra[ self.names.index(name1) ]
         c_kl_34 = self.theory_spectra[ self.names.index(name2) ]
 
-
-        cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals,
+        cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals, 
             noise_only=noise_only )
-        if(name1 == "cmbkappa_cl" and name2 == "cmbkappa_cl"):
-            print("We are assuming fsky_cmb is larger than fsky so it only is viable for the cmblensing auto covariance.")
-            n_modes = self.fsky_cmb * (2*ell_vals+1)
+        n_modes = (2*ell_vals+1)
+        if(name1 == "cmbkappa_cl"):
+            print("We are applying a different fsky for cmb lensing. This still needs to be tested")
+            n_modes = np.sqrt(self.fsky_cmb) * n_modes
         else:
-            n_modes = self.fsky * (2*ell_vals+1)
-        cov_diag  = ( cl2_sum ) / n_modes
-        return cov_diag
+            n_modes = np.sqrt(self.fsky) * n_modes
+        if(name2 == "cmbkappa_cl"):
+            print("We are applying a different fsky for cmb lensing. This still needs to be tested")
+            n_modes = np.sqrt(self.fsky_cmb) * n_modes
+        else:
+            n_modes = np.sqrt(self.fsky) * n_modes
+        cov_diag  = ( cl2_sum ) / n_modes  
+        return cov_diag  
 
     def get_cl2sum_ijkl( self, c_ij_12, c_kl_34, ij, kl, ells, noise_only=False):
         #Get the spectra C^{ik}_{13}, C^{jl}_{24}, C^{il}_{14}, C^{kl}_{23}
@@ -360,7 +365,7 @@ class ClCov( object ):
             t1, t2 = type_pair
             types = (t1, t2)
             if types not in self.types:
-                #If we don't have a spectra with these types, we probably
+                #If we don't have a spectra with these types, we probably 
                 #have an equivalent one with the types the other way round.
                 #In this case, we also need to swap bin1 and bin2, because
                 #we are accessing e.g. C^{ik}_{13} via C^{ki}_{31}.
@@ -375,7 +380,7 @@ class ClCov( object ):
 
     def get_binned_cl_cov( self, ell_lims, noise_only=False):
         #-Build a binned C(l) covariance
-        #-Assume the measured C(l) for bin i is the (2l+1)-weighted average
+        #-Assume the measured C(l) for bin i is the (2l+1)-weighted average 
         #of C(ell_lims[i],...,ell_lims[i+1]-1)
         #First construct the output array
         n_spectra = len(self.theory_spectra)
@@ -410,8 +415,8 @@ class ClCov( object ):
                         else:
                             #First calculate the unbinned Cl covariance
                             ell_max = ell_lims[-1]
-                            cl_var_unbinned = self.get_cov_diag_ijkl( cl_spec_i.name,
-                                cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max,
+                            cl_var_unbinned = self.get_cov_diag_ijkl( cl_spec_i.name, 
+                                cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max, 
                                 ell_min=ell_lims[0], noise_only=noise_only )
                             #Now bin this diaginal covariance
                             #Var(binned_cl) = Sum_i Var(C(l_i)) / (# of ell in bin)^2
@@ -422,25 +427,14 @@ class ClCov( object ):
                                 #Get the indices in cl_var_binned these correspond to:
                                 ell_vals_bin_inds = ell_vals_bin - ell_lims[0]
                                 cl_var_unbinned_bin = cl_var_unbinned[ell_vals_bin_inds]
-                                #cl_var_binned[ell_bin] = (np.sum((2*ell_vals_bin+1) * cl_var_unbinned_bin)
-                                #    / np.sum(2*ell_vals_bin+1))
-                                #lukas edit
-                                # print("cosmosis")
-                                # print(cl_var_binned[ell_bin])
-                                # print(np.sum((2*ell_vals_bin+1)**2 *cl_var_unbinned_bin) / np.sum(2*ell_vals_bin+1)**2)
-                                # print("my math approximately same as comment:")
-                                # print(np.mean(cl_var_unbinned_bin)/(ell_high-ell_low))
-                                # print("or in the same way:")
-                                # print(np.sum(cl_var_unbinned_bin)/(ell_high-ell_low)**2)
-                                #major error correction in cosmosis
-                                cl_var_binned[ell_bin] = np.sum((2*ell_vals_bin+1)**2 *cl_var_unbinned_bin) / np.sum(2*ell_vals_bin+1)**2
+                                cl_var_binned[ell_bin] = np.sum((2*ell_vals_bin+1)**2 * cl_var_unbinned_bin) / np.sum(2*ell_vals_bin+1)**2
                             cov_blocks[i_bp, j_bp] = cl_var_binned
 
                         #Now work out where this goes in the full covariance matrix
                         #and add it there.
-                        inds_i = np.arange( cl_starts[i_cl] + n_ell*i_bp,
+                        inds_i = np.arange( cl_starts[i_cl] + n_ell*i_bp, 
                             cl_starts[i_cl] + n_ell*(i_bp+1) )
-                        inds_j = np.arange( cl_starts[j_cl] + n_ell*j_bp,
+                        inds_j = np.arange( cl_starts[j_cl] + n_ell*j_bp, 
                             cl_starts[j_cl] + n_ell*(j_bp+1) )
                         cov_inds = np.ix_( inds_i, inds_j )
                         covmat[ cov_inds ] = np.diag(cl_var_binned)
@@ -448,15 +442,12 @@ class ClCov( object ):
                         covmat[ cov_inds_T ] = np.diag(cl_var_binned)
 
         print("Completed covariance")
-        print("slog det:", np.linalg.slogdet(covmat))
-        print("Turned of calculation of condidtion number, because it takes too long.")
-        #print("condition number:", np.linalg.cond(covmat)) CHANGE BACK Lukas
-        print(covmat)
-
+        print("   Signed log det:", np.linalg.slogdet(covmat))
+        print("   Condition number:", np.linalg.cond(covmat))
         return covmat, cl_lengths
 
 
-def real_space_cov( cl_cov, cl_specs, cl2xi_types, ell_max, angle_lims_rad,
+def real_space_cov( cl_cov, cl_specs, cl2xi_types, ell_max, angle_lims_rad, 
     upsample=None, high_l_filter=0.75, noise_only=False ):
     """
     Compute real space covariance given cl covariance
@@ -502,7 +493,7 @@ def real_space_cov( cl_cov, cl_specs, cl2xi_types, ell_max, angle_lims_rad,
             #Now loop through bin pairs for each spectrum
             #The calculation for each pair of bin_pairs is done via matrix multiplication...maybe
             #we could speed things up by replacing the below for loops with more matrix multiplication,
-            #although it may be that the slow part is calculating the Cls, for which we need
+            #although it may be that the slow part is calculating the Cls, for which we need 
             #for loops anyway...
             for i_bp, bin_pair_i in enumerate(cl_spec_i.bin_pairs):
                 for j_bp, bin_pair_j in enumerate(cl_spec_j.bin_pairs):
@@ -510,24 +501,26 @@ def real_space_cov( cl_cov, cl_specs, cl2xi_types, ell_max, angle_lims_rad,
                     print(cl_spec_i.name, cl_spec_j.name)
                     #Check if we've already done this combo
                     #We've already done it if its an auto-correlation i.e. i_xi==j_xi and
-                    #j_bp is less than i_bp
+                    #j_bp is less than i_bp 
                     if (i_xi == j_xi) and cl_spec_i.is_auto and ( j_bp < i_bp ):
                         cov_blocks[i_xi, j_xi, i_bp, j_bp] = cov_blocks[i_xi, j_xi, j_bp, i_bp]
                     else:
                         #Get the full cl covariance, and the pure noise part - we're going to transform
                         #the latter analytically...
-                        cl_cov_block = cl_cov.get_cov_diag_ijkl( cl_spec_i.name, cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max,
+                        cl_cov_block = cl_cov.get_cov_diag_ijkl( cl_spec_i.name, 
+                            cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max, 
                             noise_only=noise_only )
-                        cl_cov_noise_noise = cl_cov.get_cov_diag_ijkl( cl_spec_i.name, cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max, noise_only=True )
-                        cl_cov_block_signal_mixed = cl_cov_block - cl_cov_noise_noise
-                        xi_cov_block_signal_mixed_upsampled = np.matmul( F_i_l,
-                                                              np.matmul( np.diag(cl_cov_block_signal_mixed),
+                        cl_cov_noise_noise = cl_cov.get_cov_diag_ijkl( cl_spec_i.name, 
+                            cl_spec_j.name, bin_pair_i, bin_pair_j, ell_max, noise_only=True )
+                        cl_cov_block_signal_mixed = cl_cov_block - cl_cov_noise_noise 
+                        xi_cov_block_signal_mixed_upsampled = np.matmul( F_i_l, 
+                                                              np.matmul( np.diag(cl_cov_block_signal_mixed), 
                                                               F_j_l.T ) )
-                        #For the analytic calculation, we use the fact that
+                        #For the analytic calculation, we use the fact that 
                         #\int l J_nu(l theta) J_nu(l theta) = 1/theta.
-                        #The noise term is
+                        #The noise term is 
                         #(1/4 pi^2) \int dtheta \int l J_nu(l theta) J_nu(l theta) * noise = noise / theta / 4pi^2
-                        noise = cl_cov_noise_noise[0] #This is 2*cl_noise^2/fsky.
+                        noise = cl_cov_noise_noise[0] #This is 2*cl_noise^2/fsky. 
                         #if shear-shear, we need to multiply this noise by 2, since we have noise from both E and B-modes.
                         #Feel like a hack adding it at this stage...maybe there is a more motivated way...
                         if (cl2xi_i==cl2xi_j) and (cl2xi_i in ["22+","22-"]):
@@ -540,7 +533,7 @@ def real_space_cov( cl_cov, cl_specs, cl2xi_types, ell_max, angle_lims_rad,
                         # = 8 * pi^2 * theta * dtheta / (2 * cl_noise^2 / fsky)
                         # = 8 * pi^2 * theta * dtheta / noise
                         xi_cov_block_noise_noise_diag = (noise/angle_mids_rad/(8*np.pi*np.pi)/dangle )
-                        xi_cov_block_signal_mixed, angle_mids = downsample_block( angle_lims_rad_upsampled,
+                        xi_cov_block_signal_mixed, angle_mids = downsample_block( angle_lims_rad_upsampled, 
                             angle_mids_rad_upsampled, xi_cov_block_signal_mixed_upsampled, ntheta )
                         xi_cov_block = xi_cov_block_signal_mixed + np.diag(xi_cov_block_noise_noise_diag)
                         cov_blocks[i_xi, j_xi, i_bp, j_bp] = xi_cov_block
