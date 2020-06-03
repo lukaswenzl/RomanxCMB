@@ -46,12 +46,16 @@ def get_scales( x_min, x_max, nbins, logspaced=True, integer_lims=False, two_thi
 
     return lims, mids
 
-def get_ell_scales( ell_min, ell_max, nbins, logspaced=True, two_thirds_midpoint=False):
+def get_ell_scales( ell_min, ell_max, nbins, logspaced=True, two_thirds_midpoint=False, ell_as_int=True):
     #ells should be integers. So get scales using get_scales and then 
     #convert
     lims, mids = get_scales( ell_min, ell_max, nbins, logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint)
-    ell_lims = (np.floor(lims)).astype(int)
-    ell_mids = np.exp( 0.5 * ( np.log(ell_lims[1:]) + np.log(ell_lims[:-1]) ) )
+    if (ell_as_int):
+        ell_lims = (np.floor(lims)).astype(int)
+        ell_mids = np.exp( 0.5 * ( np.log(ell_lims[1:]) + np.log(ell_lims[:-1]) ) )
+    else:
+        ell_lims = lims 
+        ell_mids = mids
     return ell_lims, ell_mids
 
 def setup(options):
@@ -141,8 +145,9 @@ def setup(options):
         ell_max = options.get_int(option_section, "ell_max")
         n_ell = options.get_int(option_section, "n_ell")
         config["n_ell"] = n_ell
+        ell_as_int = options.get_bool(option_section, "force_ell_limits_to_be_integer", True)
         ell_lims, ell_mids = get_ell_scales( ell_min, ell_max, n_ell,
-            logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint)
+            logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint, ell_as_int=ell_as_int )
         config['angle_lims'] = ell_lims
         config['angle_mids'] = ell_mids
         config['angle_lims_userunits'] = config['angle_lims']
@@ -391,7 +396,7 @@ def execute(block, config):
             cl_theory_spec_list[spec_index].cut_bin_pair( (b1,b2) )
 
         #load external covariance
-        covmat = cosmolike_metadata.rearrange_cov(config["cosmolike_covariance"],spec_meas_list,"modules/WFIRSTxCMB/cosmolike_data/cov_indices_testruns_apr9.txt", config["n_ell"])
+        covmat = cosmolike_metadata.rearrange_cov(config["cosmolike_covariance"],spec_meas_list,config["cosmolike_metadata_file"], config["n_ell"])
         
         assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
         covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list], [len(s.value) for s in spec_meas_list], covmat )
