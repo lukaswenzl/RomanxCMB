@@ -309,7 +309,7 @@ class ClCov( object ):
     """
     Class for computing cl covariance
     """
-    def __init__(self, theory_spectra, fsky=1., fsky_cmb=-1):
+    def __init__(self, theory_spectra, fsky=1., fsky_cmb=-1, cov_calc_multiply_range_instead_of_sum=False):
         self.theory_spectra = theory_spectra
         self.types = [ t.types for t in self.theory_spectra ]
         self.names = [t.name for t in self.theory_spectra ]
@@ -318,6 +318,11 @@ class ClCov( object ):
             self.fsky_cmb = self.fsky
         else:
             self.fsky_cmb = fsky_cmb
+        self.cov_calc_multiply_range_instead_of_sum = cov_calc_multiply_range_instead_of_sum
+        if(cov_calc_multiply_range_instead_of_sum):
+            print("Calculating gaussian covariance matrix type 2")
+        else:
+            print("Calculating gaussian covariance matrix type 1")
 
     def get_cov_diag_ijkl( self, name1, name2, ij, kl, ell_max, ell_min=0, noise_only=False):
         # From Joachimi & Bridle 2010 0911.2454
@@ -333,13 +338,13 @@ class ClCov( object ):
         cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals, 
             noise_only=noise_only )
         n_modes = (2*ell_vals+1)
+        if(self.fsky != self.fsky_cmb):
+            print("We are applying a different fsky for cmb lensing. This still needs to be tested or shown!")
         if(name1 == "cmbkappa_cl"):
-            print("We are applying a different fsky for cmb lensing. This still needs to be tested")
             n_modes = np.sqrt(self.fsky_cmb) * n_modes
         else:
             n_modes = np.sqrt(self.fsky) * n_modes
         if(name2 == "cmbkappa_cl"):
-            print("We are applying a different fsky for cmb lensing. This still needs to be tested")
             n_modes = np.sqrt(self.fsky_cmb) * n_modes
         else:
             n_modes = np.sqrt(self.fsky) * n_modes
@@ -428,6 +433,14 @@ class ClCov( object ):
                                 ell_vals_bin_inds = ell_vals_bin - ell_lims[0]
                                 cl_var_unbinned_bin = cl_var_unbinned[ell_vals_bin_inds]
                                 cl_var_binned[ell_bin] = np.sum((2*ell_vals_bin+1)**2 * cl_var_unbinned_bin) / np.sum(2*ell_vals_bin+1)**2
+                                if(self.cov_calc_multiply_range_instead_of_sum):
+                                    #instead of summing over the l we could instead multiply by the range, this is a hack and should not used be used for science results
+                                    exact_lims = np.exp(np.linspace( np.log(30), np.log(3000), 20+1 ))
+                                    exact_middle = np.exp(0.5* (np.log(exact_lims[ell_bin+1]) + np.log(exact_lims[ell_bin])))
+                                    middle = int(np.exp(0.5*(np.log(ell_low)+np.log(ell_high))))
+                                    middle_idx = middle-ell_lims[0]
+                                    cl_middle = np.interp(exact_middle, [middle, middle+1], [cl_var_unbinned[middle_idx], cl_var_unbinned[middle_idx+1]])
+                                    cl_var_binned[ell_bin] = cl_middle / (exact_lims[ell_bin+1]-exact_lims[ell_bin])
                             cov_blocks[i_bp, j_bp] = cl_var_binned
 
                         #Now work out where this goes in the full covariance matrix
@@ -443,7 +456,7 @@ class ClCov( object ):
 
         print("Completed covariance")
         print("   Signed log det:", np.linalg.slogdet(covmat))
-        print("   Condition number:", np.linalg.cond(covmat))
+        #print("   Condition number:", np.linalg.cond(covmat))
         return covmat, cl_lengths
 
 

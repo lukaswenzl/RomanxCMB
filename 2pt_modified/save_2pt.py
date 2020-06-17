@@ -146,6 +146,7 @@ def setup(options):
         n_ell = options.get_int(option_section, "n_ell")
         config["n_ell"] = n_ell
         ell_as_int = options.get_bool(option_section, "force_ell_limits_to_be_integer", True)
+        config["cov_calc_multiply_range_instead_of_sum"] = options.get_bool(option_section, "cov_calc_multiply_range_instead_of_sum", False)
         ell_lims, ell_mids = get_ell_scales( ell_min, ell_max, n_ell,
             logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint, ell_as_int=ell_as_int )
         config['angle_lims'] = ell_lims
@@ -347,6 +348,7 @@ def execute(block, config):
                             def __init__(self, filename):
                                 data=np.loadtxt(filename)   
                                 self.ell = data[:,0]
+                                #note that the noise file does not have to be rescaled to some full sky value
                                 self.noise = data[:,1]
                             def __call__(self, l):
                                 return np.interp(l, self.ell, self.noise)
@@ -359,7 +361,7 @@ def execute(block, config):
 
                 cl_specs.append( cl_spec )
 
-        cl_cov = ClCov(cl_specs, fsky=config['fsky'], fsky_cmb=config['fsky_cmblensing'])
+        cl_cov = ClCov(cl_specs, fsky=config['fsky'], fsky_cmb=config['fsky_cmblensing'], cov_calc_multiply_range_instead_of_sum=config["cov_calc_multiply_range_instead_of_sum"])
 
         if real_space:
 

@@ -1,0 +1,40 @@
+name: "high_z_power"
+version: "1.0"
+purpose: "Extrapolate power spectrum to high z with growth function"
+url: ""
+interface: highz_z_power.py
+attribution: ["DES collaboration"]
+rules: "None."
+cite: []
+
+assumptions:
+    - "halofit and growth modules aready ran"
+    - "needs to find the power spectrum in the datavector"
+
+explanation: |
+    "This module takes the power spectrum from the datavector and extrapolates it to higher redshift.
+
+    "
+
+# List of parameters that can go in the params.ini file in the section for this module    
+params:
+    data_file: "string. Filename of the 2pt format FITS file to use."
+    sections: "Specify which matter power spectra should be extrapolated, Default matter_power_nl"
+    zmax: "Redshift to which we want to extrapolate to."
+    nz: "Number of log spaced redshift samples from max redshift of input power spectrum to new maximum redshift."
+    verbose: "Set to True to get more console output from the module"
+
+inputs:
+    matter_power_nl:
+        k_h: "real 1D array, sample values of nonlinear spectrum in Mpc/h"
+        z: "real 1D array, redshift of nonlinear spectrum samples"
+        P_k: "real 2D array, nonlinear spectrum in (Mpc/h)^{-3}"
+
+outputs:
+    matter_power_nl:
+        k_h: "real 1D array, sample values of nonlinear spectrum in Mpc/h"
+        z: "real 1D array, redshift of nonlinear spectrum samples"
+        P_k: "real 2D array, nonlinear spectrum in (Mpc/h)^{-3}"
+    growth_parameters:
+        z: "real 1D array, redshift of nonlinear spectrum samples"
+        d_z: "1D real array, linear growth factor D"
