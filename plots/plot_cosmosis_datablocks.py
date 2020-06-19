@@ -5,7 +5,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 output = "example/"
-path_to_datablocks = "../../../6x2pt_WFIRST_SO_plot_naive_cmbkappa/"
+path_to_datablocks = "../../../6x2pt_Roman_SO/"
 
 def plot(folder_prefix, name, label, factor = True, absolute=False):
     Cl = np.loadtxt("{}/{}.txt".format(path_to_datablocks+folder_prefix,name))

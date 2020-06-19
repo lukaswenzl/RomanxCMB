@@ -1,5 +1,5 @@
-# WFIRSTxCMB
-WFIRST x CMB Forecast
+# RomanxCMB
+Nancy Grace Roman Space Telescope x CMB Forecast
 
 work in progress
 
@@ -8,19 +8,19 @@ work in progress
 Create a datavector with gaussian covaraince matrix build directly with cosmosis
 
 ```
-cosmosis modules/WFIRSTxCMB/create_datavector_gaussian_covariance.ini
+cosmosis modules/RomanxCMB/create_datavector_gaussian_covariance.ini
 ```
 
 Create datavector using covariance matrix from cosmolike
 
 ```
-cosmosis modules/WFIRSTxCMB/create_datavector.ini
+cosmosis modules/RomanxCMB/create_datavector.ini
 ```
 
 Run forecast
 
 ```
-cosmosis modules/WFIRSTxCMB/params.ini
+cosmosis modules/RomanxCMB/params.ini
 ```
 
 
@@ -40,14 +40,14 @@ covariance matrix and other large files are not included
 # How to use
 * written as a module for CosmoSIS. Clone github into modules/
 
-* Also create a folder 6x2pt_WFIRST_SO in your cosmosis home directory.
-mkdir 6x2pt_WFIRST_SO
+* Also create a folder 6x2pt_Roman_SO in your cosmosis home directory.
+mkdir 6x2pt_Roman_SO
 
 
 * you have to add the module the makefile
 nano modules/Makefile.modules
 then add:
-SUBDIRS+=WFIRSTxCMB
+SUBDIRS+=RomanxCMB
 and save
 
 

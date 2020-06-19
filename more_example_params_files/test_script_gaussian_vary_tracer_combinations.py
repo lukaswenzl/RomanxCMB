@@ -19,7 +19,7 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 #written for v0.1
-#run with mpirun -n 14 python modules/WFIRSTxCMB/script_gaussian_vary_tracer_combinations.py
+#run with mpirun -n 14 python modules/RomanxCMB/script_gaussian_vary_tracer_combinations.py
 from mpi4py import MPI #without this line mpi won't work but if mpi is not installed there will be an error: can also run without it
 
 
@@ -30,12 +30,12 @@ runs = []
 output = "6x2pt.txt"
 # Create the configuration based on a file.
 override = {}
-override[("output", "filename")] = output_folder + "6x2pt_WFIRST_SO_gaussian-chain.txt"
-#override[("pipeline", "values")] = "modules/WFIRSTxCMB/values_few_variables.ini" 
+override[("output", "filename")] = output_folder + "6x2pt__SO_gaussian-chain.txt"
+#override[("pipeline", "values")] = "modules/RomanxCMB/values_few_variables.ini" 
 #override[("pipeline", "priors")] = ""
 
 
-ini = Inifile("modules/WFIRSTxCMB/params_gaussian_covariance.ini", override = override)
+ini = Inifile("modules/RomanxCMB/params_gaussian_covariance.ini", override = override)
 
 # Build the likelihood pipeline based on the config
 pipeline = LikelihoodPipeline(ini)
@@ -77,10 +77,10 @@ runs.append({"label":"test", "output":output, "ini":ini})
 # output = "gg.txt"
 
 # override = {}
-# override[("output", "filename")] = output_folder + "6x2pt_WFIRST_SO_gaussian-chain.txt"
-# override[("pipeline", "values")] = "modules/WFIRSTxCMB/values_few_variables.ini" 
+# override[("output", "filename")] = output_folder + "6x2pt__SO_gaussian-chain.txt"
+# override[("pipeline", "values")] = "modules/RomanxCMB/values_few_variables.ini" 
 # override[("pipeline", "priors")] = ""
-# ini2 = Inifile("modules/WFIRSTxCMB/params_gaussian_covariance.ini", override={("DEFAULT", "2pt_data_sets"):"test"})
+# ini2 = Inifile("modules/RomanxCMB/params_gaussian_covariance.ini", override={("DEFAULT", "2pt_data_sets"):"test"})
 # pipeline = LikelihoodPipeline(ini)
 # output = TextColumnOutput(output_folder + output)
 # sampler = FisherSampler(ini, pipeline, output)

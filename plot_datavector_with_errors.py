@@ -13,7 +13,7 @@ from matplotlib.patches import Rectangle
 
 
 #cosmosis covariance, assuming fsky 0.05 throughout
-filename = "6x2pt_WFIRST_SO_gaussian.fits"
+filename = "6x2pt_Roman_SO_gaussian.fits"
 outputfolder = ""
 
 def make_error_boxes(ax, xdata, ydata, xerror, yerror, facecolor='r',

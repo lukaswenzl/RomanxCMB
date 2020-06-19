@@ -1,12 +1,12 @@
 # script to match cosmosis and cosmolike
-# part of 6x 2pt forecast for WFIRST_SO
+# part of 6x 2pt forecast for Roman_SO
 # determine bin cuts
 # Author Lukas Wenzl
 
 
 import numpy as np
 
-def load_covariance_metadata(filename="modules/WFIRSTxCMB/cosmolike_data/cov_indices_testruns_apr9.txt"):
+def load_covariance_metadata(filename="modules/RomanxCMB/cosmolike_data/cov_indices_testruns_apr9.txt"):
     #index starts at 0 for cosmlike
     info = np.genfromtxt(filename, delimiter=" ", dtype=None, names=("cov_idx","ell_idx","ell", "bin1","bin2","tracers"))
 

@@ -195,7 +195,7 @@ def test():
     phi_red = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)###
 
     m_lim = 27.5 
-    print("testing with m_lim = 27.5 in r band for WFIRST HLS survey as in Krause et al 2016")
+    print("testing with m_lim = 27.5 in r band for Roman HLS survey as in Krause et al 2016")
     L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="Sa")
     L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="E")
 
