@@ -17,9 +17,9 @@ def load_cov(filename, name):
 
 
 print("not final")
-g_cosmolike = load_cov("../6x2pt_WFIRST_SO_g_cosmolike_v0_3_1996900.fits", "g cosmolike")
-g1 = load_cov("../6x2pt_WFIRST_SO_gaussian.fits", "g cosmosis type1 (sum l bins)")
-g2 = load_cov("../6x2pt_WFIRST_SO_gaussian_type2.fits", "g cosmosis type2 (multiply delta l)")
+g_cosmolike = load_cov("../6x2pt_WFIRST_SO_g_cosmolike_v0_4_02887fd.fits", "g cosmolike")
+g1 = load_cov("../6x2pt_WFIRST_SO_gaussian_v0_4_02887fd.fits", "g cosmosis type1 (sum l bins)")
+g2 = load_cov("../6x2pt_WFIRST_SO_gaussian_type2_v0_4_02887fd.fits", "g cosmosis type2 (multiply delta l)")
 
 
 
@@ -50,7 +50,7 @@ plt.legend()
 plt.ylabel("Diagonal log Cov")
 plt.xlabel("Index of covariance")
 
-plt.savefig("v0_4_compare_diag_logspace.png")
+##plt.savefig("v0_4_compare_diag_logspaceRAW.png")
 ##########################
 plt.figure(figsize=(20,5))
 plt.title("ratio")
@@ -73,4 +73,4 @@ plt.ylabel("Diagonal Cov ratio")
 plt.xlabel("Index of covariance")
 plt.legend()
 
-plt.savefig("v0_4_compare_diag_ratio.png")
+##plt.savefig("v0_4_compare_diag_ratioRAW.png")

@@ -1,7 +1,9 @@
 *.fits
-*.txt
 *.pdf
 .vscode
+#cosmolike files
+cosmolike_data/*.txt
+!cosmolike_data/cov_indices_apr9.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
