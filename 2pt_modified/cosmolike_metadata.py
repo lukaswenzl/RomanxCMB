@@ -22,6 +22,8 @@ def load_covariance_metadata(filename="modules/RomanxCMB/cosmolike_data/cov_indi
     #calculate the identifier string
     tracers = {"ss":"shear_cl", "ls":"galaxy_shear_cl", "ll":"galaxy_cl", "lk":"galaxy_cmbkappa_cl", "sk":"shear_cmbkappa_cl", "kk":"cmbkappa_cl"}
     metadata_identifiers = np.array([tracers[i["tracers"]]+str(i["bin1"]+1)+str(i["bin2"]+1)+str(i["ell_idx"])  for i in info])
+    #tracers[i["tracers"].decode('utf-8')]
+    print("I might need to add a unicode conversion to load covariance metadata")
     return info, metadata_identifiers
 
 def build_metadata_for_cosmosis(spectra, n_ell,ignore_ells=False):

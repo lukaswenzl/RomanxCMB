@@ -86,7 +86,7 @@ function execute(block, config) result(status)
 
   call spline_cubic_set ( n_growth, zbins , dz, 2, 0.0, 2, 0.0, dz_interpolated )
 
-  if ( (abs(zbins(1) - settings%zmin) .gt. 0.1d0) .or. abs(zbins(n_growth)- settings%zmax).gt. 0.1d0 ) then
+  if ( (abs(zbins(1) - settings%zmin) .gt. 0.1d0) .or. (settings%zmax - zbins(n_growth)).gt. 0.1d0 ) then
 
      print*, "======================="
      print*,  " the chosen bounds of the growth module does not cover the entire redshift range requested for the power spectrum"
