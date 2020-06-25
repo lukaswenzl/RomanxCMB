@@ -4,6 +4,8 @@
 #cosmolike files
 cosmolike_data/*.txt
 !cosmolike_data/cov_indices_apr9.txt
+!cosmolike_data/readme.txt
+!cosmolike_data/WFIRST_area2.000000e+03_ng5.100000e+01_nl6.600000e+01_datavector_Ncl20_Ntomo10.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
