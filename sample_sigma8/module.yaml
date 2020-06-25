@@ -27,6 +27,9 @@ explanation: |
     and sigma_8 for the fiducial amplitude calculated, the CMB and matter power spectra
     are scaled by (sigma8_input**2)/(sigma8_boltzmann**2), and sigma_8 is overwritten.
 
+    Added option to get sigma8 from power spectrum since eisenstein and hu does not calculate
+    sigma8 for us.
+
 
 
 params: {}
