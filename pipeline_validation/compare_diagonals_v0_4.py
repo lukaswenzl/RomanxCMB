@@ -16,7 +16,6 @@ def load_cov(filename, name):
     return data
 
 
-print("not final")
 g_cosmolike = load_cov("../6x2pt_WFIRST_SO_g_cosmolike_v0_4_02887fd.fits", "g cosmolike")
 g1 = load_cov("../6x2pt_WFIRST_SO_gaussian_v0_4_02887fd.fits", "g cosmosis type1 (sum l bins)")
 g2 = load_cov("../6x2pt_WFIRST_SO_gaussian_type2_v0_4_02887fd.fits", "g cosmosis type2 (multiply delta l)")

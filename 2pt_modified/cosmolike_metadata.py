@@ -6,9 +6,9 @@
 
 import numpy as np
 
-def load_covariance_metadata(filename="modules/RomanxCMB/cosmolike_data/cov_indices_testruns_apr9.txt"):
+def load_covariance_metadata(filename="modules/RomanxCMB/cosmolike_data/cov_indices_apr9.txt"):
     #index starts at 0 for cosmlike
-    info = np.genfromtxt(filename, delimiter=" ", dtype=None, names=("cov_idx","ell_idx","ell", "bin1","bin2","tracers"))
+    info = np.genfromtxt(filename, delimiter=" ", dtype=None, names=("cov_idx","ell_idx","ell", "bin1","bin2","tracers"), encoding=None)
 
     #need to reverse ks -> sk
     idx = np.argwhere(info["tracers"]=="ks")
@@ -23,7 +23,6 @@ def load_covariance_metadata(filename="modules/RomanxCMB/cosmolike_data/cov_indi
     tracers = {"ss":"shear_cl", "ls":"galaxy_shear_cl", "ll":"galaxy_cl", "lk":"galaxy_cmbkappa_cl", "sk":"shear_cmbkappa_cl", "kk":"cmbkappa_cl"}
     metadata_identifiers = np.array([tracers[i["tracers"]]+str(i["bin1"]+1)+str(i["bin2"]+1)+str(i["ell_idx"])  for i in info])
     #tracers[i["tracers"].decode('utf-8')]
-    print("I might need to add a unicode conversion to load covariance metadata")
     return info, metadata_identifiers
 
 def build_metadata_for_cosmosis(spectra, n_ell,ignore_ells=False):
@@ -87,6 +86,26 @@ def rearrange_cov(cov_filename, spectra, metadata_filename, n_ell):
     cov = cov[:, reshape]
     return cov
 
+def rearange_cosmolike_datavec(filename, spectra, metadata_filename, n_ell=20):
+    #give the power spectra in the order of the cosmosis covariance
+    info, metadata_identifiers = load_covariance_metadata(metadata_filename)
+    filename= "../cosmolike_data/WFIRST_area2.000000e+03_ng5.100000e+01_nl6.600000e+01_datavector_Ncl20_Ntomo10.txt"
+    datavector = np.genfromtxt(filename, delimiter=" ", dtype=None, names=("spec_idx","ell", "bin1","bin2","cl"), encoding=None)
+    ell = datavector["ell"]
+    cl = datavector["cl"]
+
+    combinations, cosmosis_identifiers = build_metadata_for_cosmosis(spectra,n_ell, ignore_ells=False)
+
+    sort_cosmosis = np.argsort(cosmosis_identifiers)
+    unsort_cosmosis = np.argsort(sort_cosmosis)
+    sort_metadata = np.argsort(metadata_identifiers)
+    reshape = sort_metadata[unsort_cosmosis]
+
+    ell = ell[reshape]
+    cl = cl[reshape]
+    metadata_identifiers_new = metadata_identifiers[reshape]
+
+    return {"ell":ell, "cl":cl, "metadata_identifiers":metadata_identifiers_new, "cosmosis_identifiers":cosmosis_identifiers, "metadata_identifiers_original":metadata_identifiers}
 
 # info = load_covariance_metadata()
 # print(info)
