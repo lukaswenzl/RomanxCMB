@@ -326,6 +326,7 @@ class SpectrumCalculator(object):
         self.fatal_errors = options.get_bool(option_section, "fatal_errors", False)
         self.get_kernel_peaks = options.get_bool(option_section, "get_kernel_peaks", False)
         self.save_kernel_zmax = options.get_double(option_section, "save_kernel_zmax", -1.0)
+        self.set_offdiag_for_galaxycl_to_one = options.get_bool(option_section, "set_offdiag_for_galaxycl_to_one", False)#Lukas: saves a tiny bit of computation time
 
         # Check which spectra we are requested to calculate
         self.parse_requested_spectra(options)
@@ -662,17 +663,16 @@ class SpectrumCalculator(object):
             #for cross-correlations we must do both
             jmax = i+1 if spectrum.is_autocorrelation() else nb
             for j in range(jmax):
-                #can avoid calculating all galaxy cross spectra, but makes less than 2% difference in total time
-                #kernals are already calculated
-                # if (spectrum_name=="galaxy_cl" and i != j):
-                #     c_ell = np.zeros_like(self.ell)
-                # else:
-                #     c_ell = spectrum.compute( block, self.ell, i, j, 
-                #                           relative_tolerance=self.relative_tolerance, 
-                #                           absolute_tolerance=self.absolute_tolerance )
-                c_ell = spectrum.compute( block, self.ell, i, j, 
+                #Lukas: can avoid calculating all galaxy cross spectra
+                if (self.set_offdiag_for_galaxycl_to_one and spectrum_name=="galaxy_cl" and i != j):
+                    c_ell = np.zeros_like(self.ell)
+                else:
+                    c_ell = spectrum.compute( block, self.ell, i, j, 
                                           relative_tolerance=self.relative_tolerance, 
                                           absolute_tolerance=self.absolute_tolerance )
+                # c_ell = spectrum.compute( block, self.ell, i, j, 
+                #                           relative_tolerance=self.relative_tolerance, 
+                #                           absolute_tolerance=self.absolute_tolerance )
                 block[spectrum_name, 'bin_{}_{}'.format(i+1,j+1)] = c_ell
                 if self.get_kernel_peaks:
                     chi_peak, z_peak = spectrum.kernel_peak(block, i, j, self.a_of_chi)
