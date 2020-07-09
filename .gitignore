@@ -1,5 +1,5 @@
 *.fits
-*.pdf
+#*.pdf
 .vscode
 #cosmolike files
 cosmolike_data/*.txt
