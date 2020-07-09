@@ -37,18 +37,15 @@ def loop_comosis_datavector(two_point_data, n_ell=20):
     return {"cl":cl, "ell":ell, "bin1":bin1, "bin2":bin2, "names":names}
 
 
-filename = "../6x2pt_Roman_SO.fits"
+filename = "../6x2pt_WFIRST_SO_v0_5_8b4e5be.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_ehu = loop_comosis_datavector(two_point_data)
 
-filename = "../6x2pt_Roman_SO_camb.fits"
+filename = "../6x2pt_WFIRST_SO_camb_v0_5_8b4e5be.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_camb = loop_comosis_datavector(two_point_data)
 
 cosmolike = cosmolike_metadata.rearange_cosmolike_datavec(filename, two_point_data.spectra, "../cosmolike_data/cov_indices_apr9.txt")
-
-
-print("not final")
 
 
 
