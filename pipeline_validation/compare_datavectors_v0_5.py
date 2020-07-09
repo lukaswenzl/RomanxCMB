@@ -7,9 +7,13 @@ import astropy.io.fits as fits
 #from astropy import units as u
 #from astropy import constants as const
 
+
+plt.style.use(['science'])#,'no-latex'])
+
 #load cosmolike interface tools
 import sys
 sys.path.append('../2pt_modified/')
+
 import cosmolike_metadata
 import twopoint
 
@@ -35,9 +39,12 @@ def loop_comosis_datavector(two_point_data, n_ell=20):
 
 filename = "../6x2pt_Roman_SO.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
+cosmosis_ehu = loop_comosis_datavector(two_point_data)
 
+filename = "../6x2pt_Roman_SO_camb.fits"
+two_point_data = twopoint.TwoPointFile.from_fits(filename)
+cosmosis_camb = loop_comosis_datavector(two_point_data)
 
-cosmosis = loop_comosis_datavector(two_point_data)
 cosmolike = cosmolike_metadata.rearange_cosmolike_datavec(filename, two_point_data.spectra, "../cosmolike_data/cov_indices_apr9.txt")
 
 
@@ -45,51 +52,61 @@ print("not final")
 
 
 
-x = np.arange(len(cosmosis["cl"]))
-plt.figure(figsize=(20,5))
-plt.title("datavector comparison")
-plt.yscale("log")
-plt.plot(x, cosmosis["cl"], label="cosmosis")
-plt.plot(x, cosmolike["cl"], label="cosmolike")
+x = np.arange(len(cosmosis_ehu["cl"]))
+fig, axs = plt.subplots(2,1, figsize=(9,3))
 
-plt.text(0, 1e-5, "shear ->")
-plt.axvline(x=1100)
-plt.text(1100, 1e-5, "galaxy x shear ->")
-plt.axvline(x=1740)
-plt.text(1740, 1e-5, "shear x cmb")
-plt.axvline(x=1940)
-plt.text(1940, 1e-5, "galaxy")
-plt.axvline(x=2140)
-plt.text(2140, 1e-5, "galaxy x cmb")
-plt.axvline(x=2340)
-plt.text(2340, 1e-5, "cmb")
-
-plt.legend()
-plt.ylabel("C_l (times l factors)")
-plt.xlabel("Index of datavector")
+#plt.figure(figsize=(16,4))
+fig.suptitle("datavector comparison")
+axs[0].set_yscale("log")
+axs[0].plot(x, cosmosis_ehu["cl"], label="cosmosis ehu")
+axs[0].plot(x, cosmosis_camb["cl"], "--",label="cosmosis camb")
+axs[0].plot(x, cosmolike["cl"], ":", label="cosmolike")
 
 
-plt.savefig("v0_5_compare_datavector_logspaceRAW.png")
+axs[0].text(300, 5e-12, "shear")
+axs[0].axvline(x=1100)
+axs[0].text(1105, 5e-12, "galaxy x shear")
+axs[0].axvline(x=1740)
+axs[0].text(1745, 5e-7, "shear x \ncmb $\kappa$")
+axs[0].axvline(x=1940)
+axs[0].text(1945, 5e-12, "galaxy")
+axs[0].axvline(x=2140)
+axs[0].text(2145, 5e-12, "galaxy x \ncmb $\kappa$")
+axs[0].axvline(x=2340)
+axs[0].text(2340, 5e-12, "$\kappa$")
+
+axs[0].legend(ncol=2)
+axs[0].set_ylabel("$C_l$ (times l factors)")
+#axs[0].set_xlabel("Index of datavector")
+axs[0].set_xlim(0,2370)
+
+#plt.savefig("v0_5_compare_datavector_logspaceRAW.png")
 
 ##########################
-plt.figure(figsize=(20,5))
-plt.title("Ratio of datavectors")
+#plt.figure(figsize=(16,4))
+#plt.title("Ratio of datavectors")
 
-plt.plot(x, cosmosis["cl"]/cosmolike["cl"], label="cosmosis/cosmolike")
+axs[1].plot(x, cosmosis_ehu["cl"]/cosmolike["cl"], label="cosmosis ehu/cosmolike")
+#axs[1].plot(x, cosmosis_camb["cl"]/cosmolike["cl"],"--", label="cosmosis camb/cosmolike")
+axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis camb/cosmosis ehu", linewidth=2, color="grey", alpha=0.4)
 
-plt.text(0, 1.1, "shear ->")
-plt.axvline(x=1100)
-plt.text(1100, 1.1, "galaxy x shear ->")
-plt.axvline(x=1740)
-plt.text(1740, 1.1, "shear x cmb")
-plt.axvline(x=1940)
-plt.text(1940, 1.1, "galaxy")
-plt.axvline(x=2140)
-plt.text(2140, 1.1, "galaxy x cmb")
-plt.axvline(x=2340)
-plt.text(2340, 1.1, "cmb")
-plt.ylabel("C_l ratio")
-plt.xlabel("Index of datavector")
-plt.legend()
 
-plt.savefig("v0_5_compare_datavector_ratioRAW.png")
+
+
+# axs[1].text(0, 1.1, "   shear ->")
+# axs[1].axvline(x=1100)
+# axs[1].text(1100, 1.1, "galaxy x shear ->")
+# axs[1].axvline(x=1740)
+# axs[1].text(1740, 1.1, "shear x cmb")
+# axs[1].axvline(x=1940)
+# axs[1].text(1940, 1.1, "galaxy")
+# axs[1].axvline(x=2140)
+# axs[1].text(2140, 1.1, "galaxy x cmb")
+# axs[1].axvline(x=2340)
+# axs[1].text(2340, 1.1, "  cmb")
+axs[1].set_ylabel("$C_l$ ratio")
+axs[1].set_xlabel("Index of datavector")
+axs[1].legend(loc=(0.2,0.52))
+axs[1].set_xlim(0,2370)#making it a little wider so the kappa fits
+
+fig.savefig("v0_5_compare_datavectorRAW.pdf")
