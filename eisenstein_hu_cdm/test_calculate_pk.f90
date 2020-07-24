@@ -33,17 +33,20 @@ PROGRAM test_ehu_cdm_pk
 
       integer, parameter :: dl=8
       real(dl) :: k_ov_h,A_s,h0,om0,ob0,n_s  ! INTENT(IN) 
-      real(dl) :: pk !INTENT(INOUT)
+      !real(dl) :: pk !INTENT(INOUT)
       DOUBLE PRECISION :: trans
 
       !to delete
       INTEGER :: numk
       !real(8) :: kmax, input_OMEga, input_OMEgal, omeganu, omegab, h
-      real(8) :: kmin, kmax, input_OMEga, input_OMEgal, omeganu, omegab, h, t_cmb, input_N_Nu
-      real(8) :: sigma_8
-      real(8) :: Z,K,Dd_cb,Dd_cbnu,Dd0
+      real(8) :: kmin, kmax, input_omega, input_omeganu, input_omegab, input_h, nsval
+      real(8) :: t_cmb, input_N_Nu
+      real(8) :: K,Dd_cb,Dd_cbnu,Dd0
       real(8), dimension(:), allocatable :: transfer, k_arr
 
+      INTEGER Nk
+      DOUBLE PRECISION Rk(100), Pk(100)
+      DOUBLE PRECISION anorm, z, sigma8
 
       h0 = 0.6727d0
       k_ov_h = 1 / h0
@@ -61,27 +64,39 @@ PROGRAM test_ehu_cdm_pk
       ! i.e same k_pivot
 
 
-      
-      input_OMEga = 0.3 
-      input_OMEgal = 0.7
+      Nk = 100
+      input_omega = 0.3 
+      !input_omegal = 0.7
       !N_Nu = 1. !* input_N_Nu
-      omeganu = 0.0
-      omegab = 0.05
-      h = 0.5
+      input_omeganu = 0.0
+      input_omegab = 0.05
+      input_h = 0.5
       t_cmb = 2.726
       kmax = 10.
       kmin = 1.E-5
       numk = 50 
       input_N_Nu = 3
-      CALL calculate_transfer(input_OMEga, input_OMEgal, omeganu, omegab, h, t_cmb,input_N_Nu, kmin, &
-          & kmax, numk, transfer, k_arr, sigma_8)! note omega 0 is sum with neutrinos! todo
+      z = 0.
+      nsval = 0.9645
+      !CALL calculate_transfer(input_OMEga, input_OMEgal, omeganu, omegab, h, t_cmb,input_N_Nu, kmin, &
+      !    & kmax, numk, transfer, k_arr, sigma_8)! note omega 0 is sum with neutrinos! todo
 
-      print *, 'Test of transfer gives ', transfer(5)
-      print *, 'Sigma_8  ', sigma_8
+      !print *, 'Test of transfer gives ', transfer(5)
+      !print *, 'Sigma_8  ', sigma_8
 
-      Z = 21.1
+      CALL POWER(input_omega, input_omegab, input_omeganu, input_h, nsval, sigma8, anorm,Nk,Rk,Pk,z)
+      print *, 'Test of power at k= ', Rk(5)
+      print *, 'gives Pk = ', Pk(5)
+      print *, 'Sigma_8  ', sigma8
+      print *, 'normalization ', anorm ! I think this is A_s but which scale is unclear... cobe likely did not use k=0.05
+
+      z = 21.1
       K = 1.
-      CALL GROWTH(Z,K,Dd_cb,Dd_cbnu,Dd0)
+      CALL GROWTH(z,K,Dd_cb,Dd_cbnu,Dd0)
+
+      print *, 'Dd_cbnu at redshift 21.1:  ', Dd_cbnu
+      print *, 'Dd at redshift 21.1:  ', Dd0
+
 
   
       !pk=A_s*(2d0*k_ov_h**2d0*2998d0**2d0/5d0/om0)**2d0 &

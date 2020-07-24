@@ -1,4 +1,6 @@
-
+!gfortran -O3 -g -fPIC -I/cosmosis/cosmosis/datablock  -std=gnu -ffree-line-length-none -shared 
+!-o eisenstein_hu_cdm_module.so spline.f90 interface_tools.f90 eisenstein_hu_cdm.f90 
+!eisenstein_hu_cdm_module.f90 /cosmosis/cosmosis/datablock/libcosmosis_fortran.so
 function setup(options) result(result)
   USE cosmosis_modules
   USE interface_tools
@@ -13,7 +15,7 @@ function setup(options) result(result)
   status = status + datablock_get_double_default(options, option_section, "zmin", 0.0D-04, settings%zmin)
   status = status + datablock_get_double_default(options, option_section, "zmax", 3.0D+00, settings%zmax)
   status = status + datablock_get_int_default(options, option_section, "nz_steps", 800, settings%nz_steps)
-  !status = status + datablock_get_double_default(options, option_section, "kmin", 1.0D-05, settings%kmin)
+  status = status + datablock_get_double_default(options, option_section, "kmin", 1.0D-05, settings%kmin)
   status = status + datablock_get_double_default(options, option_section, "kmax", 10D+00, settings%kmax)
   status = status + datablock_get_int_default(options, option_section, "nk_steps", 800, settings%nk_steps)
 
@@ -42,7 +44,7 @@ end function setup
 ! ==========================================
 
 function execute(block, config) result(status)
-  use compute_pk_nowiggle
+  use ehu_cdm
   use interface_tools
   use cosmosis_modules
   implicit none
@@ -51,13 +53,16 @@ function execute(block, config) result(status)
   type(c_ptr), value :: config
   type(ini_settings), pointer :: settings
   type(pk_settings) :: PK
-  real(8) :: omega_baryon,omega_matter,w_de,omega_de,h0,n_s,n_run,A_s
+  real(8) :: omega_baryon,omega_matter,w_de,omega_de,h0,n_s,n_run,A_s, omega_nu, sigma8, anorm
+  real(8) :: omega_matter_and_nu, z_for_Pk_calc, dd_cb,dd_cbnu,dd0, D_0_new
   real(8) :: k, z,D_0,yval, ypval, yppval
   real(8), allocatable, dimension(:,:) :: P
   real(8), allocatable, dimension(:) :: dz,zbins,dz_interpolated
 
+  real(dl), dimension(:), allocatable :: Pk_at_one_redshift, k_h_linear
 
-  integer iz,n,i,n_growth
+
+  integer iz,n,i, j,n_growth
 
   status = 0
   call c_f_pointer(config, settings)
@@ -75,6 +80,9 @@ function execute(block, config) result(status)
   n_growth= datablock_get_array_length(block, GROWTH_PARAMETERS_SECTION, "d_z")
   status = status+ datablock_get_double_array_1d(block, GROWTH_PARAMETERS_SECTION, "d_z", dz,n_growth);
   status = status+  datablock_get_double_array_1d(block, GROWTH_PARAMETERS_SECTION, "z", zbins,n_growth);
+
+  status = status + datablock_get_double(block, cosmological_parameters_section, "OMEGA_NU", omega_nu)
+
 
   
 
@@ -109,6 +117,7 @@ function execute(block, config) result(status)
   ! create empty containers, defined in interface.tools.f90
 
   call  allocate_matterpower(PK)
+  allocate(k_h_linear(PK%num_k))
 
   z=settings%zmin
   k=log(settings%kmin)
@@ -130,18 +139,48 @@ function execute(block, config) result(status)
   ! finally fill with P(k,z) with EH formula
   ! cycle over k
 
-
+  omega_matter_and_nu = omega_matter+omega_nu
+  z_for_Pk_calc = 0.
+  allocate(Pk_at_one_redshift(PK%num_k))
+  !    POWER(input_omega          , input_omegab, input_omeganu, input_h, nsval, sigma8, anorm,Nk      ,Rk,Pk                 ,z)
+  CALL POWER(omega_matter_and_nu, omega_baryon, omega_nu     , h0, n_s ,&
+          &  sigma8, anorm,PK%num_k,PK%kh,Pk_at_one_redshift,z_for_Pk_calc)
+  !notes:
+  !cosmosis: omega_m = 1-omega_lambda-omega_k-omega_nu
+  ! so input_omega = omega_matter + omega_nu (we need to include neutrinos)
+   print *, 'Test of power at k= ', PK%kh(5)
+   print *, 'gives Pk = ', Pk_at_one_redshift(5)
   do i = 1, PK%num_k, 1
-     k=PK%kh(i)
-     call   compute_pknowiggle(k,A_s,n_s,h0,omega_matter,omega_baryon,PK%matpower(i,1))
+     !k=PK%kh(i)
+     !call   compute_pknowiggle(k,A_s,n_s,h0,omega_matter,omega_baryon,PK%matpower(i,1))
+     PK%matpower(i,1) = Pk_at_one_redshift(i)
   end do
   ! cycle over z just applying the growth
 
-  D_0=dz_growth(PK%redshifts(1),zbins,dz,dz_interpolated)
-  PK%matpower(:,1)=PK%matpower(:,1)*(D_0)**2
-  do i = 2, PK%num_z, 1
-     z=PK%redshifts(i)
-     PK%matpower(:,i)=PK%matpower(:,1)*(dz_growth(z,zbins,dz,dz_interpolated)/D_0)**2
+  !original code from ehu module: uses cosmosis growth function
+   D_0=dz_growth(PK%redshifts(1),zbins,dz,dz_interpolated)
+   print *, 'original D_0: ', D_0
+
+   PK%matpower(:,1)=PK%matpower(:,1)*(D_0)**2
+!   do i = 2, PK%num_z, 1
+!      z=PK%redshifts(i)
+!      PK%matpower(:,i)=PK%matpower(:,1)*(dz_growth(z,zbins,dz,dz_interpolated)/D_0)**2
+!   end do
+
+  
+  do j = 1, Pk%num_k, 1
+   z = PK%redshifts(1)
+   CALL GROWTH(z,PK%kh(j)*h0,dd_cb,dd_cbnu,dd0)
+   D_0_new = dd_cbnu*dd0
+   print *, 'new D_0: ', D_0_new
+   !print *, 'new dd_cbnu: ', dd_cbnu
+   !print *, 'new dd0: ', dd0
+   !PK%matpower(j,1)=PK%matpower(j,1)*(D_0_new)**2
+   do i = 2, PK%num_z, 1
+      z=PK%redshifts(i)
+      CALL GROWTH(z,PK%kh(j)*h0,dd_cb,dd_cbnu,dd0)
+      PK%matpower(j,i)=PK%matpower(j,1)*(dd_cbnu*dd0/D_0_new)**2
+   end do
   end do
 
 
