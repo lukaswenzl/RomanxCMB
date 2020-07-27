@@ -81,7 +81,8 @@
    
    
    
-        SUBROUTINE POWER(input_omega, input_omegab, input_omeganu, input_h, nsval, sigma8, anorm,Nk,Rk,Pk, z)
+        SUBROUTINE POWER(input_omega, input_omegab, input_omeganu, input_h, nsval, sigma8, anorm,Nk,Rk,Pk, z, &
+            & A_s)
       !input_omega, input_omegab, input_omeganu, input_h, sigma8, anorm, Nk, Rk in units Mpc/h, Pk at one redshift, z
         IMPLICIT NONE
   !*--POWER77
@@ -93,7 +94,8 @@
         DOUBLE PRECISION OMEga , H , OMEgab , OMEganu
 
         DOUBLE PRECISION, INTENT(INOUT) :: input_omega, &
-             & input_omegab, input_omeganu, input_h, sigma8, z, anorm, nsval
+             & input_omegab, input_omeganu, input_h, sigma8, &
+             & z, anorm, nsval, A_s
         
         REAL(8) :: OMHh , F_Nu , F_Baryon , Y_D ,    &
              & ALPha_nu , BETa_c , SOUnd_horizon ,      &
@@ -150,10 +152,9 @@
   !
         CALL TFMDM(Nk,Rk,tcbnu,anorm,sigma8)
   !
-        PRINT * , 'finished'
   !        compute power spectrum
   !
-        CALL CONVERT(Nk,Rk,tcbnu,anorm,nsval,H,Pk)
+        CALL CONVERT(Nk,Rk,tcbnu,anorm,nsval,H,Pk, A_s, OMEga)!-OMEganutodo is it correct to substract omeganu here?
   !
         !PRINT * , 'Output k, P(k) in file pk.out'
         END
@@ -162,7 +163,7 @@
    
    
    
-        SUBROUTINE CONVERT(N,K,Tcbnu,Anorm,N_s,H,Pk)
+        SUBROUTINE CONVERT(N,K,Tcbnu,Anorm,N_s,H,Pk, A_s, om0)
         IMPLICIT NONE
   !*--CONVERT146
         INTEGER N
@@ -173,11 +174,13 @@
         INTEGER i
    
         hn = H**(3.D0+N_s)
+        !print *, "small scale transfer: ", Tcbnu(1) !Does go to 1 for small k as desired
+
         DO i = 1 , N
            !Pk(i) = 2.D0*PI*PI*hn*Anorm*Tcbnu(i)*Tcbnu(i)*K(i)**N_s
            k_ov_h = K(i)
-           A_s = 2.1e-9
-           om0 = 0.3156  !unclear!! todo
+           !A_s = 2.1e-9
+           !om0 = 0.3156  !unclear!! todo
            Pk(i) =A_s*(2d0*k_ov_h**2d0*2998d0**2d0/5d0/om0)**2d0 &
              *Tcbnu(i)**2d0*(k_ov_h*H/0.05d0)**(N_s-1d0) &
              *2d0*PI**2d0/k_ov_h**3d0
@@ -406,8 +409,8 @@
    
         !TILt = nsval
         IPOwer = 1
-        kmax = 30
-        numk = 30
+        !kmax = 30
+        !numk = 30
    
    
   !	Translate Parameters into forms GLOBALVARIABLES form
@@ -423,24 +426,25 @@
         OMHh = OMEga*h*h
    
    
-        PRINT * , 'hello:' 
         CALL TFSET_PARAMETERS
    
   !	sound_horizon=sound_horizon_fit(omhh,f_baryon)
    
-        kmin = 0.0001
-        numk = numk*LOG10(kmax/kmin)
+        !kmin = 0.0001
+        !numk = numk*LOG10(kmax/kmin)
    
-        PRINT * , 'hello2:' 
         DO i = 1 , N2df
            k = K2df(i)
-           PRINT * , 'hellomid:' 
            CALL GROWTH(Z,k*h,dd_cb,dd_cbnu,dd0)
            t_master = TF_MASTER(k*h)
-           Tfunc(i) = t_master*dd_cbnu*dd0
+           Tfunc(i) = t_master
+           !*dd_cbnu*dd0 removed the growth factor here and add it 
+           ! note that dd0 is normalized for COBE not to for when using a primodial power spectrum
+           ! it has dd0 -> 1 for z=0 small k
+           ! when using priomodial power spectrum you want dd0 ->1 for high z and lower k (here it is about 1.25 for lambda cdm)
         ENDDO
-        PRINT * , 'hello3:' 
    
+      !everything below here can be commented out: todo
   !	Power Spectrum Statistics
    
         iz = 1
@@ -495,7 +499,6 @@
   !
         ENDIF
   !
-        PRINT * , 'hello4:'
    
         tol = 1.E-6
   !
@@ -509,13 +512,6 @@
         SCAle = 8./h
         IF ( iz.EQ.0 ) Z = 0
         IPOwer = 0
-      !   PRINT * , 'hello5:', scale, tol, h
-      !   PRINT * , 'hello5:', omega, omegal, h
-      !   PRINT * , 'hello5:', OMEga , OMEgal
-      !  PRINT * , 'hello5:', omeganu , omegab
-      !  PRINT * , 'hello5:', h , t_cmb , N_Nu
-      !  PRINT * , 'hello5:', t_cmb
-      !  PRINT * , 'hello5:', Z , nsval
 
         Sigma_8 = SQRT                                                    &
                 & (Anorm*(ROMBINT(SIGMATOP,DLOG(0.001/SCAle),DLOG(0.1D0/  &
