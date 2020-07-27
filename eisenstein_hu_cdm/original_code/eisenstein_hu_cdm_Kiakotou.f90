@@ -2,15 +2,13 @@
 !*==GAUSS.spg  processed by SPAG 6.72Dc at 19:48 on 22 Jul 2020
 !converted from F77 to F90 with https://fortran.uk/plusfortonline.php?id=140&id1=3&id2=1&id3=1&id4=-1&id5=1
 
-!     
-!     
+!     Date: 23 Nov 2007
+!     A. Kiakotou, O. Elgaroy & O. Lahav 2007, arXiv:0709.0253
 !**************************************************************************
 !     Modifying the Eisenstein & Hu (1998, astro-ph/9710252) fitting
 !     formula for matter power spectrum, optimized now for
 !     3 degenerate massive neutrinos.
 !     The driver below generates a COBE-normalized power spectrum
-!
-!     includes bugfixes for edgecases by A. Kiakotou, O. Elgaroy & O. Lahav 2007, arXiv:0709.0253
 !**************************************************************************
  
       MODULE ehu_cdm
@@ -122,8 +120,8 @@
    
   !       Try N_nu = 3.04
         !n_nu = 3.0
-        !n_nu = 3.046
-        n_nu = 1.
+        n_nu = 3.046
+        !n_nu = 1.
         PRINT * , 'Assumed number of degenerate massive neutrinos:' , n_nu
    
   !     CMB temperature
@@ -737,7 +735,7 @@
         ALPha_nu = ALPha_nu*(1.+Y_D)**(p_c-p_cb)
         ALPha_nu = ALPha_nu*(1.+(p_cb-p_c)                                &
                  & /2.*(1.+1./(4.*p_c+3.)/(4.*p_cb+7.))/(1.+Y_D))
-        BETa_c = 1./(1.-0.949*f_nub)
+        BETa_c = 1.D0/(1.D0-0.949D0*f_nub)
    
    
         END
@@ -759,17 +757,18 @@
                                & THEta_cmb , OMEga , OMEgal , Z_Equality
    
         q = K*THEta_cmb**2/OMHh
-        !IF ( ALPha_nu.LT.0.D0 ) ALPha_nu = 0.D0     ! fix put in 13/03/02 OE !maybe keep todo Lukas
+        IF ( ALPha_nu.LT.0.D0 ) ALPha_nu = 0.D0     ! fix put in 13/03/02 OE
         gamma_eff = (SQRT(ALPha_nu)+(1.-SQRT(ALPha_nu))                   &
                   & /(1.+(0.43*K*SOUnd_horizon)**4))
         q_eff = q/gamma_eff
         TF_MASTER = DLOG(DEXP(1.D0)+1.84*BETa_c*SQRT(ALPha_nu)*q_eff)
         TF_MASTER = TF_MASTER/                                            &
                   & (TF_MASTER+q_eff**2*(14.4+325./(1.+60.5*q_eff**1.11)))
-  
-                  q_nu = 3.92*q*SQRT(N_Nu/F_Nu)
-                  TF_MASTER = TF_MASTER*(1.+(1.2*F_Nu**(0.64)*N_Nu**(0.3+0.6*F_Nu)) &
-                            & /(q_nu**(-1.6)+q_nu**(0.8)))
+  !     AK modified
+        q_nu = 4.9*q*SQRT(N_Nu/F_Nu)
+  !     AK modified
+        TF_MASTER = TF_MASTER*(1.+(1.2*F_Nu**(0.68)*N_Nu**(0.3+0.6*F_Nu)) &
+                  & /(q_nu**(-1.3)+q_nu**(0.45)))
    
    
         END
