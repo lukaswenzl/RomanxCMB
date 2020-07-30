@@ -398,14 +398,6 @@
         DOUBLE PRECISION omeganu , omegab , nsval , h
         COMMON /BLOCK1/ H , OMEgab , OMEganu, t_cmb
    
-  !      Input Cosmological Parameters
-   
-      !   OPEN (7,FILE='inp.dat')
-      !   READ (7,*) OMEga , OMEgal
-      !   READ (7,*) omeganu , omegab
-      !   READ (7,*) h , t_cmb , N_Nu
-      !   READ (7,*) Z , nsval
-      !   CLOSE (7)
    
         
         PRINT * , 'nsval:' , nsval
@@ -432,9 +424,7 @@
         CALL TFSET_PARAMETERS
    
   !	sound_horizon=sound_horizon_fit(omhh,f_baryon)
-   
-        !kmin = 0.0001
-        !numk = numk*LOG10(kmax/kmin)
+ 
    
         DO i = 1 , N2df
            k = K2df(i)
@@ -447,63 +437,63 @@
            ! when using priomodial power spectrum you want dd0 ->1 for high z and lower k (here it is about 1.25 for lambda cdm)
         ENDDO
    
-      !everything below here can be commented out: todo
+      !everything below here can be commented out since we are not using the COBE normalization and do not need the power spectrum statistics
   !	Power Spectrum Statistics
    
-        iz = 1
-        TILt = 1
+!         iz = 1
+!         TILt = 1
    
-        IF ( ABS(1-OMEga-OMEgal).LT.1E-5 ) IPOwer = 1
+!         IF ( ABS(1-OMEga-OMEgal).LT.1E-5 ) IPOwer = 1
    
-        IF ( IPOwer.EQ.0 ) THEN
-           Anorm = 1.94E-5*OMEga**(-0.785-0.05*LOG(OMEga))                &
-                 & *EXP(1.*(TILt-1.)+1.97*(TILt-1.)**2)
+!         IF ( IPOwer.EQ.0 ) THEN
+!            Anorm = 1.94E-5*OMEga**(-0.785-0.05*LOG(OMEga))                &
+!                  & *EXP(1.*(TILt-1.)+1.97*(TILt-1.)**2)
    
-           Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
+!            Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
    
-        ELSE
-           Anorm = 1.94E-5*OMEga**(-0.785-0.05*LOG(OMEga))                &
-                 & *EXP(-0.95*(TILt-1.)-0.169*(TILt-1.)**2)
+!         ELSE
+!            Anorm = 1.94E-5*OMEga**(-0.785-0.05*LOG(OMEga))                &
+!                  & *EXP(-0.95*(TILt-1.)-0.169*(TILt-1.)**2)
    
-           Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
-        ENDIF
+!            Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
+!         ENDIF
    
-  !
+!   !
    
-        IF ( OMEgal.EQ.0 ) THEN
+!         IF ( OMEgal.EQ.0 ) THEN
    
-           IF ( TILt.LT.1 ) THEN
-              IPOwer = 1
-           ELSE
-              IPOwer = 1
+!            IF ( TILt.LT.1 ) THEN
+!               IPOwer = 1
+!            ELSE
+!               IPOwer = 1
    
-           ENDIF
+!            ENDIF
    
-           IF ( IPOwer.EQ.0 ) THEN
-              Anorm = 1.95E-5*OMEga**(-0.35-0.19*LOG(OMEga)+0.15*(TILt-1))&
-                    & *EXP(1.02*(TILt-1.)+1.70*(TILt-1.)**2)
+!            IF ( IPOwer.EQ.0 ) THEN
+!               Anorm = 1.95E-5*OMEga**(-0.35-0.19*LOG(OMEga)+0.15*(TILt-1))&
+!                     & *EXP(1.02*(TILt-1.)+1.70*(TILt-1.)**2)
    
-              Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
-           ELSE
-              Anorm = 1.95E-5*OMEga**(-0.35-0.19*LOG(OMEga)-0.17*(TILt-1))&
-                    & *EXP(-1.*(TILt-1.)-0.14*(TILt-1.)**2)
-              Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
-           ENDIF
+!               Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
+!            ELSE
+!               Anorm = 1.95E-5*OMEga**(-0.35-0.19*LOG(OMEga)-0.17*(TILt-1))&
+!                     & *EXP(-1.*(TILt-1.)-0.14*(TILt-1.)**2)
+!               Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
+!            ENDIF
    
-        ELSE
+!         ELSE
    
-           Anorm = 2.422 - 1.166*EXP(OMEga) + 0.800*EXP(OMEgal)           &
-                 & + 3.780*OMEga - 2.267*OMEga*EXP(OMEgal)                &
-                 & + 0.487*OMEga**2 + 0.561*OMEgal +                      &
-                 & 3.392*OMEgal*EXP(OMEga) - 8.568*OMEga*OMEgal +         &
-                 & 1.080*OMEgal**2
-           Anorm = 1.E-5*Anorm
-           Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
-  !
-        ENDIF
-  !
+!            Anorm = 2.422 - 1.166*EXP(OMEga) + 0.800*EXP(OMEgal)           &
+!                  & + 3.780*OMEga - 2.267*OMEga*EXP(OMEgal)                &
+!                  & + 0.487*OMEga**2 + 0.561*OMEgal +                      &
+!                  & 3.392*OMEgal*EXP(OMEga) - 8.568*OMEga*OMEgal +         &
+!                  & 1.080*OMEgal**2
+!            Anorm = 1.E-5*Anorm
+!            Anorm = Anorm**2*(2997.9/h)**(3.+TILt)
+!   !
+!         ENDIF
+!   !
    
-        tol = 1.E-6
+!         tol = 1.E-6
   !
   !  we save some time by not computing the following statistics
   !  if you want to include them, just uncomment the lines below
@@ -512,19 +502,19 @@
   !	Sigma_8: Mass fluctuations in a top hat of 8./h Mpc at
   !	         redshift z=0; total mass: CDM+baryon+neutrino
    
-        SCAle = 8./h
-        IF ( iz.EQ.0 ) Z = 0
-        IPOwer = 0
+      !   SCAle = 8./h
+      !   IF ( iz.EQ.0 ) Z = 0
+      !   IPOwer = 0
 
-        Sigma_8 = SQRT                                                    &
-                & (Anorm*(ROMBINT(SIGMATOP,DLOG(0.001/SCAle),DLOG(0.1D0/  &
-                & SCAle),tol)+ROMBINT(SIGMATOP,DLOG(0.1D0/SCAle),         &
-                & DLOG(1D0/SCAle),tol)                                    &
-                & +ROMBINT(SIGMATOP,DLOG(1D0/SCAle),DLOG(10.D0/SCAle),tol)&
-                & +ROMBINT(SIGMATOP,DLOG(10.D0/SCAle),DLOG(100.D0/SCAle), &
-                & tol)))
+      !   Sigma_8 = SQRT                                                    &
+      !           & (Anorm*(ROMBINT(SIGMATOP,DLOG(0.001/SCAle),DLOG(0.1D0/  &
+      !           & SCAle),tol)+ROMBINT(SIGMATOP,DLOG(0.1D0/SCAle),         &
+      !           & DLOG(1D0/SCAle),tol)                                    &
+      !           & +ROMBINT(SIGMATOP,DLOG(1D0/SCAle),DLOG(10.D0/SCAle),tol)&
+      !           & +ROMBINT(SIGMATOP,DLOG(10.D0/SCAle),DLOG(100.D0/SCAle), &
+      !           & tol)))
    
-        PRINT * , 'COBE normalized z, sigma_8: ' , Z , Sigma_8
+      !   PRINT * , 'COBE normalized z, sigma_8: ' , Z , Sigma_8
   !	write(6,51) sigma_8,z
   !51	FORMAT('sigma_8:   ',E12.5,
   !     *      '                                  z=',F5.2)

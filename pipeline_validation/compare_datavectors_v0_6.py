@@ -37,11 +37,11 @@ def loop_comosis_datavector(two_point_data, n_ell=20):
     return {"cl":cl, "ell":ell, "bin1":bin1, "bin2":bin2, "names":names}
 
 
-filename = "../6x2pt_Roman_SO_v0_5_8b4e5be.fits"
+filename = "../6x2pt_Roman_SO.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_ehu = loop_comosis_datavector(two_point_data)
 
-filename = "../6x2pt_Roman_SO_camb_v0_5_8b4e5be.fits"
+filename = "../6x2pt_Roman_SO_camb.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_camb = loop_comosis_datavector(two_point_data)
 
@@ -90,27 +90,16 @@ axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis 
 
 
 
-# axs[1].text(0, 1.1, "   shear ->")
-# axs[1].axvline(x=1100)
-# axs[1].text(1100, 1.1, "galaxy x shear ->")
-# axs[1].axvline(x=1740)
-# axs[1].text(1740, 1.1, "shear x cmb")
-# axs[1].axvline(x=1940)
-# axs[1].text(1940, 1.1, "galaxy")
-# axs[1].axvline(x=2140)
-# axs[1].text(2140, 1.1, "galaxy x cmb")
-# axs[1].axvline(x=2340)
-# axs[1].text(2340, 1.1, "  cmb")
 axs[1].set_ylabel("$C_l$ ratio")
 axs[1].set_xlabel("Index of datavector")
 axs[1].legend(loc=(0.2,0.52))
 axs[1].set_xlim(0,2370)#making it a little wider so the kappa fits
 
-fig.savefig("v0_5_compare_datavectorRAW.pdf")
+fig.savefig("v0_6_compare_datavectorRAW.pdf")
 
 
-#compare high and low resolution sampling of ehu. I want to make sure that by reducing the sampling the Cl don't change dramatically
-filename = "../6x2pt_Roman_SO_301nz.fits"
+# #compare high and low resolution sampling of ehu. I want to make sure that by reducing the sampling the Cl don't change dramatically
+filename = "../6x2pt_Roman_SO_251nz_v0_6.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_ehu_highsampling = loop_comosis_datavector(two_point_data)
 
@@ -121,4 +110,4 @@ plt.title("ehu sampling in z")
 plt.plot(x, np.array(cosmosis_ehu["cl"])/cosmosis_ehu_highsampling["cl"], label="cosmosis ehu nz=101 / nz=301")
 
 plt.legend()
-plt.savefig("v0_5_compare_z_sampling_for_ehuRAW.pdf")
+plt.savefig("v0_6_compare_z_sampling_for_ehuRAW.pdf")

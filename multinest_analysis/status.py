@@ -2,6 +2,7 @@ import argparse
 import watcher
 
 #example: python modules/RomanxCMB/multinest_analysis/status.py --n "mn_quick_DESY1"
+#         python ../../cosmosis/modules/RomanxCMB/multinest_analysis/status.py --n "mn_6x2pt_Roman_SO"
 
 parser = argparse.ArgumentParser(description='Getting the status from multinest')
 parser.add_argument("--n", default="No Name Given please specify root", type=str, help="Root name for the files of the current multinest run")
