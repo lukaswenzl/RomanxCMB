@@ -37,11 +37,11 @@ def loop_comosis_datavector(two_point_data, n_ell=20):
     return {"cl":cl, "ell":ell, "bin1":bin1, "bin2":bin2, "names":names}
 
 
-filename = "../6x2pt_Roman_SO.fits"
+filename = "../6x2pt_Roman_SO_v0_6_69d216a.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_ehu = loop_comosis_datavector(two_point_data)
 
-filename = "../6x2pt_Roman_SO_camb.fits"
+filename = "../6x2pt_Roman_SO_camb_v0_6_69d216a.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_camb = loop_comosis_datavector(two_point_data)
 
@@ -55,7 +55,7 @@ fig, axs = plt.subplots(2,1, figsize=(9,3))
 #plt.figure(figsize=(16,4))
 fig.suptitle("datavector comparison")
 axs[0].set_yscale("log")
-axs[0].plot(x, cosmosis_ehu["cl"], label="cosmosis ehu")
+axs[0].plot(x, cosmosis_ehu["cl"], label="cosmosis EH98")
 axs[0].plot(x, cosmosis_camb["cl"], "--",label="cosmosis camb")
 axs[0].plot(x, cosmolike["cl"], ":", label="cosmolike")
 
@@ -83,9 +83,9 @@ axs[0].set_xlim(0,2370)
 #plt.figure(figsize=(16,4))
 #plt.title("Ratio of datavectors")
 
-axs[1].plot(x, cosmosis_ehu["cl"]/cosmolike["cl"], label="cosmosis ehu/cosmolike")
+axs[1].plot(x, cosmosis_ehu["cl"]/cosmolike["cl"], label="cosmosis EH98/cosmolike")
 #axs[1].plot(x, cosmosis_camb["cl"]/cosmolike["cl"],"--", label="cosmosis camb/cosmolike")
-axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis camb/cosmosis ehu", linewidth=2, color="grey", alpha=0.4)
+axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis camb/cosmosis EH98", linewidth=2, color="grey", alpha=0.4)
 
 
 
@@ -98,16 +98,16 @@ axs[1].set_xlim(0,2370)#making it a little wider so the kappa fits
 fig.savefig("v0_6_compare_datavectorRAW.pdf")
 
 
-# #compare high and low resolution sampling of ehu. I want to make sure that by reducing the sampling the Cl don't change dramatically
-filename = "../6x2pt_Roman_SO_251nz_v0_6.fits"
-two_point_data = twopoint.TwoPointFile.from_fits(filename)
-cosmosis_ehu_highsampling = loop_comosis_datavector(two_point_data)
+# # #compare high and low resolution sampling of ehu. I want to make sure that by reducing the sampling the Cl don't change dramatically
+# filename = "../6x2pt_Roman_SO_251nz_v0_6.fits"
+# two_point_data = twopoint.TwoPointFile.from_fits(filename)
+# cosmosis_ehu_highsampling = loop_comosis_datavector(two_point_data)
 
-plt.figure(figsize=(9,2))
+# plt.figure(figsize=(9,2))
 
-#plt.figure(figsize=(16,4))
-plt.title("ehu sampling in z")
-plt.plot(x, np.array(cosmosis_ehu["cl"])/cosmosis_ehu_highsampling["cl"], label="cosmosis ehu nz=101 / nz=301")
+# #plt.figure(figsize=(16,4))
+# plt.title("ehu sampling in z")
+# plt.plot(x, np.array(cosmosis_ehu["cl"])/cosmosis_ehu_highsampling["cl"], label="cosmosis ehu nz=101 / nz=301")
 
-plt.legend()
-plt.savefig("v0_6_compare_z_sampling_for_ehuRAW.pdf")
+# plt.legend()
+# plt.savefig("v0_6_compare_z_sampling_for_ehuRAW.pdf")

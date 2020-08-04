@@ -124,7 +124,7 @@
         !n_nu = 3.0
         !n_nu = 3.046
         n_nu = 1.
-        PRINT * , 'Assumed number of degenerate massive neutrinos:' , n_nu
+        !PRINT * , 'Assumed number of degenerate massive neutrinos:' , n_nu
    
   !     CMB temperature
         !t_0 = 2.726D0
@@ -400,7 +400,7 @@
    
    
         
-        PRINT * , 'nsval:' , nsval
+        !PRINT * , 'nsval:' , nsval
    
         !TILt = nsval
         IPOwer = 1

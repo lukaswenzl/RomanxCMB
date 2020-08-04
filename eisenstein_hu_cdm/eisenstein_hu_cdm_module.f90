@@ -148,8 +148,8 @@ function execute(block, config) result(status)
   !notes:
   !cosmosis: omega_m = 1-omega_lambda-omega_k-omega_nu
   ! so input_omega = omega_matter + omega_nu (we need to include neutrinos)
-   print *, 'Test of power at k= ', PK%kh(5)
-   print *, 'gives Pk = ', Pk_at_one_redshift(5)
+   ! print *, 'Test of power at k= ', PK%kh(5)
+   ! print *, 'gives Pk = ', Pk_at_one_redshift(5)
   do i = 1, PK%num_k, 1
      !k=PK%kh(i)
      !call   compute_pknowiggle(k,A_s,n_s,h0,omega_matter,omega_baryon,PK%matpower(i,1))
@@ -159,7 +159,7 @@ function execute(block, config) result(status)
 
   !original code from ehu module: uses cosmosis growth function
    D_0=dz_growth(PK%redshifts(1),zbins,dz,dz_interpolated)
-   print *, 'original D_0: ', D_0
+   !print *, 'original D_0: ', D_0
 
    PK%matpower(:,1)=PK%matpower(:,1)*(D_0)**2
 !   do i = 2, PK%num_z, 1
@@ -188,15 +188,15 @@ function execute(block, config) result(status)
 
    end do
   end do
-  z = 5.
-  CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
-  print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
-  z = 10.
-  CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
-  print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
-  z = 30.
-  CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
-  print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
+!   z = 5.
+!   CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
+!   print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
+!   z = 10.
+!   CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
+!   print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
+!   z = 30.
+!   CALL GROWTH(z,PK%kh(1)*h0,dd_cb,dd_cbnu,dd0)
+!   print *, "DD0 and dd_cbnu: ", (1+z)*dd0, dd_cbnu
 
 
   ! save in datablock
