@@ -1,0 +1,48 @@
+#This is a template for module description files
+name: load_nz
+version: 2
+purpose: Calculate per bin number density n(z) based on overall redshift distribution
+url: ""
+interface: calculate_nz.py
+attribution: [Lukas Wenzl]
+rules: "If you use a file from a particular survey you should cite that survey"
+cite: []
+
+assumptions:
+    - "n(z) file first column = z, others = bin n(z)"
+
+explanation: |
+    "This module just loads the overall distribution of observed galaxies
+    Then it splits them in the requested number of eually sized bins
+    and then convolves with a redshift weighted gaussian.
+    The gaussian is: $$n^i_x(z_{\mathrm{ph}}) = 
+    \int_{z^i_{\mathrm{min},x}}^{z^i_{\mathrm{max},x}} dz \, n_{\mathrm{x}}(z) \, 
+    p^i\left(z_{\mathrm{ph}}|z,x\right)\,, $$
+    with $$p^i\left(z_{\mathrm{ph}}|z,x\right) = 
+    \frac{1}{\sqrt{2\pi}\sigma_{z,x}(1+z)} 
+    \exp\left[-\frac{\left(z-z_{\mathrm{ph}} - \Delta^i_{z,x}\right)^2}{2\left(\sigma_{z,x}(1+z)\right)^2}\right]\,.$$
+    The n(z) are normalized before being saved. You can marginalize over the sigma and addidive bias.
+    This module is based on version 1 of load_nz in the standard cosmosis library."
+
+# List of parameters that can go in the params.ini file in the section for this module    
+params:
+    filepath: "String; absolute or relative path to overall n(z) file"
+    nbin: "Integer; number of equally sized bins to split the distribution into"
+    z_min: "Real; low cutoff applied to the overall distribution"
+    z_max: "Real; high cutoff applied to the overall distribution"
+    nsamples: "Integer; Number of samples in redshift from 0 to zmax"
+    input_section: "String, optional; If set, look for input parameters in this named section instead of wl_photoz_errors. If not set but sample is set, look in sample_errors"
+    output_section: "String, default ''wl_number_density''. The section to which to save the output."
+#Inputs for a given choice of a parameter, from the values.ini or from other modules
+#If no such choices, just do one of these omitting mode=something part:
+inputs: 
+    wl_photoz_errors:
+        bias_i: Real; for i=1..nbin. Bias size for this bin, also called Delta_i.
+        sigma_i: Real; for i=1..nbin. Sigma size for this bin.
+
+outputs:
+    output_section:
+        nz: "Integer; number of redshift samples. By default all these will go in wl_number_density."
+        nbin: "Integer; number of bins"
+        z: "Real vector; redshift sample values"
+        bin_: "Real vector; n(z) at redshift sample values.  bin_1, bin_2, ..."
