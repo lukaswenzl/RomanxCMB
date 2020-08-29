@@ -309,12 +309,12 @@ class ClCov( object ):
     """
     Class for computing cl covariance
     """
-    def __init__(self, theory_spectra, fsky=1., fsky_cmb=-1, cov_calc_multiply_range_instead_of_sum=False):
+    def __init__(self, theory_spectra, fsky=1., fsky_cmb=-1., cov_calc_multiply_range_instead_of_sum=False):
         self.theory_spectra = theory_spectra
         self.types = [ t.types for t in self.theory_spectra ]
         self.names = [t.name for t in self.theory_spectra ]
         self.fsky = fsky
-        if (fsky_cmb == -1):
+        if (fsky_cmb == -1.):
             self.fsky_cmb = self.fsky
         else:
             self.fsky_cmb = fsky_cmb

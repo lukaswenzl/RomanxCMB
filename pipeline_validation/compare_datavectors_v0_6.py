@@ -55,7 +55,7 @@ fig, axs = plt.subplots(2,1, figsize=(9,3))
 #plt.figure(figsize=(16,4))
 fig.suptitle("datavector comparison")
 axs[0].set_yscale("log")
-axs[0].plot(x, cosmosis_ehu["cl"], label="cosmosis EH98")
+axs[0].plot(x, cosmosis_ehu["cl"], label="cosmosis EH99")
 axs[0].plot(x, cosmosis_camb["cl"], "--",label="cosmosis camb")
 axs[0].plot(x, cosmolike["cl"], ":", label="cosmolike")
 
@@ -83,9 +83,9 @@ axs[0].set_xlim(0,2370)
 #plt.figure(figsize=(16,4))
 #plt.title("Ratio of datavectors")
 
-axs[1].plot(x, cosmosis_ehu["cl"]/cosmolike["cl"], label="cosmosis EH98/cosmolike")
+axs[1].plot(x, cosmosis_ehu["cl"]/cosmolike["cl"], label="cosmosis EH99/cosmolike")
 #axs[1].plot(x, cosmosis_camb["cl"]/cosmolike["cl"],"--", label="cosmosis camb/cosmolike")
-axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis camb/cosmosis EH98", linewidth=2, color="grey", alpha=0.4)
+axs[1].plot(x, np.array(cosmosis_camb["cl"])/cosmosis_ehu["cl"],label="cosmosis camb/cosmosis EH99", linewidth=2, color="grey", alpha=0.4)
 
 
 
