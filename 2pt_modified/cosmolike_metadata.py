@@ -107,6 +107,23 @@ def rearange_cosmolike_datavec(filename, spectra, metadata_filename, n_ell=20):
 
     return {"ell":ell, "cl":cl, "metadata_identifiers":metadata_identifiers_new, "cosmosis_identifiers":cosmosis_identifiers, "metadata_identifiers_original":metadata_identifiers}
 
+def rescale_fsky(covmat,spectra, n_ell, cosmolike_overall_fsky, new_fsky_cmb_lensing):
+    #for our science case the fsky of the cmblensing autocorrelation is much larger so we rescale that part to the appropriate larger fsky. The cross correlations can only be
+    #calculated for the overlap
+    
+    combinations, identifiers = build_metadata_for_cosmosis(spectra, n_ell, ignore_ells=False) 
+    cmblensingnames = ["cmbkappa_cl11"+str(i) for i in range(n_ell) ]
+    mask = [s in cmblensingnames for s in identifiers]
+    if(np.sum(mask) != n_ell):
+        print("WARNING: the selection mask has not the right number of elemets. Something went wrong. Check cosmolike_metadata.py!")
+    print(np.sum(mask))
+    print(len(mask))
+    covmat[mask, :] = covmat[mask, :]* np.sqrt(cosmolike_overall_fsky/new_fsky_cmb_lensing)
+    covmat[:, mask] = covmat[:, mask]*np.sqrt(cosmolike_overall_fsky/new_fsky_cmb_lensing)
+
+    return covmat
+
+
 # info = load_covariance_metadata()
 # print(info)
 

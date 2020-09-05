@@ -221,6 +221,10 @@ The input value should be sigma_e_total = sqrt(2) * sigma_e_per_component""")
     ## capability to load an external cosmolike covariance matrix
     config['cosmolike_covariance'] = options.get_string(option_section, "cosmolike_covariance", "")
 
+    config["new_fsky_cmb_lensing"] = options.get_double(option_section, "new_fsky_cmb_lensing", -1)
+    config["cosmolike_overall_fsky"] = options.get_double(option_section, "cosmolike_overall_fsky", -1)
+
+    
 
     return config
 
@@ -399,6 +403,9 @@ def execute(block, config):
 
         #load external covariance
         covmat = cosmolike_metadata.rearrange_cov(config["cosmolike_covariance"],spec_meas_list,config["cosmolike_metadata_file"], config["n_ell"])
+        if (config["cosmolike_overall_fsky"] >0 and config["new_fsky_cmb_lensing"] >0):
+            print("rescaling fsky for cmblensing!")
+            covmat = cosmolike_metadata.rescale_fsky(covmat,spectra=spec_meas_list, n_ell=config["n_ell"], cosmolike_overall_fsky=config["cosmolike_overall_fsky"], new_fsky_cmb_lensing=config["new_fsky_cmb_lensing"])
         
         assert covmat.shape[0] == sum([len(s.value) for s in spec_meas_list])
         covmat_info = twopoint.CovarianceMatrixInfo( 'COVMAT', [s.name for s in spec_meas_list], [len(s.value) for s in spec_meas_list], covmat )
