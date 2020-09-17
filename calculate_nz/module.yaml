@@ -33,6 +33,7 @@ params:
     nsamples: "Integer; Number of samples in redshift from 0 to zmax"
     input_section: "String, optional; If set, look for input parameters in this named section instead of wl_photoz_errors. If not set but sample is set, look in sample_errors"
     output_section: "String, default ''wl_number_density''. The section to which to save the output."
+    use_only_one_sigma: "Bool, set to true to only use one overall sigma instead of sigma_i. Default: False"
 #Inputs for a given choice of a parameter, from the values.ini or from other modules
 #If no such choices, just do one of these omitting mode=something part:
 inputs: 

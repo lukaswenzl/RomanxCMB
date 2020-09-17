@@ -24,20 +24,24 @@ def setup(options):
         print("WARNING: the requested sampling accuracy is quite high. The function has only been tested up to about a sampling of 100 per redshift range of 1")
 
     full_distribution = Distribution(filename)
-
+    use_only_one_sigma = options.get_bool(option_section, "use_only_one_sigma", False)
 
     print(nsamples)
     print(sampling)
 
 
     print("Loaded file %s" % (filename))
-    return (full_distribution, nbin, sampling, input_section, zmin, output_section)
+    return (full_distribution, nbin, sampling, input_section, zmin, output_section,use_only_one_sigma)
 
 
 def execute(block, config):
-    (full_distribution, nbin, sampling, input_section, zmin, output_section) = config
+    (full_distribution, nbin, sampling, input_section, zmin, output_section,use_only_one_sigma) = config
     bias = [block[input_section, "bias_%d" % i] for i in range(1, nbin+1)]
-    sigma = [block[input_section, "sigma_%d" % i] for i in range(1, nbin+1)]
+    if(use_only_one_sigma):
+        overal_sigma_value = block[input_section, "sigma"]
+        sigma = [overal_sigma_value for i in range(1, nbin+1)]
+    else: 
+        sigma = [block[input_section, "sigma_%d" % i] for i in range(1, nbin+1)]
     for i in range(nbin): 
         if(sigma[i] < 0.0008):
             sigma[i] = 0.0008 #smaller sigmas lead to numerical inaccuracy. If you want to lower this you need to test the integral convergence
