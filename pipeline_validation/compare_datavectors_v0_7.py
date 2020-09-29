@@ -37,11 +37,11 @@ def loop_comosis_datavector(two_point_data, n_ell=20):
     return {"cl":cl, "ell":ell, "bin1":bin1, "bin2":bin2, "names":names}
 
 
-filename = "../6x2pt_Roman_SO.fits"
+filename = "../6x2pt_Roman_SO_v0_7_483f98a.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_ehu = loop_comosis_datavector(two_point_data)
 
-filename = "../6x2pt_Roman_SO_camb_v0_6_69d216a.fits"
+filename = "../6x2pt_Roman_SO_camb_v0_7_483f98a.fits"
 two_point_data = twopoint.TwoPointFile.from_fits(filename)
 cosmosis_camb = loop_comosis_datavector(two_point_data)
 

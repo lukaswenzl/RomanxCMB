@@ -34,6 +34,8 @@ class TwoPointLikelihood(GaussianLikelihood):
     like_name = "2pt"
 
     def __init__(self, options):
+        #extra option to allow us to flag for minue infinity likelihood during pipeline run
+        self.check_for_minus_infinity_likelihhood =options.get_bool("check_for_minus_infinity_likelihhood", False)
         # We may decide to use an analytic gaussian covariance
         # in that case we won't load the covmat.
         self.gaussian_covariance = options.get_bool(
@@ -302,6 +304,14 @@ class TwoPointLikelihood(GaussianLikelihood):
     def do_likelihood(self, block):
         # Run the
         super(TwoPointLikelihood, self).do_likelihood(block)
+
+        #added by Lukas:
+        #extra option to allow us to flag for minue infinity likelihood during pipeline run
+        if(self.check_for_minus_infinity_likelihhood == True):
+            cosmo = names.cosmological_parameters
+            if(block[cosmo, 'set_likelihood_minus_infinity']):
+                block[names.likelihoods, self.like_name+"_LIKE"] = -1* np.inf
+                block[names.data_vector, self.like_name+"_CHI2"] = np.inf
 
         if self.sellentin:
             # The Sellentin-Heavens correction from arxiv 1511.05969

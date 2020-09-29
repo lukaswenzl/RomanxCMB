@@ -9,7 +9,7 @@ import astropy.io.fits as fits
 
 plt.style.use(['science','no-latex'])
 
-print("not final")
+print("final")
 
 def load_cov(filename, name):
     hdul = fits.open(filename)
@@ -20,9 +20,9 @@ def load_cov(filename, name):
     return data
 
 
-g_cosmolike = load_cov("../6x2pt_Roman_SO_g_cosmolike.fits", "g cosmolike")
-g1 = load_cov("../6x2pt_Roman_SO_gaussian.fits", "g cosmosis EH99 type1 (sum l bins)")
-g2 = load_cov("../6x2pt_Roman_SO_gaussian_type2.fits", "g cosmosis EH99 type2 (multiply delta l)")
+g_cosmolike = load_cov("../6x2pt_Roman_SO_g_cosmolike_v0_7_483f98a.fits", "g cosmolike")
+g1 = load_cov("../6x2pt_Roman_SO_gaussian_v0_7_483f98a.fits", "g cosmosis EH99 type1 (sum l bins)")
+g2 = load_cov("../6x2pt_Roman_SO_gaussian_type2_v0_7_483f98a.fits", "g cosmosis EH99 type2 (multiply delta l)")
 
 
 
