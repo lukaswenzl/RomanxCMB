@@ -1,0 +1,43 @@
+#This is a template for module description files
+name: "growth"
+version: "1.1"
+interface: growth.py
+purpose: "Calculate growth function"
+url: ""
+attribution: ["Lukas Wenzl"]
+rules: []
+cite: []
+assumptions:
+    - "Growth scale independent and parametrized by gamma or w0wa. Assumes flat spacetime"
+
+explanation: |
+    Gives back the growth function based on a fitting function. 
+    You will need to calculate the scale dependent neutrino effect separately.
+    Can handle both w0wa or alternatively independent gamma0/gammaa parametrization of deviation from LambdaCDM
+    todo discuss normalization
+
+
+
+params:
+        zmin: "Real, min value to save f,D (default = 0.0)"
+        zmax: "Real, max value to save f,D (default = 3.0)"
+        dz: "Real, redshift binsize (default  = 0.01)"
+        zmax_log: "Real, default=1100. redshift max for additional z values tacked above zmax, log space"
+        nz_log: "int, default=0. number of log spaced values (if 0 then no log-spaced values)"
+        gamma_parametrization: "Bool, parametrize by gamma0/gammaa instead of wa/w0"
+        output_section: "String, name of the output section, default 'growth_parameters'"
+
+inputs:
+    cosmological_parameters:
+        omega_m:  "real, baryon + cdm + neutrino density fraction today"
+        omega_lambda:  "real, dark energy density today (default 1-omega_m)"
+        w:  "real, w(z=0) equation of state of dark energy (default -1.0) "
+        wa:  "real, equation of state parameter w(z) = w_0 + w_a z / (1+z)  (default 0.0)"
+        gamma0:  "real, if gamma_parametrization then ignore w0wa"
+        gammaa:  "real, if gamma_parametrization then ignore w0wa"
+    
+outputs:
+    growth_parameters:
+        d_z: "1D real array, linear growth factor D"
+        f_z: "1D real array, linear growth rate f"
+        z: "1D real array, redshift of samples "
