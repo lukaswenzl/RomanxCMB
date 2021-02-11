@@ -2,7 +2,7 @@
 from builtins import range
 import scipy.interpolate
 import numpy as np
-from luminosity_dependance import calculate_luminosity_function
+from luminosity_dependance import Luminosity_function
 from luminosity_dependance import calculate_L_lim
 from luminosity_dependance import integrate_luminosity_dependence
 
@@ -194,7 +194,7 @@ def kirk_rassat_host_bridle_power(z_lin, k_lin, P_lin, z_nl, k_nl, P_nl, A, Omeg
 
 
 #added by Lukas Wenzl, in test phase
-def krause_eifler_blazek(z_nl, k_nl, P_nl, A0, Omega_m, h, z0_IA, z1_IA,M0,beta,eta,eta_highz,mlim, D_L,k_corr, e_corr):
+def krause_eifler_blazek(z_nl,z_nl_cutoff, k_nl, P_nl, A0, Omega_m, h, z0_IA, z1_IA,M0,beta,eta,eta_highz,mlim, D_L,k_corr, e_corr):
     # described by Krause Eifler & Blazek 2016
 
     z0 = np.where(z_nl == 0)[0][0]
@@ -203,49 +203,54 @@ def krause_eifler_blazek(z_nl, k_nl, P_nl, A0, Omega_m, h, z0_IA, z1_IA,M0,beta,
     ksmall = np.argmin(k_nl)
 
     growth = (P_nl[:, ksmall] / P_nl[z0, ksmall])**0.5 #works as long as we don't use a scale dependent modified gravity
-
+    growth = growth[:len(z_nl_cutoff)]
 
     #first calculate the part except for luminosity scaling and red fraction factor
     #we call this A_L0 since when plugging in L=L0 the luminsity scaling disappears
     #note rho_m = Omega_m *rho_crit
     A_L0 = - A0 * C1_RHOCRIT * Omega_m / growth 
     print("check that this value: "+str(C1_RHOCRIT)+" is the same as the Krause et al 2016 value of 0.0134")
-    A_L0 = A_L0 * ((1+z_nl)/(1+z0_IA) )**eta #redshift scaling
+    A_L0 = A_L0 * ((1+z_nl_cutoff)/(1+z0_IA) )**eta #redshift scaling
 
     #luminosity scaling -> marginalize by integration, include red fraction factor for effiency
     #GAMA case in Krause et al 2016
     phi_star_0 = 9.4e-3 #(h/Mpc)^3 
-    M_star = -20.70  #  +5*np.log(0.7)#weird h factor but I think I do not have to add that here, cancels out
+    M_star = -20.70  #  +5*np.log(0.7)#weird h factor but I think I do not have to add that here, cancels out TODO
     alpha = -1.23
     P=1.8
     Q = 0.7
-    phi_all = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)###
+    phi_all = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
+
     phi_star_0 = 1.1e-2 #(h/Mpc)^3 
     M_star = -20.34 #+5*np.log(0.7)
     alpha = -0.57
     P=-1.2 
     Q = 1.8
-    phi_red = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)###
+    phi_red = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
+
     L_lim_all = calculate_L_lim(mlim, D_L, k_corr, e_corr, h, galaxy_type="Sa")
     L_lim_red = calculate_L_lim(mlim, D_L, k_corr, e_corr, h, galaxy_type="Sa")
     
-    A_L0_dic = {"A_L0":A_L0, "z":z_nl}
-    A_mlim = integrate_luminosity_dependence(A_L0_dic, phi_red, phi_all,L_lim_red, L_lim_all,M0,beta)
+    A_L0_dic = {"A_L0":A_L0, "z":z_nl_cutoff}
+    A_mlim = integrate_luminosity_dependence(A_L0_dic, phi_red, phi_all, L_lim_red, L_lim_all, M0, beta)
     
     #now high redshift scaling
     theta = np.where(A_mlim["z"] > z1_IA)
     A_mlim["A_mlim"][theta] = A_mlim["A_mlim"][theta] * ((1+A_mlim["z"][theta])/(1+z1_IA) )**eta_highz       
 
+    #add zeros beyond the cutoff redshift
+    A_mlim_beyondcutoff = np.zeros(nz)
+    A_mlim_beyondcutoff[:len(A_mlim["A_mlim"])] = A_mlim["A_mlim"]
 
     # intrinsic-intrinsic term
     P_II = np.zeros_like(P_nl)
 
     for i in range(nz):
-        P_II[i, :] = A_mlim["A_mlim"][i]**2 * P_nl[i, :]
+        P_II[i, :] = A_mlim_beyondcutoff[i]**2 * P_nl[i, :]
 
     P_GI = np.zeros_like(P_nl)
     for i in range(nz):
-        P_GI[i] = A_mlim["A_mlim"][i] * P_nl[i]
+        P_GI[i] = A_mlim_beyondcutoff[i] * P_nl[i]
 
     # Finally calculate the intrinsic and stochastic bias terms from the power spectra (these are only used for grid mode...)
     R1 = P_II / P_nl

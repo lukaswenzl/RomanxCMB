@@ -82,14 +82,19 @@ def execute(block, config):
         #todo: exception when luminosity distance not found
         D_L_values = block["distances", "d_l"]
         z_luminosity_dist = block["distances", "z"]
-        #resample we only need the z_nl sampling
-        D_L_values = resample(D_L_values, z_luminosity_dist, z_nl, extrapolate_linearly_at_highz=False)
-        if(z_nl[0]==0):
-            D_L_values[0] = 1000#this might not be a good idea
-        D_L = {"D_L":D_L_values, "z":z_nl}
+
+        #cutoff on redsift: IA beyond redshift 10 is irrelevant for us, set to 0
+        cutoff_redshift = block[ia, "cutoff_redshift"]
+        z_nl_cutoff = z_nl[z_nl<= cutoff_redshift]
+
+        #resample we only need the z_nl_cutoff sampling
+        D_L_values = resample(D_L_values, z_luminosity_dist, z_nl_cutoff, extrapolate_linearly_at_highz=False)
+        #if(z_nl[0]==0):
+        #    D_L_values[0] = 1000#this might not be a good idea
+        D_L = {"D_L":D_L_values, "z":z_nl_cutoff}
 
         P_II, P_GI, b_I, r_I, k_I, z_I = krause_eifler_blazek(
-            z_nl, k_nl, p_nl, A, omega_m, h, z0_IA,z1_IA,M0,beta,eta,eta_highz,mlim, D_L,k_corr, e_corr)
+            z_nl,z_nl_cutoff, k_nl, p_nl, A, omega_m, h, z0_IA,z1_IA,M0,beta,eta,eta_highz,mlim, D_L,k_corr, e_corr)
 
     if grid_mode:
         block.put_grid(ia, "z", z_I, "k_h", k_I,  "b_I" + suffix, b_I)

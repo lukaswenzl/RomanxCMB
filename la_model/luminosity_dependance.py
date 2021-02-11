@@ -6,13 +6,11 @@ from scipy import integrate
 #input parameters
 
 
-
-
 #utility functions
 def Magnitude_to_Luminosity(M):
     #convert absolute Magnitudes to Luminosity
     L0 =  3.0128e28 #W
-    return L0 * 10**(-0.4*M)
+    return L0 * 10.**(-0.4*M)
 
 def resample(F, z_old, z_new, extrapolate_linearly_at_highz=True):
     if extrapolate_linearly_at_highz:
@@ -40,25 +38,25 @@ class func_container():
         return np.interp(x, self.x_interp, self.values_interp)
 
 #integrate from lower cutoff to infinity
-def luminosity_integral(lower_lim, phi, L0=None,beta=None):
-    #phi depends on z and L, in order [L,z]
-    L = phi["L"]
-    z = phi["z"]
-    if(L0 != None and beta != None):#TEST THIS: todo
-        tmp = (L/L0)**beta 
-        _, L_over_L0_mesh = np.meshgrid(z, tmp)
-        integrand = phi["phi"]*L_over_L0_mesh
-    else:
-        integrand = phi["phi"]
-    integral = np.zeros(len(z))
-    print(lower_lim)
-    for i in range(len(z)):
-        f = func_container(integrand[:,i], L)
-        print(i)
-        integral[i]= integrate.quad(f, np.log(lower_lim[i]), np.log(L[-1]), epsrel=1e-6)[0] ##be careful with the upper limit. Only works if phi is sampled to high enough L.
-        #relative tolerance is tested with gamma function comparison, see test(), 
-    result = {"result":integral, "z":phi["z"]}
-    return result
+# def luminosity_integral(lower_lim, phi, L0=None,beta=None):
+#     #phi depends on z and L, in order [L,z]
+#     L = phi["L"]
+#     z = phi["z"]
+#     if(L0 != None and beta != None):#TEST THIS: todo
+#         tmp = (L/L0)**beta 
+#         _, L_over_L0_mesh = np.meshgrid(z, tmp)
+#         integrand = phi["phi"]*L_over_L0_mesh
+#     else:
+#         integrand = phi["phi"]
+#     integral = np.zeros(len(z))
+#     print(lower_lim)
+#     for i in range(len(z)):
+#         f = func_container(integrand[:,i], L)
+#         print(i)
+#         integral[i]= integrate.quad(f, np.log(lower_lim[i]), np.log(L[-1]), epsrel=1e-6)[0] ##be careful with the upper limit. Only works if phi is sampled to high enough L.
+#         #relative tolerance is tested with gamma function comparison, see test(), 
+#     result = {"result":integral, "z":phi["z"]}
+#     return result
 
 
 
@@ -81,33 +79,67 @@ def setup_luminosity_dependance(band = "r", pathtok_e_corr="k_e_correction/"):
     
     return k_corr, e_corr
 
-def calculate_luminosity_function(z,phi_star_0,M_star, alpha,P,Q,h, smallest_logL=31):
-    #$\phi(L, z)=\phi^{*}(z)\left(\frac{L}{L^{*}(z)}\right)^{\alpha} \exp \left(-\frac{L}{L^{*}(z)}\right)$
-    #with $\phi^{*}(z)=\phi_{0}^{*} 10^{0.4 P z}$
+class Luminosity_function():
+    def __init__(self, phi_star_0, M_star, alpha, P, Q, h):
+        self.phi_star_0 = phi_star_0
+        self.M_star = M_star
+        self.alpha = alpha
+        self.P = P
+        self.Q = Q
+        # self.h = h
 
-    phi_star = phi_star_0* 10**(0.4*P*z)  #(h/Mpc)^3 !!!
+    def __call__(self, logL, z):
+        #gives integrand in log space, note this is phi * L
+        L = np.exp(logL)
+        phi_star = self.phi_star_0 * 10.**(0.4*self.P*z)
+        L_star = Magnitude_to_Luminosity(self.M_star - self.Q*(z-0.1)) 
+        #print(L_star)
+        phi_integrand = phi_star *(L/L_star)**self.alpha * np.exp(-L/L_star)  * L #note the *L factor from variable change to log space
+        return phi_integrand
+
+    def get_phi(self, logL, z):
+        #gives phi 
+        L = np.exp(logL)
+        phi_star = self.phi_star_0 * 10.**(0.4*self.P*z)
+        L_star = Magnitude_to_Luminosity(self.M_star - self.Q*(z-0.1)) 
+        #print(L_star)
+        phi_values = phi_star *(L/L_star)**self.alpha * np.exp(-L/L_star)
+        return phi_values
+    
+        
+
+
+# def calculate_luminosity_function_OLD(z,phi_star_0,M_star, alpha,P,Q,h, smallest_logL=31):
+#     $\phi(L, z)=\phi^{*}(z)\left(\frac{L}{L^{*}(z)}\right)^{\alpha} \exp \left(-\frac{L}{L^{*}(z)}\right)$
+#     with $\phi^{*}(z)=\phi_{0}^{*} 10^{0.4 P z}$
+
+#    phi_star = phi_star_0* 10**(0.4*P*z)  #(h/Mpc)^3 !!!
   
-    L = np.logspace(smallest_logL,40,100)#W #31 to 40; 100 samples is enough for to reach 1e-6 accuracy for the integral
-    #on the high end the exponential takes over and the values are much smaller than machine precision for 10^40W
-    #on the low end consider the faintest dwarfs currently know are 10^5 L_sun https://arxiv.org/abs/1901.05465, this is of order 10^31 W
-    L_star = Magnitude_to_Luminosity(M_star -5*np.log10(h)- Q*(z-0.1)) #typically 10^36- 10^37W (order of magnitude of Milkyway luminosity) ##WRONG:np.log(h)?!? Why not +
-    _, L_mesh = np.meshgrid(z, L)
-    phi_star_mesh, _ = np.meshgrid(phi_star, L)
-    L_star_mesh, _ = np.meshgrid(L_star, L)
+#    L = np.logspace(smallest_logL,40,100)#W #31 to 40; 100 samples is enough for to reach 1e-6 accuracy for the integral
+#     on the high end the exponential takes over and the values are much smaller than machine precision for 10^40W
+#     on the low end consider the faintest dwarfs currently know are 10^5 L_sun https://arxiv.org/abs/1901.05465, this is of order 10^31 W
+#    L_star = Magnitude_to_Luminosity(M_star -5*np.log10(h)- Q*(z-0.1)) #typically 10^36- 10^37W (order of magnitude of Milkyway luminosity) ##WRONG:np.log(h)?!? Why not +
+#    _, L_mesh = np.meshgrid(z, L)
+#    phi_star_mesh, _ = np.meshgrid(phi_star, L)
+#    L_star_mesh, _ = np.meshgrid(L_star, L)
 
-    phi_values = phi_star_mesh *(L_mesh/L_star_mesh)**alpha * np.exp(-L_mesh/L_star_mesh)
-    phi = {"phi":phi_values,  "z":z, "L":L}
-    return phi
+#    phi_values = phi_star_mesh *(L_mesh/L_star_mesh)**alpha * np.exp(-L_mesh/L_star_mesh)
+#    phi = {"phi":phi_values,  "z":z, "L":L}
+#    return phi
 
 
-def calculate_L_lim(m_lim, D_L,k_corr,e_corr, h, galaxy_type="Sa"):
+def calculate_L_lim(m_lim, D_L,k_corr,e_corr, h, galaxy_type="Sa", combine=False):
     # $M_{\lim }\left(z, m_{\lim }\right)=m_{\lim }-\left(5 \log _{10} \frac{D_{\mathrm{L}}(z)}{\mathrm{Mpc} / \mathrm{h}}+25+k(z)\right)$
     # needs the limiting magnitude of the survey and the luminosity distance function for cosmology D_L(z) [Mpc/h]
     
     z = D_L["z"]
     print("right now we are using Sa galaxy k and e correction. This might be a pretty bad choice, only for code testing purposes!")
-    k = resample(k_corr[galaxy_type],k_corr["z"], z)+resample(e_corr[galaxy_type],e_corr["z"], z)# still unclear which column to use!!!!!!!!!!!!!!!!!!!!!!!!
-    M_lim = m_lim - ( 5.*np.log10(np.array(D_L["D_L"])/h)+25.+k)#factor h!! is this correct? TODO
+    if (combine):
+        k = 0.5*resample(k_corr[galaxy_type],k_corr["z"], z)+resample(e_corr[galaxy_type],e_corr["z"], z)
+        k += 0.5*resample(k_corr["E"],k_corr["z"], z)+resample(e_corr["E"],e_corr["z"], z)
+    else:
+        k = resample(k_corr[galaxy_type],k_corr["z"], z)+resample(e_corr[galaxy_type],e_corr["z"], z)# still unclear which column to use!!!!!!!!!!!!!!!!!!!!!!!!
+    M_lim = m_lim - ( 5.*np.log10(np.array(D_L["D_L"])/h)+25.+k) # important factor of h! camb distance is in Mpc so need to divide by h here
     L_lim_values = Magnitude_to_Luminosity(M_lim)
     if(z[0]==0):
         L_lim_values[0] = 1e30
@@ -119,17 +151,54 @@ def red_fraction(L_lim_red, L_lim_all, phi_red, phi_all):
     #$f_{\mathrm{red}}\ (m_{\lim} , z  ) = \frac{\int_{L\ (m_{\lim} , z)}^\infty d L    \phi_{\mathrm{red}}(L, z)}{\int_{L\ (m_{\lim} , z)}^\infty  dL \phi_{\mathrm{all}}(L, z)  }$
     #only for testing. Not used in final pipeline.
 
-    red = luminosity_integral(L_lim_red["L_lim"], phi_red) 
-    all = luminosity_integral(L_lim_all["L_lim"], phi_all) 
-    f_red = {"f_red": red["result"]/all["result"], "z":red["z"]}
-    return f_red,red,all
+    z = L_lim_red["z"]
+    f = lambda logL : phi_red((logL+np.log(L_lim_red["L_lim"])),z) 
+    lum_red = integrate.quad_vec(f, 0, 50, epsrel=1e-4)
 
-def integrate_luminosity_dependence(A_L0, phi_red, phi_all,L_lim_red, L_lim_all,M0,beta):
-    #integrate luminosity dependence and multiply with red fraction (saves on calculation since one integral cancels)
-    #red = luminosity_integral(lower_lim, phi_red) 
+    f = lambda logL : phi_all((logL+np.log(L_lim_all["L_lim"])),z)  
+    lum_all = integrate.quad_vec(f, 0, 50, epsrel=1e-4)
+
+    #red = luminosity_integral(L_lim_red["L_lim"], phi_red) 
+    #all = luminosity_integral(L_lim_all["L_lim"], phi_all) 
+    f_red = {"f_red": lum_red[0]/lum_all[0], "z":z}
+
+    # import matplotlib.pyplot as plt
+    # plt.plot(f_red["z"], f_red["f_red"])
+    # plt.savefig("test_fred.png")
+
+    return f_red,lum_red[0],lum_all[0]
+
+def integrate_luminosity_dependence(A_L0, phi_red, phi_all, L_lim_red, L_lim_all, M0, beta):
+
+    z = A_L0["z"]
     L0 = Magnitude_to_Luminosity(M0)
-    lum_scaling = luminosity_integral(L_lim_red["L_lim"], phi_red,L0,beta) 
-    all = luminosity_integral(L_lim_all["L_lim"], phi_all,L0,beta) 
+
+    f = lambda logL : phi_red((logL+np.log(L_lim_red["L_lim"])),z) * ((np.exp(logL)+L_lim_red["L_lim"]) / L0)**beta
+    lum_scaling = integrate.quad_vec(f, 0, 50, epsrel=1e-4) #integral goes from -inf to inf. Need to choose log space range large enough. values significant between e30 and e45
+    print("need to adapt upper and lower limit")
+
+    f = lambda logL : phi_all((logL+np.log(L_lim_all["L_lim"])),z)
+    lum_all = integrate.quad_vec(f, 0, 50, epsrel=1e-4)
+    print("hello i am here")
+    print(z)
+    print(lum_scaling[0])
+    print(lum_all[0])
+    print(lum_all)
+
+    A_mlim_values = A_L0["A_L0"] * lum_scaling[0]/lum_all[0]
+    
+    #could implement a max redshift to avoid the nulls but does not seem to be necessary since already very fast
+    A_mlim_values[np.isnan(A_mlim_values)] = 0 #TODO
+
+    print(A_mlim_values)
+    return {"A_mlim":A_mlim_values, "z":A_L0["z"]}
+
+
+    # #integrate luminosity dependence and multiply with red fraction (saves on calculation since one integral cancels)
+    # #red = luminosity_integral(lower_lim, phi_red) 
+    # L0 = Magnitude_to_Luminosity(M0)
+    # lum_scaling = luminosity_integral(L_lim_red["L_lim"], phi_red,L0,beta) 
+    # all = luminosity_integral(L_lim_all["L_lim"], phi_all,L0,beta= None) #FISING ERROR HERE! 
 
     # #resample in redshift
     # print(len(all["z"]))
@@ -139,12 +208,15 @@ def integrate_luminosity_dependence(A_L0, phi_red, phi_all,L_lim_red, L_lim_all,
     # lum_scaling["result"] = resample(lum_scaling["result"], lum_scaling["z"], A_L0["z"], extrapolate_linearly_at_highz=False)
     # lum_scaling["z"] = A_L0["z"]
 
-    A_mlim_values = A_L0["A_L0"]* lum_scaling["result"]/all["result"]
-    A_mlim = {"A_mlim":A_mlim_values, "z":A_L0["z"]} #might have to resample in z at some point here!
-    return A_mlim
+    # # A_mlim_values = A_L0["A_L0"]* lum_scaling["result"]/all["result"]
+    # A_mlim = {"A_mlim":A_mlim_values, "z":A_L0["z"]} #might have to resample in z at some point here!
+
+    # return A_mlim
+
 
 
 def test():
+    errors = ""
     h = 0.68 
     k_corr, e_corr = setup_luminosity_dependance(band = "r", pathtok_e_corr="k_e_correction/")
     #check integral, when setting lower limit to 0 we should get \gamma(alpha+1)= alpha (when normalizing the unit constants to 1)
@@ -152,17 +224,33 @@ def test():
     M_star = -20.70
     Q = 0.7
     alpha = 1
-    phi = calculate_luminosity_function(z,phi_star_0=1,M_star=M_star, alpha=alpha,P=0,Q=Q,h=h, smallest_logL=1)
-    lower_limit = np.zeros_like(phi["z"])
-    result = luminosity_integral(lower_limit, phi, L0=None,beta=None)
-    print("mean error from \gamma(2) = 1 test: "+str(np.mean(result["result"]-1)))
+    phi = Luminosity_function(phi_star_0=1,M_star=M_star, alpha=alpha,P=0,Q=Q,h=h)
+    #lower_limit = np.zeros_like(z) NEED TO TAKE LOG TODO
+    #result = luminosity_integral(lower_limit, phi, L0=None,beta=None)
+    f = lambda logL : phi(logL,z) /np.exp(logL)
+    result = integrate.quad_vec(f, 0, np.log(1e50), epsrel=1e-4)
+    print("mean error from \gamma(2) = 1 test: "+str(np.mean(result[0]-1)))
+
+    # test  = func_container2(phi)
+    # f = lambda logL : test(logL,z)
+    # result = integrate.quad_vec(f, 0, 150, epsrel=1e-4)
+    # print(result)
+    # print("mean error from \gamma(2) = 1 test: "+str(np.mean(result[0]-1)))
 
     alpha = 0.4
     goal = 2.21815954375768822
-    phi = calculate_luminosity_function(z,phi_star_0=1,M_star=M_star, alpha=alpha,P=0,Q=Q,h=h, smallest_logL=1)
-    lower_limit = np.zeros_like(phi["z"])
-    result = luminosity_integral(lower_limit, phi, L0=None,beta=None)
-    print("mean error from \gamma(0.4) = 2.21815954375768822 test: "+str(np.mean(result["result"]-goal)))
+    phi = Luminosity_function(phi_star_0=1,M_star=M_star, alpha=alpha,P=0,Q=Q,h=h)
+    #lower_limit = np.zeros_like(z)
+    #result = luminosity_integral(lower_limit, phi, L0=None,beta=None)
+    f = lambda logL : phi(logL,z) /np.exp(logL)
+    result = integrate.quad_vec(f, 0, np.log(1e50), epsrel=1e-4)
+    print("mean error from \gamma(0.4) = 2.21815954375768822 test: "+str(np.mean(result[0]-goal)))
+
+
+
+    if( np.abs(np.mean(result[0]-goal)) > 0.001):
+        errors = errors + "Luminosity function integral is not accurate. Tested by comparing to gamma function \n"
+
 
     #from a fiducial cosmology run with CAMB we prepared a test luminosity distance function
     D_L_values = [    0.        ,   672.57723759,  1455.48030101,  2331.48753462,
@@ -181,23 +269,23 @@ def test():
     #testrun calculating A and red fraction for GAMA case in Krause et al 2016
     #all galaxies case, GAMA case
     phi_star_0 = 9.4e-3 #(h/Mpc)^3 
-    M_star = -20.70  #  +5*np.log(0.7)#weird h factor but I think I do not have to add that here.
+    M_star = -20.70   #+5*np.log(0.7)#weird h factor but I think I do not have to add that here. TODO
     alpha = -1.23
     P=1.8
     Q = 0.7
-    phi_all = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)###
+    phi_all = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
     phi_star_0 = 1.1e-2 #(h/Mpc)^3 
-    M_star = -20.34 #+5*np.log(0.7)
+    M_star = -20.34 #+5*np.log(0.7) #TODO
     alpha = -0.57
     P=-1.2 
     Q = 1.8
     
-    phi_red = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)###
+    phi_red = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
 
     m_lim = 27.5 
     print("testing with m_lim = 27.5 in r band for Roman HLS survey as in Krause et al 2016")
-    L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="Sa")
-    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="E")
+    L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h,galaxy_type="Sa")
+    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h,galaxy_type="Sa")
 
     print("here are the limiting Luminosities, they should be between 1e30 and 1e40 and increasing")
     print(L_lim_all["L_lim"])
@@ -205,32 +293,32 @@ def test():
 
     #testing for lower limiting mag: 
     m_lim = 24.5
-    L_lim = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="E")#WRONG
-    L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="Sa")
-    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="E")
+    #L_lim = calculate_L_lim(m_lim, D_L, k_corr, h, e_corr,galaxy_type="E")#WRONG
+    L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h, galaxy_type="Sa")
+    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h, galaxy_type="Sa")
     f_red_gamma_24_5,_,_ = red_fraction(L_lim_red,L_lim_all , phi_red, phi_all)
 
     #deep2 survey
     phi_star_0 = 9.4e-3 #(h/Mpc)^3 
-    M_star = -20.70  #  +5*np.log(0.7)#weird h factor but I think I do not have to add that here.
+    M_star = -20.70    #+5*np.log(0.7)#weird h factor but I think I do not have to add that here. TODO
     alpha = -1.23
     P=-0.3
     Q=1.23
-    phi_all = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q, h)
+    phi_all = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)
     phi_star_0 = 1.1e-2 #(h/Mpc)^3 
-    M_star = -20.34 #+5*np.log(0.7)
+    M_star = -20.34 #+5*np.log(0.7) #TODO
     alpha = -0.57
-    P=-1.15
+    P=-1.15 
     Q=1.20
-    phi_red = calculate_luminosity_function(D_L["z"],phi_star_0,M_star, alpha,P,Q ,h)
+    phi_red = Luminosity_function(phi_star_0,M_star, alpha,P,Q ,h)
     m_lim = 27.5
     L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="Sa")##THIS HAS A HUGE IMPACT??!
-    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="E")##THIS HAS A HUGE IMPACT??!
+    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="Sa")##THIS HAS A HUGE IMPACT??!
     #L_lim["L_lim"] = L_lim["L_lim"]*5#WRONG
     f_red_deep2_27_5,_,_ = red_fraction(L_lim_red,L_lim_all , phi_red, phi_all)
     m_lim = 24.5
     L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="Sa")##THIS HAS A HUGE IMPACT??!
-    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="E")##THIS HAS A HUGE IMPACT??!
+    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr, h, galaxy_type="Sa")##THIS HAS A HUGE IMPACT??!
     #L_lim["L_lim"] = L_lim["L_lim"]*5#WRONG
     f_red_deep2_24_5,_,_ = red_fraction(L_lim_red,L_lim_all , phi_red, phi_all)
 
@@ -252,12 +340,12 @@ def test():
     plt.xlim(0,3.5)
     plt.savefig("test_fraction_of_red_galaxies.png")
 
-    plt.figure()
-    plt.plot(all["z"],all["result"], "--", label="all")
-    plt.plot(red["z"],red["result"], "--", label="red")
-    plt.xlabel("z")
-    plt.legend()
-    plt.savefig("test_number_of_galaxies_vs_redshift.png")
+    # plt.figure()
+    # plt.plot(z,all.get_phi(z), "--", label="all")
+    # plt.plot(red["z"],red["result"], "--", label="red")
+    # plt.xlabel("z")
+    # plt.legend()
+    # plt.savefig("test_number_of_galaxies_vs_redshift.png")
 
     #Luminosity function looks accurate
     # plt.figure()
@@ -265,6 +353,8 @@ def test():
     # plt.yscale("log")
     # plt.savefig("test.png")
 
+    print("Reached end. Here is a list of errors if any where encountered:")
+    print(errors)
 
     import pdb; pdb.set_trace()
 
