@@ -353,6 +353,42 @@ def test():
     # plt.yscale("log")
     # plt.savefig("test.png")
 
+
+    #another plot just of the fraction we actually use:
+    #testrun calculating A and red fraction for GAMA case in Krause et al 2016
+    #all galaxies case, GAMA case
+    phi_star_0 = 9.4e-3 #(h/Mpc)^3 
+    M_star = -20.70   #+5*np.log(0.7)#weird h factor but I think I do not have to add that here. TODO
+    alpha = -1.23
+    P=1.8
+    Q = 0.7
+    phi_all = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
+    phi_star_0 = 1.1e-2 #(h/Mpc)^3 
+    M_star = -20.34 #+5*np.log(0.7) #TODO
+    alpha = -0.57
+    P=-1.2 
+    Q = 1.8
+    
+    phi_red = Luminosity_function(phi_star_0,M_star, alpha,P,Q, h)###
+
+    m_lim = 25.3 
+    #print("testing with m_lim = 27.5 in r band for Roman HLS survey as in Krause et al 2016")
+    L_lim_all = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h,galaxy_type="Sa")
+    L_lim_red = calculate_L_lim(m_lim, D_L, k_corr, e_corr,h,galaxy_type="Sa")
+
+    #print("here are the limiting Luminosities, they should be between 1e30 and 1e40 and increasing")
+    #print(L_lim_all["L_lim"])
+    f_red,red,all = red_fraction(L_lim_red,L_lim_all , phi_red, phi_all)
+    plt.figure(figsize=(7,4))
+    plt.plot(f_red["z"],f_red["f_red"],"--", color="red", label="GAMA, m_r,lim=25.3")
+    plt.xlabel("z")
+    plt.ylabel("fraction of red galaxies")
+    plt.ylim(0.,0.2)
+    plt.legend()
+    plt.xlim(0,3.5)
+    plt.savefig("Roman_redfraction.png")
+
+
     print("Reached end. Here is a list of errors if any where encountered:")
     print(errors)
 
