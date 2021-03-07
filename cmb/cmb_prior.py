@@ -43,7 +43,7 @@ class CMBLikelihood(GaussianLikelihood):
 
         params_test = np.array([block[self.cosmo, i] for i in params_names])
         #to get Omegamh2 maybe I need to somehow access consistency section?
-        print("!!still need to check that is is ok to multiply prior to like!")
+        #print("!!still need to check that is is ok to multiply prior to like!") TODO
         return params_test
 
 
