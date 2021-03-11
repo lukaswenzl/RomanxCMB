@@ -113,3 +113,6 @@ clean:
 	rm -f $(BUILD_DIR)/*.mod
 	rm -f $(DEBUG_BUILD_DIR)/*.o
 	rm -f $(DEBUG_BUILD_DIR)/*.mod
+
+test: $(OBJ) test.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -J$(BUILD_DIR) $(LDFLAGS)
