@@ -70,6 +70,7 @@ int execute(c_datablock * block, growth_config * config)
 
 	int i,status=0;
 	double w,wa,omega_m,omega_v;
+	double mu0;
 	int nz_lin = config->nz_lin;
 	int nz_log = config->nz_log;
 	int nz = nz_lin + nz_log;
@@ -81,6 +82,8 @@ int execute(c_datablock * block, growth_config * config)
 	status |= c_datablock_get_double_default(block, cosmo, "wa", 0.0, &wa);
 	status |= c_datablock_get_double(block, cosmo, "omega_m", &omega_m);
 	status |= c_datablock_get_double_default(block, cosmo, "omega_lambda", 1-omega_m, &omega_v);
+	status |= c_datablock_get_double(block, cosmo, "mu0", &mu0);
+	
 
 	if (status){
 		fprintf(stderr, "Could not get required parameters for growth function (%d)\n", status);
@@ -114,7 +117,7 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(a,nz);
 
 	// Compute D and f
-	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz);
+	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mu0);
 	
 	// Now reverse everything back to increasing z
 	// Note that we do not unreverse z as we never reversed it in the first place.
