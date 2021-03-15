@@ -37,8 +37,8 @@ CONTAINS
       ! Different HMcode versions
       !INTEGER, PARAMETER :: version = HMcode2015
       !INTEGER, PARAMETER :: version = HMcode2016
-      INTEGER, PARAMETER :: version = HMcode2020
-      !INTEGER, PARAMETER :: version = HMcode2020_feedback
+      !INTEGER, PARAMETER :: version = HMcode2020
+      INTEGER, PARAMETER :: version = HMcode2020_feedback
 
       ! Fill arrays with desired k and a points
       CALL fill_array_log(kmin, kmax, k, nk)
@@ -61,6 +61,8 @@ CONTAINS
       cosm%Om_w = 1.-cosm%Om_m ! Set dark-energy density assuming flatness
       cosm%iw = iw_wCDM        ! Set to wCDM dark energy
       cosm%Om_v = 0.           ! Force vacuum energy density to zero (note that DE density is non-zero)
+
+      cosm%Theat = 2*10**7.8 !fiducial value: 10**7.8
 
       ! Read in linear spectrum if provided
       CALL read_command_argument(7, infile, '', def='')

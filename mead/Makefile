@@ -1,51 +1,7 @@
-# Makefile to compile HMcode
+include ${COSMOSIS_SRC_DIR}/config/compilers.mk
 
-# Compiler
-FC = gfortran 
 
-# Standard flags
-FFLAGS = \
-	-fcheck=all \
-	-fmax-errors=4 \
-	-ffpe-trap=invalid,zero,overflow \
-	-fimplicit-none \
-	-O3 \
-	-std=gnu \
-	-ffree-line-length-none \
-	-fdefault-real-8 \
-	-fdefault-double-8 \
-	-lgfortran \
-	-lm
-
-# Extra debugging flags
-DEBUG_FLAGS = \
-	-Wall \
-	-fcheck=all \
-	-fbounds-check \
-	-fbacktrace \
-	-Og
-
-# Binary
-BIN = HMcode
-BIN_DEBUG = $(BIN)_debug
-
-# Source-code directory
-SRC_DIR = src
-
-# Build directory
-BUILD_DIR = build
-
-# Fortran library directory
-MOD_DIR = library/src
-
-# Debug build directory
-DEBUG_BUILD_DIR = debug_build
-
-# Executable directory
-BIN_DIR = bin
-
-# Objects
-_OBJ = \
+OBJ = \
 	precision.o \
 	constants.o \
 	physics.o \
@@ -68,51 +24,43 @@ _OBJ = \
 	cosmology_functions.o \
 	hmx.o 
 
-# Add prefixes of build directory to objects
-OBJ = $(addprefix $(BUILD_DIR)/,$(_OBJ))
-DEBUG_OBJ = $(addprefix $(DEBUG_BUILD_DIR)/,$(_OBJ))
-
+# Build directory
+#BUILD_DIR = build
+# Fortran library directory
+MOD_DIR = library/src
 # This is a rule to make directories
 make_dirs = @mkdir -p $(@D)
 
-# Standard rules
-all: bin
-bin: $(BIN_DIR)/$(BIN)
-
-# Debugging rules
-debug: FFLAGS += $(DEBUG_FLAGS)
-debug: $(BIN_DIR)/$(BIN_DEBUG)
+#OBJ = $(addprefix $(BUILD_DIR)/,$(_OBJ))
 
 # Rule to make object files
-$(BUILD_DIR)/%.o: $(MOD_DIR)/%.f90
+%.o: $(MOD_DIR)/%.f90
 	$(make_dirs)
-	$(FC) -c -o $@ $< -J$(BUILD_DIR) $(LDFLAGS) $(FFLAGS)
+	$(FC) -c -o $@ $< $(LDFLAGS) $(FFLAGS)
 
-# Rule to make executable
-$(BIN_DIR)/$(BIN): $(OBJ) $(SRC_DIR)/$(BIN).f90
-	@echo "\nBuilding executable.\n"
-	$(make_dirs)
-	$(FC) -o $@ $^ -J$(BUILD_DIR) $(LDFLAGS) $(FFLAGS)
+all: mead_interface.so
 
-# Rule to make debugging objects
-$(DEBUG_BUILD_DIR)/%.o: $(MOD_DIR)/%.f90
-	$(make_dirs)
-	$(FC) -c -o $@ $< -J$(DEBUG_BUILD_DIR) $(LDFLAGS) $(FFLAGS)
+mead_interface.so: $(OBJ) mead_interface.f90
+	#$(FC) $(FFLAGS) -shared -o $@ $+ -L. -lhmcode $(LDFLAGS) -lcosmosis_fortran -lcosmosis
+	$(FC) $(FFLAGS) -shared -o $@ $+ -L. $(LDFLAGS) -lcosmosis_fortran -lcosmosis
 
-# Rule to make debugging executable
-$(BIN_DIR)/$(BIN_DEBUG): $(DEBUG_OBJ) $(SRC_DIR)/$(BIN).f90
-	@echo "\nBuilding debugging executable.\n"
-	$(FC) -o $@ $^ -J$(DEBUG_BUILD_DIR) $(LDFLAGS) $(FFLAGS)
 
-# Clean up
-.PHONY: clean
+
+#test: test.f90 libhmcode.so
+#	$(FC) $(FFLAGS) -o $@ $< -L. -lhmcode $(LDFLAGS)
+
+
 clean:
-	rm -f $(BIN_DIR)/$(BIN)
-	rm -f $(BIN_DIR)/$(BIN_DEBUG)
-	rm -f $(BUILD_DIR)/*.o
-	rm -f $(BUILD_DIR)/*.mod
-	rm -f $(DEBUG_BUILD_DIR)/*.o
-	rm -f $(DEBUG_BUILD_DIR)/*.mod
+	#rm -f hmcode
+	rm -f libhmcode.so
+	rm -f hmcode.o
+	rm -f mead_interface.so
+	#rm -rf test
+	rm -rf power.dat
+	rm -rf *.dSYM/
+	rm -rf *.mod
+	rm -rf *.o
 
-test: $(OBJ) test.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -J$(BUILD_DIR) $(LDFLAGS)
+#libhmcode.so: HMcode.f90
+#	$(FC) $(FFLAGS) -c  $+ $(LDFLAGS)
+#	$(FC) -shared -o $(CURDIR)/$@ HMcode.o
