@@ -121,3 +121,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# MAC
+*.DS_Store
+
+# MG tests
+growth_modified_gravity/test/
