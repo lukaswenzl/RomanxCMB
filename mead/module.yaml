@@ -1,17 +1,20 @@
 #This is a template for module description files
 name: mead
-version: 1.0
+version: 1.1
 purpose: Uses an extended Halo model to compute non-linear and baryonic power
 url: "https://github.com/alexander-mead/hmcode"
 interface: mead_interface.so
 attribution: [Alexander Mead]
 rules: []
-cite: ["http://arxiv.org/abs/1505.07833v1"]
+cite: ["https://arxiv.org/abs/2009.01858", "http://arxiv.org/abs/1505.07833v1"]
 
 assumptions:
-    - "Halo model and particular extensions described in referenced paper"
+    - "Halo model and particular extensions described in referenced papers"
 
 explanation: |
+
+    Note Copied from cosmosis-standard-library and updated to use updated mead2020 code. 
+    Using commit 99c628b of the library from March2021.
 
     In the non-linear regime (high k; small scales) predicting the matter 
     power spectrum is extremely challenging, as the simple predictability
@@ -45,6 +48,7 @@ params:
     kmin: "Real, min wavenumber to save output P(k,z), in Mpc/h"
     kmax: "Real, max wavenumber to save P(k,z), in Mpc/h"
     nk:   "Integer, number of wavenumber samples in P(k,z)"
+    feedback: "Boolean, whether to use baryon feedback model"
 
 inputs:
     cosmological_parameters:
@@ -54,9 +58,11 @@ inputs:
         h0:  "real, little h Hubble parameter  (H0 / (100 km/s/Mpc))"
         sigma_8: "real, amplitude of linear matter power at 8/h Mpc at z=0."
         w:  "real, w(z=0) equation of state of dark energy (default -1.0)"
-    halo_model_parameters:
-        A: "real, default=3.13, Minimum halo concentration"
-        eta_0: "real, default=0.603, Halo bloating parameter constant term"
+        log10T_AGN: "AGN temperature, free variable for Baryon feedback model. Only used when feedback=T"
+    matter_power_lin:
+        k_h: "real 1D array, sample values of linear spectrum in Mpc/h"
+        z: "real 1D array, redshift of nonlinear spectrum samples, only uses z=0"
+        P_k: "real 2D array, linear spectrum in (Mpc/h)^{-3}"
 outputs:
     matter_power_nl:
         k_h: "real 1D array, sample values of nonlinear spectrum in Mpc/h"

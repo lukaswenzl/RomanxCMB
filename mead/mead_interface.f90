@@ -90,11 +90,11 @@ function execute(block,config) result(status)
 	!real(4) :: p1h, p2h,pfull, plin, z
 	integer :: i,j, z_index, nk_lin
 	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
-	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:), z_lin(:), a_lin(:)
+	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:), z_lin(:), a_lin(:)
 	TYPE(cosmology) :: cosm
 	!TYPE(tables) :: lut
 	!CosmoSIS supplies double precision - need to convert
-	real(8) :: Om_m, Om_lam, Om_b, h, w, sig8, n_s, Om_nu
+	real(8) :: Om_m, Om_lam, Om_b, h, w,wa, sig8, n_s, Om_nu, omnuh2
 	real(8), ALLOCATABLE :: k_in(:), z_in(:), p_in(:,:), a_in(:)
 	real(8), ALLOCATABLE :: k_out(:), z_out(:), a_out(:), p_out(:,:)
 	!real(8) :: Halo_as, halo_eta0
@@ -120,16 +120,19 @@ function execute(block,config) result(status)
 	status = status + datablock_get(block, cosmo, "omega_m", Om_m)
 	status = status + datablock_get(block, cosmo, "omega_lambda", Om_lam)
 	status = status + datablock_get(block, cosmo, "omega_b", Om_b)
-        status = status + datablock_get_double_default(block, cosmo, "omega_nu", 0.0D0, Om_nu)
+    !status = status + datablock_get_double_default(block, cosmo, "omega_nu", 0.0D0, Om_nu)
 	status = status + datablock_get(block, cosmo, "h0", h)
 	status = status + datablock_get(block, cosmo, "sigma_8", sig8)
 	status = status + datablock_get(block, cosmo, "n_s", n_s)
 	status = status + datablock_get_double_default(block, cosmo, "w", -1.0D0, w)
+	status = status + datablock_get_double_default(block, cosmo, "wa", 0.0D0, wa)
+	status = status + datablock_get_double_default(block, cosmo, "omnuh2", 0.0D0, omnuh2)
+
 
 
 	!status = status + datablock_get_double_default(block, halo, "A", 3.13D0, halo_as)
 	!status = status + datablock_get_double_default(block, halo, "eta_0", 0.603D0, halo_eta0)
-	!status = status + datablock_get_double_default(block, halo, "log10T_AGN", 7.8, log10T_AGN)
+	status = status + datablock_get_double_default(block, halo, "log10T_AGN", 7.8D0, log10T_AGN)
 
 
 	if (status .ne. 0 ) then
@@ -144,47 +147,52 @@ function execute(block,config) result(status)
     !I think om_m now includes the neutrinos, but i can't really specify neutrinos as a mass... 
 	!i guess i can convert omega_nu to m_nu but annoying
 	!also do I need to specify upper or lower case ones?, need to add wa as well
-	cosm%iw = iw_wCDM        ! Set to wCDM dark energy
+	cosm%iw = iw_waCDM        ! Set to w_waCDM dark energy
     cosm%Om_v = 0.           ! Force vacuum energy density to zero (note that DE density is non-zero)
 	cosm%Om_w=Om_lam
+	cosm%w=w
+	cosm%wa=wa
+
+	cosm%Om_m=Om_m
     cosm%Om_b=Om_b
     cosm%h=h
-    cosm%w=w
     cosm%sig8=sig8
     cosm%ns=n_s
+	cosm%m_nu= omnuh2 * 93.14
 
     !cosi%eta_0 = halo_eta0
     !cosi%As = halo_as
-	!cosm%Thead=10**log10T_AGN
+	cosm%Theat=10**log10T_AGN
 
     !And get the cosmo power spectrum, again as double precision
     !Also the P is 2D as we get z also
 	status = status + datablock_get_double_grid(block, linear_power, &
         "k_h", k_in, "z", z_in, "p_k", p_in)
 	a_in = 1/(1+z_in)
-	!allocate(k_lin(size(k_in)))
-	!allocate(a_lin(size(a_in)))
-	!allocate(z_lin(size(z_in)))
-	!allocate(pk_lin(size(k_in), size(z_in)))
-	!k_lin = k_in
-	!a_lin = a_in!(:-1)
-	!z_lin = z_in!(:-1)
-	!pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
+	allocate(k_lin(size(k_in)))
+	allocate(a_lin(size(a_in)))
+	allocate(z_lin(size(z_in)))
+	allocate(pk_lin(size(k_in), size(z_in)))
+	k_lin = k_in
+	a_lin = a_in!(:-1)
+	z_lin = z_in !(:-1)
+	pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
 	!DO i=1,size(z_lin)
 	!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
 	!END DO
 	!pk_lin = Pk_Delta(pk_lin, k_lin)
+	CALL init_external_linear_power_tables(cosm, k_lin, a_lin, pk_lin)
 
-	allocate(k_lin(size(k_in)))
-	allocate(a_lin(1))
-	allocate(z_lin(1))
-	allocate(pk_lin(size(k_in)))
-	k_lin = k_in
-	a_lin = a_in(1)
-	z_lin = z_in(1)
-	pk_lin = p_in(:, 1) !* (k_lin**3.0) * (2.*(pi**2.))    
+	!allocate(k_lin(size(k_in)))
+	!allocate(a_lin(1))
+	!allocate(z_lin(1))
+	!allocate(pk_lin(size(k_in)))
+	!k_lin = k_in
+	!a_lin = a_in(1)
+	!z_lin = z_in(1)
+	!pk_lin = p_in(:, 1) !* (k_lin**3.0) * (2.*(pi**2.))    
 	!Pk_lin = Pk_Delta(Pk_lin, k_lin)
-    CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
+    !CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
 
 	if (status .ne. 0 ) then
 		write(*,*) "Error reading P(k,z) for Mead code"
