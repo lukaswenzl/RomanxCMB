@@ -90,7 +90,7 @@ function execute(block,config) result(status)
 	!real(4) :: p1h, p2h,pfull, plin, z
 	integer :: i,j, z_index, nk_lin
 	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
-	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:), z_lin(:), a_lin(:)
+	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:), z_lin(:), a_lin(:)
 	TYPE(cosmology) :: cosm
 	!TYPE(tables) :: lut
 	!CosmoSIS supplies double precision - need to convert
@@ -162,14 +162,29 @@ function execute(block,config) result(status)
 	status = status + datablock_get_double_grid(block, linear_power, &
         "k_h", k_in, "z", z_in, "p_k", p_in)
 	a_in = 1/(1+z_in)
+	!allocate(k_lin(size(k_in)))
+	!allocate(a_lin(size(a_in)))
+	!allocate(z_lin(size(z_in)))
+	!allocate(pk_lin(size(k_in), size(z_in)))
+	!k_lin = k_in
+	!a_lin = a_in!(:-1)
+	!z_lin = z_in!(:-1)
+	!pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
+	!DO i=1,size(z_lin)
+	!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
+	!END DO
+	!pk_lin = Pk_Delta(pk_lin, k_lin)
+
 	allocate(k_lin(size(k_in)))
-	allocate(a_lin(size(a_in)))
-	allocate(z_lin(size(z_in)))
-	allocate(pk_lin(size(k_in), size(z_in)))
-	k_lin = k_in 
-	a_lin = a_in
-	z_lin = z_in
-	pk_lin = p_in
+	allocate(a_lin(1))
+	allocate(z_lin(1))
+	allocate(pk_lin(size(k_in)))
+	k_lin = k_in
+	a_lin = a_in(1)
+	z_lin = z_in(1)
+	pk_lin = p_in(:, 1) !* (k_lin**3.0) * (2.*(pi**2.))    
+	!Pk_lin = Pk_Delta(Pk_lin, k_lin)
+    CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
 
 	if (status .ne. 0 ) then
 		write(*,*) "Error reading P(k,z) for Mead code"
@@ -256,7 +271,11 @@ function execute(block,config) result(status)
 	k_out = k
 	z_out = ztab
 	allocate(p_out(settings%nk,settings%nz))
-	p_out = pk
+	DO i=1,size(z_out)
+		!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
+		p_out(:, i) = Pk_Delta(pk(:,i), k)
+	END DO
+	!p_out = pk
 
 	!Convert k to k/h to match other modules
 	!Output results to cosmosis
