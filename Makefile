@@ -6,4 +6,5 @@ SUBDIRS += 2pt_modified
 SUBDIRS += crl_eisenstein_hu
 SUBDIRS += projection
 SUBDIRS += eisenstein_hu_cdm
+SUBDIRS += growth_modified_gravity
 #
