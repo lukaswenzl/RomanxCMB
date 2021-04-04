@@ -11,6 +11,10 @@ module mead_settings_mod
 
 		logical :: feedback
 
+		!boolean to switch between input p(k,z) and p(k, z=0)
+		!only meant for testing
+		logical :: power_input_zdep
+
 	end type mead_settings
 
 end module mead_settings_mod
@@ -40,7 +44,9 @@ function setup(options) result(result)
 	!status = status + datablock_get_double_default(options, option_section, "numin", 0.1D0, settings%numin)
 	!status = status + datablock_get_double_default(options, option_section, "numax", 5.0D0, settings%numax)
 
-	status = status + datablock_get_logical_default(options, option_section, "feedback", .false., settings%feedback)
+	status = status + datablock_get_logical_default(options, option_section, "feedback", .true., settings%feedback)
+	status = status + datablock_get_logical_default(options, option_section, "power_input_zdep", .true., settings%power_input_zdep)
+
 
 	if (status .ne. 0) then
 		write(*,*) "One or more parameters not found for hmcode"
@@ -83,14 +89,14 @@ function execute(block,config) result(status)
 	integer, parameter :: LINEAR_SPACING = 0
 	integer, parameter :: LOG_SPACING = 1
 	character(*), parameter :: cosmo = cosmological_parameters_section
-	character(*), parameter :: halo = halo_model_parameters_section
+	!character(*), parameter :: halo = halo_model_parameters_section
 	character(*), parameter :: linear_power = matter_power_lin_section
 	character(*), parameter :: nl_power = matter_power_nl_section
 
 	!real(4) :: p1h, p2h,pfull, plin, z
 	integer :: i,j, z_index, nk_lin
 	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
-	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:), z_lin(:), a_lin(:)
+	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:),pk_lin_k_only(:), z_lin(:), a_lin(:)
 	TYPE(cosmology) :: cosm
 	!TYPE(tables) :: lut
 	!CosmoSIS supplies double precision - need to convert
@@ -101,7 +107,7 @@ function execute(block,config) result(status)
 	real(8) :: log10T_AGN
 	INTEGER, PARAMETER :: icos_default = 1
 	INTEGER :: icos
-	INTEGER, PARAMETER :: version = HMcode2020_feedback
+	INTEGER :: version != HMcode2020
 	LOGICAL, PARAMETER :: verbose = .TRUE.
 	REAL :: kmin, kmax, zmin, zmax
 
@@ -112,6 +118,13 @@ function execute(block,config) result(status)
 	!TODO if statement: if feedback -> set hmcode 2020 feedback
 
 	! Different HMcode versions
+	if (settings%feedback ) then
+		version = HMcode2020_feedback
+		write(*,*) "HMcode2020_feedback"
+	else 
+		version = HMcode2020
+		write(*,*) "HMcode2020"
+	endif
     !version = HMcode2020
 	!version = HMcode2020_feedback
 
@@ -132,7 +145,7 @@ function execute(block,config) result(status)
 
 	!status = status + datablock_get_double_default(block, halo, "A", 3.13D0, halo_as)
 	!status = status + datablock_get_double_default(block, halo, "eta_0", 0.603D0, halo_eta0)
-	status = status + datablock_get_double_default(block, halo, "log10T_AGN", 7.8D0, log10T_AGN)
+	status = status + datablock_get_double_default(block, cosmo, "log10T_AGN", 7.8D0, log10T_AGN)
 
 
 	if (status .ne. 0 ) then
@@ -169,19 +182,39 @@ function execute(block,config) result(status)
 	status = status + datablock_get_double_grid(block, linear_power, &
         "k_h", k_in, "z", z_in, "p_k", p_in)
 	a_in = 1/(1+z_in)
-	allocate(k_lin(size(k_in)))
-	allocate(a_lin(size(a_in)))
-	allocate(z_lin(size(z_in)))
-	allocate(pk_lin(size(k_in), size(z_in)))
-	k_lin = k_in
-	a_lin = a_in!(:-1)
-	z_lin = z_in !(:-1)
-	pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
-	!DO i=1,size(z_lin)
-	!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
-	!END DO
-	!pk_lin = Pk_Delta(pk_lin, k_lin)
-	CALL init_external_linear_power_tables(cosm, k_lin, a_lin, pk_lin)
+
+	if (settings%power_input_zdep) then
+		allocate(k_lin(size(k_in)))
+		allocate(a_lin(size(a_in)))
+		allocate(z_lin(size(z_in)))
+		allocate(pk_lin(size(k_in), size(z_in)))
+		k_lin = k_in
+		a_lin = a_in!(:-1)
+		z_lin = z_in !(:-1)
+		pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
+		!DO i=1,size(z_lin)
+		!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
+		!END DO
+		!pk_lin = Pk_Delta(pk_lin, k_lin)
+		CALL init_external_linear_power_tables(cosm, k_lin, a_lin, pk_lin)
+	else
+		write(*,*) "This code should not be used its only for testing. Please set power_input_zdep=True for HMcode "
+		allocate(k_lin(size(k_in)))
+		allocate(pk_lin_k_only(size(k_in)))
+		!na_lin = 1
+        allocate(a_lin(1))
+        a_lin = 1.         
+        !Pk_lin = Pk_Delta(Pk_lin, k_lin)
+		pk_lin_k_only = p_in(:, 1)
+        CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin_k_only, [nk_lin, 1]))
+
+
+		!TEST ONLY
+	
+	endif
+
+		
+         
 
 	!allocate(k_lin(size(k_in)))
 	!allocate(a_lin(1))
@@ -199,8 +232,9 @@ function execute(block,config) result(status)
 		return
 	endif
 
-	nk_lin = size(k_lin)
-	CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
+	!TODO DUPLICATE REMOVE
+	!nk_lin = size(k_lin)
+	!CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
 	!Copy in k
 	!allocate(cosi%ktab(size(k_in)))
 	!cosi%ktab = k_in
