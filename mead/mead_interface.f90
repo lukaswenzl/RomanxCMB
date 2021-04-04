@@ -89,16 +89,13 @@ function execute(block,config) result(status)
 	integer, parameter :: LINEAR_SPACING = 0
 	integer, parameter :: LOG_SPACING = 1
 	character(*), parameter :: cosmo = cosmological_parameters_section
-	!character(*), parameter :: halo = halo_model_parameters_section
 	character(*), parameter :: linear_power = matter_power_lin_section
 	character(*), parameter :: nl_power = matter_power_nl_section
 
-	!real(4) :: p1h, p2h,pfull, plin, z
 	integer :: i,j, z_index, nk_lin
 	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
 	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:),pk_lin_k_only(:), z_lin(:), a_lin(:)
 	TYPE(cosmology) :: cosm
-	!TYPE(tables) :: lut
 	!CosmoSIS supplies double precision - need to convert
 	real(8) :: Om_m, Om_lam, Om_b, h, w,wa, sig8, n_s, Om_nu, omnuh2
 	real(8), ALLOCATABLE :: k_in(:), z_in(:), p_in(:,:), a_in(:)
@@ -107,17 +104,15 @@ function execute(block,config) result(status)
 	real(8) :: log10T_AGN
 	INTEGER, PARAMETER :: icos_default = 1
 	INTEGER :: icos
-	INTEGER :: version != HMcode2020
+	INTEGER :: version != HMcode2020_feedback
 	LOGICAL, PARAMETER :: verbose = .TRUE.
 	REAL :: kmin, kmax, zmin, zmax
 
 	status = 0
 	call c_f_pointer(config, settings)
 
-	!feedback = settings%feedback
-	!TODO if statement: if feedback -> set hmcode 2020 feedback
 
-	! Different HMcode versions
+	! feedback setting switches between HMcode versions
 	if (settings%feedback ) then
 		version = HMcode2020_feedback
 		write(*,*) "HMcode2020_feedback"
@@ -125,15 +120,12 @@ function execute(block,config) result(status)
 		version = HMcode2020
 		write(*,*) "HMcode2020"
 	endif
-    !version = HMcode2020
-	!version = HMcode2020_feedback
 
 	!Fill in the cosmology parameters. We need to convert from CosmoSIS 8-byte reals
 	!to HMcode 4-byte reals, hence the extra bit
 	status = status + datablock_get(block, cosmo, "omega_m", Om_m)
 	status = status + datablock_get(block, cosmo, "omega_lambda", Om_lam)
 	status = status + datablock_get(block, cosmo, "omega_b", Om_b)
-    !status = status + datablock_get_double_default(block, cosmo, "omega_nu", 0.0D0, Om_nu)
 	status = status + datablock_get(block, cosmo, "h0", h)
 	status = status + datablock_get(block, cosmo, "sigma_8", sig8)
 	status = status + datablock_get(block, cosmo, "n_s", n_s)
@@ -141,10 +133,7 @@ function execute(block,config) result(status)
 	status = status + datablock_get_double_default(block, cosmo, "wa", 0.0D0, wa)
 	status = status + datablock_get_double_default(block, cosmo, "omnuh2", 0.0D0, omnuh2)
 
-
-
-	!status = status + datablock_get_double_default(block, halo, "A", 3.13D0, halo_as)
-	!status = status + datablock_get_double_default(block, halo, "eta_0", 0.603D0, halo_eta0)
+	!The log10T_AGN is only used for HMcode2020_feedback, it is the free parameter for the baryon model
 	status = status + datablock_get_double_default(block, cosmo, "log10T_AGN", 7.8D0, log10T_AGN)
 
 
@@ -156,10 +145,9 @@ function execute(block,config) result(status)
 	icos = icos_default
 	CALL assign_cosmology(icos, cosm, verbose)
 
-    !cosi%om_m=om_m-om_nu !The halo modelling should include only cold matter components (i.e. DM and baryons)
-    !I think om_m now includes the neutrinos, but i can't really specify neutrinos as a mass... 
-	!i guess i can convert omega_nu to m_nu but annoying
-	!also do I need to specify upper or lower case ones?, need to add wa as well
+	!note: in Mead2016 the code defined the internal omega_m without neutrinos. This I think has changed and here we
+	!include neutrinos in omega_m so we can directly map cosm%Om_m=Om_m
+	!also note: lower case is multiplied by h2 (eg om_m), upper case is not (eg Om_m)
 	cosm%iw = iw_waCDM        ! Set to w_waCDM dark energy
     cosm%Om_v = 0.           ! Force vacuum energy density to zero (note that DE density is non-zero)
 	cosm%Om_w=Om_lam
@@ -173,8 +161,6 @@ function execute(block,config) result(status)
     cosm%ns=n_s
 	cosm%m_nu= omnuh2 * 93.14
 
-    !cosi%eta_0 = halo_eta0
-    !cosi%As = halo_as
 	cosm%Theat=10**log10T_AGN
 
     !And get the cosmo power spectrum, again as double precision
@@ -189,75 +175,26 @@ function execute(block,config) result(status)
 		allocate(z_lin(size(z_in)))
 		allocate(pk_lin(size(k_in), size(z_in)))
 		k_lin = k_in
-		a_lin = a_in!(:-1)
-		z_lin = z_in !(:-1)
-		pk_lin = p_in!(:, :-1) !* (k_lin**3.0) * (2.*(pi**2.))
-		!DO i=1,size(z_lin)
-		!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
-		!END DO
-		!pk_lin = Pk_Delta(pk_lin, k_lin)
+		a_lin = a_in
+		z_lin = z_in
+		pk_lin = p_in
+		!note we are putting in the power spectrum. In future updates this function will likely change
+		!to the internal Delta^2, so for future updates a factor k^3 * 2pi^2 might be needed. 
 		CALL init_external_linear_power_tables(cosm, k_lin, a_lin, pk_lin)
 	else
 		write(*,*) "This code should not be used its only for testing. Please set power_input_zdep=True for HMcode "
 		allocate(k_lin(size(k_in)))
 		allocate(pk_lin_k_only(size(k_in)))
-		!na_lin = 1
         allocate(a_lin(1))
         a_lin = 1.         
-        !Pk_lin = Pk_Delta(Pk_lin, k_lin)
 		pk_lin_k_only = p_in(:, 1)
         CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin_k_only, [nk_lin, 1]))
-
-
-		!TEST ONLY
-	
 	endif
-
-		
-         
-
-	!allocate(k_lin(size(k_in)))
-	!allocate(a_lin(1))
-	!allocate(z_lin(1))
-	!allocate(pk_lin(size(k_in)))
-	!k_lin = k_in
-	!a_lin = a_in(1)
-	!z_lin = z_in(1)
-	!pk_lin = p_in(:, 1) !* (k_lin**3.0) * (2.*(pi**2.))    
-	!Pk_lin = Pk_Delta(Pk_lin, k_lin)
-    !CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
 
 	if (status .ne. 0 ) then
 		write(*,*) "Error reading P(k,z) for Mead code"
 		return
 	endif
-
-	!TODO DUPLICATE REMOVE
-	!nk_lin = size(k_lin)
-	!CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin, [nk_lin, 1]))
-	!Copy in k
-	!allocate(cosi%ktab(size(k_in)))
-	!cosi%ktab = k_in
-
-	!Find the index of z where z==0
-	!if (z_in(1)==0.0) then
-	!	z_index=1
-	!elseif (z_in(size(z_in))==0.0) then
-	!	z_index=size(z_in)
-	!else
-	!	write(*,*) "P(k,z=0) not found - please calculate"
-	!	status = 1
-	!	return
-	!endif
-	!Copy in P(k) from the right part of P(k,z)
-	!allocate(cosi%pktab(size(k_in)))
-    !cosi%pktab = p_in(:, z_index) * (cosi%ktab**3.)/(2.*(pi**2.))
-    !cosi%itk = 5
-
-
-	!Set the output ranges in k and z
-	!CALL fill_table(real(settings%kmin),real(settings%kmax),k,settings%nk,LOG_SPACING)DELETE
-	!CALL fill_table(real(settings%zmin),real(settings%zmax),ztab,settings%nz,LINEAR_SPACING)DELETE
 
 	!create a and k arrays based on parameters
 	kmin = settings%kmin
@@ -268,44 +205,12 @@ function execute(block,config) result(status)
     CALL fill_array(zmin, zmax, ztab, settings%nz)
 	! need to calculate a = 1/(1+z)
 	atab = 1 /(1+ztab) 
-    !CALL fill_array(amin, amax, a, na) DELTE
-
-	!Fill table for output power
-	!ALLOCATE(p_out(settings%nk,settings%nz))
 
 	! Initialise cosmological model
 	CALL init_cosmology(cosm)
 	CALL print_cosmology(cosm)
 
 	CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
-
-
-	!Loop over redshifts
-	!DO j=1,settings%nz
-
-		!Sets the redshift
-		!z=ztab(j)
-
-		!Initiliasation for the halomodel calcualtion
-		!Also normalises power spectrum (via sigma_8)
-		!and fills sigma(R) tables
-		
-		!CALL halomod_init(z,real(settings%numin),real(settings%numax),lut,cosi)
-
-		!Loop over k values
-		!DO i=1,SIZE(k)
-		!	plin=p_lin(k(i),cosi)        
-		!	CALL halomod(k(i),z,p1h,p2h,pfull,plin,lut,cosi)
-			!This outputs k^3 P(k).  We convert back.
-		!	p_out(i,j)=pfull / (k(i)**3.0) * (2.*(pi**2.))
-		!END DO
-
-		!IF(j==1) THEN
-		!	if (settings%feedback) WRITE(*,fmt='(A5,A7)') 'i', 'z'
-		!	if (settings%feedback) WRITE(*,fmt='(A13)') '   ============'
-		!END IF
-		! if (settings%feedback) WRITE(*,fmt='(I5,F8.3)') j, ztab(j)
-	!END DO
 
 	!convert to double precision
 	allocate(k_out(settings%nk))
@@ -314,10 +219,11 @@ function execute(block,config) result(status)
 	z_out = ztab
 	allocate(p_out(settings%nk,settings%nz))
 	DO i=1,size(z_out)
-		!	pk_lin(:, i) = p_in(:, i) * (k_lin**3.0) * (2.*(pi**2.))
+		! To convert from the internal Delta^2 convention back to P(k) we use 
+		! the included function
 		p_out(:, i) = Pk_Delta(pk(:,i), k)
 	END DO
-	!p_out = pk
+
 
 	!Convert k to k/h to match other modules
 	!Output results to cosmosis
@@ -332,11 +238,5 @@ function execute(block,config) result(status)
 	deallocate(p_in)
 	deallocate(k_out)
 	deallocate(z_out)
-	!call deallocate_LUT(lut)
-    !IF(ALLOCATED(cosm%rtab)) DEALLOCATE(cosm%rtab)
-    !IF(ALLOCATED(cosm%sigtab)) DEALLOCATE(cosm%sigtab)   
-    !IF(ALLOCATED(cosm%ktab)) DEALLOCATE(cosm%ktab)
-    !IF(ALLOCATED(cosm%tktab)) DEALLOCATE(cosm%tktab)
-    !IF(ALLOCATED(cosm%pktab)) DEALLOCATE(cosm%pktab)
 
 end function execute
