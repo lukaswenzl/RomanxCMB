@@ -14,6 +14,11 @@ module mead_settings_mod
 		!boolean to switch between input p(k,z) and p(k, z=0)
 		!only meant for testing
 		logical :: power_input_zdep
+		!boolean switch to minimize the nl samples to calculate
+		logical :: optimize_nl_samples
+		!boolean switch to us cosmosis growth instead of internal mead growth
+		logical :: use_cosmosis_growth
+
 
 	end type mead_settings
 
@@ -46,6 +51,9 @@ function setup(options) result(result)
 
 	status = status + datablock_get_logical_default(options, option_section, "feedback", .true., settings%feedback)
 	status = status + datablock_get_logical_default(options, option_section, "power_input_zdep", .true., settings%power_input_zdep)
+	status = status + datablock_get_logical_default(options, option_section, "optimize_nl_samples", .false., settings%optimize_nl_samples)
+	status = status + datablock_get_logical_default(options, option_section, "use_cosmosis_growth", .true., settings%use_cosmosis_growth)
+
 
 
 	if (status .ne. 0) then
@@ -91,15 +99,20 @@ function execute(block,config) result(status)
 	character(*), parameter :: cosmo = cosmological_parameters_section
 	character(*), parameter :: linear_power = matter_power_lin_section
 	character(*), parameter :: nl_power = matter_power_nl_section
+	character(*), parameter :: growth_section = "growth_parameters"
 
 	integer :: i,j, z_index, nk_lin
 	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
 	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:),pk_lin_k_only(:), z_lin(:), a_lin(:)
+	REAL, ALLOCATABLE :: growth(:), rate(:), a_growth(:)
 	TYPE(cosmology) :: cosm
 	!CosmoSIS supplies double precision - need to convert
 	real(8) :: Om_m, Om_lam, Om_b, h, w,wa, sig8, n_s, Om_nu, omnuh2
 	real(8), ALLOCATABLE :: k_in(:), z_in(:), p_in(:,:), a_in(:)
 	real(8), ALLOCATABLE :: k_out(:), z_out(:), a_out(:), p_out(:,:)
+	real(8), ALLOCATABLE :: growth_in(:), rate_in(:), a_growth_in(:)
+	integer :: n_growth
+
 	!real(8) :: Halo_as, halo_eta0
 	real(8) :: log10T_AGN
 	INTEGER, PARAMETER :: icos_default = 1
@@ -196,34 +209,58 @@ function execute(block,config) result(status)
 		return
 	endif
 
-	!create a and k arrays based on parameters
-	kmin = settings%kmin
-	kmax = settings%kmax
-	zmin = settings%zmin
-	zmax = settings%zmax
-	CALL fill_array_log(kmin, kmax, k, settings%nk)
-    CALL fill_array(zmin, zmax, ztab, settings%nz)
-	! need to calculate a = 1/(1+z)
-	atab = 1 /(1+ztab) 
-
 	! Initialise cosmological model
 	CALL init_cosmology(cosm)
 	CALL print_cosmology(cosm)
 
-	CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
+	!if desired can pipe the growth from cosmosis into the mead module. For wCDM with neutrinos 
+	!there shouldn't be any difference, but when using modified growth this can have an effect
+	!note this needs to be after init_cosmology
+	if(settings%use_cosmosis_growth) then
+		status = status + datablock_get_double_array_1d(block, growth_section, "d_z", growth_in, n_growth)
+		status = status + datablock_get_double_array_1d(block, growth_section, "f_z", rate_in, n_growth)
+		status = status + datablock_get_double_array_1d(block, growth_section, "a", a_growth_in, n_growth)
+		WRITE (*, *) 'loaded growth from cosmosis pipeline'
+		growth = growth_in
+		rate = rate_in
+		a_growth = a_growth_in
+		WRITE (*, *) 'check is has growth is true before putting external growth: ', cosm%has_growth
+		WRITE (*, *) 'check inormalization before putting external growth: ', growth(1)
 
-	!convert to double precision
-	allocate(k_out(settings%nk))
-	allocate(z_out(settings%nz))
-	k_out = k
-	z_out = ztab
-	allocate(p_out(settings%nk,settings%nz))
-	DO i=1,size(z_out)
-		! To convert from the internal Delta^2 convention back to P(k) we use 
-		! the included function
-		p_out(:, i) = Pk_Delta(pk(:,i), k)
-	END DO
+		CALL init_external_growth(a_growth, growth, rate, cosm)
+		WRITE (*, *) 'check is has growth is true: ', cosm%has_growth
+	endif
 
+	if (.NOT. settings%optimize_nl_samples) then
+		!create a and k arrays based on parameters
+		kmin = settings%kmin
+		kmax = settings%kmax
+		zmin = settings%zmin
+		zmax = settings%zmax
+		CALL fill_array_log(kmin, kmax, k, settings%nk)
+		CALL fill_array(zmin, zmax, ztab, settings%nz)
+		! need to calculate a = 1/(1+z)
+		atab = 1 /(1+ztab) 
+
+		CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
+
+		!convert to double precision
+		allocate(k_out(settings%nk))
+		allocate(z_out(settings%nz))
+		k_out = k
+		z_out = ztab
+		allocate(p_out(settings%nk,settings%nz))
+		DO i=1,size(z_out)
+			! To convert from the internal Delta^2 convention back to P(k) we use 
+			! the included function
+			p_out(:, i) = Pk_Delta(pk(:,i), k)
+		END DO
+	else
+		!case optimize_nl_samples -> we will only calculate the nl power at key points and rescale the linear model
+		!todo
+		write(*,*) "This part still needs to be written!!"
+
+	endif
 
 	!Convert k to k/h to match other modules
 	!Output results to cosmosis

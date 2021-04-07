@@ -21,6 +21,7 @@ MODULE cosmology_functions
    PUBLIC :: print_cosmology
    PUBLIC :: assign_init_cosmology
    PUBLIC :: convert_cosmology
+   PUBLIC :: init_external_growth
 
    ! Scale factor and z
    PUBLIC :: scale_factor_z
@@ -4729,6 +4730,104 @@ CONTAINS
       END IF
 
    END SUBROUTINE init_growth
+
+   SUBROUTINE init_external_growth(a, growth, rate, cosm)
+
+      ! Fills look-up tables for scale-dependent growth: a vs. g(a), f(a) and G(a)
+      ! TODO: Figure out why if I set amax=10, rather than amax=1, I start getting weird f(a) around a=0.001
+      USE calculus_table
+      TYPE(cosmology), INTENT(INOUT) :: cosm
+      INTEGER :: i
+      REAL, ALLOCATABLE, INTENT(INOUT)  :: a(:), growth(:), rate(:)
+      REAL, ALLOCATABLE :: agrow(:)
+      REAL, ALLOCATABLE :: d(:), v(:)
+      REAL :: g0, f0, bigG0
+      REAL, PARAMETER :: k = 0. ! Scale-indepdent so large-scale limit fixed
+      REAL, PARAMETER :: amin = amin_growth
+      REAL, PARAMETER :: amax = amax_growth
+      INTEGER :: ng != na_growth
+      REAL, PARAMETER :: acc_ODE = acc_ODE_growth
+      INTEGER, PARAMETER :: imeth_ODE = imeth_ODE_growth
+      INTEGER, PARAMETER :: iorder_interp = iorder_ODE_interpolation_growth
+      INTEGER, PARAMETER :: ifind_interp = ifind_ODE_interpolation_growth
+      INTEGER, PARAMETER :: imeth_interp = imeth_ODE_interpolation_growth
+      INTEGER, PARAMETER :: iorder_agrow = iorder_integration_agrow
+
+      
+      ng = size(a)
+      ! Write some useful information to the screen
+      IF (cosm%verbose) THEN
+         WRITE (*, *) 'INIT_GROWTH: Solving growth equation' 
+         WRITE (*, *) 'INIT_GROWTH: Number of points for look-up tables:', ng
+      END IF
+
+      
+
+      ! Normalise so that g(z=0)=1 and store the normalising factor
+      IF(a(1) .NE. 1.0D0) STOP 'ERROR: mead needs input growth in decending order starting with a=1.'
+      cosm%gnorm = growth(1)
+
+      IF (cosm%verbose) WRITE (*, *) 'INIT_GROWTH: Unnormalised growth at z=0:', real(cosm%gnorm)
+      growth = growth/cosm%gnorm
+
+      CALL init_interpolator(a, growth, cosm%grow, &
+         iorder = iorder_interp_grow, &
+         iextrap = iextrap_grow, &
+         store = store_grow, &
+         logx = .TRUE., &
+         logf = .TRUE. &
+         )
+
+      CALL init_interpolator(a, rate, cosm%grate, &
+         iorder = iorder_interp_rate, &
+         iextrap = iextrap_rate, &
+         store = store_rate, &
+         logx = .TRUE., &
+         logf = .FALSE. &
+         )
+
+      !! Table integration to calculate G(a)=int_0^a g(a')/a' da' !!
+
+      ! Set to zero, because I have an x=x+y thing later on
+      ALLOCATE(agrow(ng))
+      agrow = 0.
+
+      ! Do the integral up to table position i, which fills the accumulated growth table
+      DO i = 1, ng
+         ! Do the integral using the arrays
+         IF (i > 1) THEN
+            agrow(i) = integrate_table(a, cosm%gnorm*growth/a, 1, i, iorder_agrow)
+         END IF
+         ! Add missing section; g(a=0)/0 = 1, so you just add on a rectangle of height g*a/a=g
+         agrow(i) = agrow(i)+cosm%gnorm*growth(1)
+      END DO
+
+      CALL init_interpolator(a, agrow, cosm%agrow, &
+         iorder = iorder_interp_agrow, &
+         iextrap = iextrap_agrow, &
+         store = store_agrow, &
+         logx = .TRUE., &
+         logf = .TRUE.  &
+         )
+
+      ! Set the flag to true so that this subroutine is only called once
+      cosm%has_growth = .TRUE.
+
+      ! Write stuff about growth parameter at a=1 to the screen
+      ! Note that has_growth = .TRUE. must have been set before to avoid a recursion
+      IF (cosm%verbose) THEN
+         g0 = grow(1., cosm)
+         f0 = growth_rate(1., cosm)
+         bigG0 = acc_growth(1., cosm)
+         WRITE (*, *) 'INIT_GROWTH: Normalised growth at z=0:', g0
+         WRITE (*, *) 'INIT_GROWTH: Growth rate at z=0:', f0
+         WRITE (*, *) 'INIT_GROWTH: Integrated growth at z=0:', bigG0
+         WRITE (*, *) 'INIT_GROWTH: Done'
+         WRITE (*, *)
+      END IF
+
+   END SUBROUTINE init_external_growth
+
 
    REAL FUNCTION velocity(d, v, k, a, cosm)
 
