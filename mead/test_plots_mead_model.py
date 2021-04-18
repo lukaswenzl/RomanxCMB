@@ -11,12 +11,15 @@ from scipy.interpolate import interp1d
 
 output_folder = "modules/RomanxCMB/mead/plots/"
 
-whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence "
+whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence,growth_test,growth_gamma,mead_with_modified_growth,sampling_accuracy"
 #whattodo = ",halofit_comparison "
 #whattodo = "wdependence"
-whattodo = "power_input_zdep,growth_test"
-whattodo = "power_input_zdep,growth_gamma"
+#whattodo = "power_input_zdep,growth_test,growth_gamma,mead_with_modified_growth"
+#whattodo = "power_input_zdep"#halofit_comparison"
 whattodo = "mead_with_modified_growth"
+whattodo = "sampling_accuracy"
+whattodo = "sample_only_above_cutoff"
+#whattodo = "halofit_comparison"
 
 
 
@@ -111,7 +114,7 @@ if ("power_input_zdep" in whattodo):
         print("Done ", i)
     plt.title("power_input_zdep")
     plt.xscale("log")
-    plt.xlim(10.**(-3), 100.)
+    plt.xlim(10.**(-5), 100.)
     plt.xlabel("k/h")
     plt.ylim(0.7,1.3)
     plt.ylabel("P / P_lin")
@@ -364,7 +367,7 @@ if ("halofit_comparison" in whattodo):
     
     plt.title("fiducial cosmology - halofit vs mead")
     plt.xscale("log")
-    plt.xlim(10.**(-3), 100.)
+    plt.xlim(10.**(-5), 100.)
     plt.xlabel("k/h")
     plt.ylim(0.7,1.3)
     plt.ylabel("$P(k) / P_{mead} (k)$")
@@ -720,3 +723,151 @@ if ("mead_with_modified_growth" in whattodo):
 
     
 
+if ("sampling_accuracy" in whattodo):
+    #compare different samplings
+
+    plt.figure()
+
+    ini = Inifile("modules/RomanxCMB/mead/params.ini")
+    ini.set("mead", "nk",  "450")
+    ini.set("mead", "na", "250")
+
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    #index = params_names.index("cosmological_parameters--omnuh2")
+    #vector[index] = 0.00005
+    data = pipeline.run_parameters(vector)
+
+    k_highsampling = data['matter_power_nl', 'k_h']
+    z = data['matter_power_nl', 'z']
+    p_nl = data['matter_power_nl', 'p_k'] 
+    Pk_highsampling = interp1d(z, p_nl, axis=0)
+
+    for i, fraction in enumerate([1,0.75,1./2, 1./4.]):
+        ## cosmosis growth piped into mead
+
+        ini = Inifile("modules/RomanxCMB/mead/params.ini")
+        ini.set("mead", "nk",  "{}".format(int(200*fraction)))
+        ini.set("mead", "na", "{}".format(int(100*fraction)))
+
+        pipeline = LikelihoodPipeline(ini)
+        pipeline.quiet = True
+        pipeline.debug = False
+        pipeline.timing = False
+
+        params_names = pipeline.varied_params
+        vector = pipeline.start_vector()
+        #index = params_names.index("cosmological_parameters--omnuh2")
+        #vector[index] = 0.00005
+        data = pipeline.run_parameters(vector)
+
+        k = data['matter_power_nl', 'k_h']
+        z = data['matter_power_nl', 'z']
+        p_nl = data['matter_power_nl', 'p_k'] 
+        Pk = interp1d(z, p_nl, axis=0)
+
+        z_sample = 0.
+        plt.plot(k_highsampling,np.interp(k_highsampling,k,Pk(z_sample)) /Pk_highsampling(z_sample) -i/20.,label="fraction = {}, offset = ".format(fraction,-i/20.) )
+        z_sample = 1.
+        plt.plot(k_highsampling,np.interp(k_highsampling,k,Pk(z_sample)) /Pk_highsampling(z_sample)-i/20.,"--")
+        z_sample = 5.
+        plt.plot(k_highsampling,np.interp(k_highsampling,k,Pk(z_sample)) /Pk_highsampling(z_sample)-i/20.,":")
+        z_sample = 10.
+        plt.plot(k_highsampling,np.interp(k_highsampling,k,Pk(z_sample)) /Pk_highsampling(z_sample)-i/20.,":")
+        
+
+    
+
+
+    plt.title("Testing sampling accuracy")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.8,1.2)
+    plt.ylabel("$P_{nl} / P_{nl} (high sampling)$")
+
+    # Save our plot.
+    plt.legend()
+    
+    plt.savefig(output_folder+"power_spectrum_sampling_accuracy_RAW.pdf")
+
+if ("sample_only_above_cutoff" in whattodo):
+    #compare different samplings
+
+    plt.figure()
+
+    ini = Inifile("modules/RomanxCMB/mead/params.ini")
+    ini.set("mead", "optimize_nl_samples",  "F")
+
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    #index = params_names.index("cosmological_parameters--omnuh2")
+    #vector[index] = 0.00005
+    data = pipeline.run_parameters(vector)
+
+    k_fullsampling = data['matter_power_nl', 'k_h']
+    z = data['matter_power_nl', 'z']
+    p_nl = data['matter_power_nl', 'p_k'] 
+    Pk_fullsampling = interp1d(z, p_nl, axis=0)
+
+
+    ini = Inifile("modules/RomanxCMB/mead/params.ini")
+    ini.set("mead", "optimize_nl_samples",  "T")
+
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    #index = params_names.index("cosmological_parameters--omnuh2")
+    #vector[index] = 0.00005
+    data = pipeline.run_parameters(vector)
+
+    k_cutoffsampling = data['matter_power_lin', 'k_h']
+    z = data['matter_power_lin', 'z']
+    p_lin = data['matter_power_lin', 'p_k'] 
+    Pk_lin = interp1d(z, p_lin, axis=0)
+
+    k_cutoffsampling = data['matter_power_nl', 'k_h']
+    z = data['matter_power_nl', 'z']
+    p_nl = data['matter_power_nl', 'p_k'] 
+    Pk_cutoffsampling = interp1d(z, p_nl, axis=0)
+
+    
+
+    z_sample = 0.
+    plt.plot(k_fullsampling, Pk_cutoffsampling(z_sample) /Pk_lin(z_sample) ,label="z = {}".format(z_sample) )
+    z_sample = 1.
+    plt.plot(k_fullsampling,Pk_cutoffsampling(z_sample) /Pk_lin(z_sample) ,"--",label="z = {}".format(z_sample))
+    z_sample = 5.
+    plt.plot(k_fullsampling,Pk_cutoffsampling(z_sample) /Pk_lin(z_sample) ,":",label="z = {}".format(z_sample))
+    z_sample = 10.
+    plt.plot(k_fullsampling,Pk_cutoffsampling(z_sample) /Pk_lin(z_sample) ,":",label="z = {}".format(z_sample))
+        
+
+    
+
+
+    plt.title("Testing cutoff for non-linear sampling")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.9,1.1)
+    plt.ylabel("$P_{nl} / P_{lin}$")
+
+    # Save our plot.
+    plt.legend()
+    
+    plt.savefig(output_folder+"power_spectrum_sample_only_above_cutoff_RAW.pdf")

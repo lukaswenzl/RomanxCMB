@@ -88,7 +88,7 @@ function execute(block,config) result(status)
     USE array_operations
     USE cosmology_functions
     USE HMx
-	USE interpolate
+	!USE interpolate
     USE camb_stuff
 
 	implicit none
@@ -124,6 +124,7 @@ function execute(block,config) result(status)
 	!LOGICAL, PARAMETER :: verbose = .TRUE.
 	REAL :: kmin, kmax, zmin, zmax
 	integer :: k_idx_cutoff
+	REAL, ALLOCATABLE :: k_less(:), norm_lin(:)
 
 	status = 0
 	call c_f_pointer(config, settings)
@@ -228,15 +229,17 @@ function execute(block,config) result(status)
 		status = status + datablock_get_double_array_1d(block, growth_section, "d_z", growth_in, n_growth)
 		status = status + datablock_get_double_array_1d(block, growth_section, "f_z", rate_in, n_growth)
 		status = status + datablock_get_double_array_1d(block, growth_section, "a", a_growth_in, n_growth)
-		WRITE (*, *) 'loaded growth from cosmosis pipeline'
+		IF (settings%verbose) THEN
+			WRITE (*, *) 'loaded growth from cosmosis pipeline'
+		ENDIF
 		growth = growth_in
 		rate = rate_in
 		a_growth = a_growth_in
-		WRITE (*, *) 'check is has growth is true before putting external growth: ', cosm%has_growth
-		WRITE (*, *) 'check inormalization before putting external growth: ', growth(1)
+		!WRITE (*, *) 'check is has growth is true before putting external growth: ', cosm%has_growth
+		!WRITE (*, *) 'check inormalization before putting external growth: ', growth(1)
 
 		CALL init_external_growth(a_growth, growth, rate, cosm)
-		WRITE (*, *) 'check is has growth is true: ', cosm%has_growth
+		!WRITE (*, *) 'check is has growth is true: ', cosm%has_growth
 	endif
 
 	if (.NOT. settings%optimize_nl_samples) then
@@ -265,8 +268,11 @@ function execute(block,config) result(status)
 		END DO
 	else
 		!case optimize_nl_samples -> we will only calculate the nl power at key points and rescale the linear model
-		!todo
-		write(*,*) "This part still needs to be written!!"
+
+		IF (size(k_lin) .ne. settings%nk) THEN
+			write(*,*) "ERROR: Linear and nonline power spectrum need same sampling to use optimize nl samples!"
+			return
+		ENDIF
 		!create a and k arrays based on parameters
 		kmin = settings%kmin
 		kmax = settings%kmax
@@ -277,11 +283,20 @@ function execute(block,config) result(status)
 		! need to calculate a = 1/(1+z)
 		atab = 1 /(1+ztab) 
 
-		k_idx_cutoff = 90
-		!k_less = k(k_switch:)
+		k_idx_cutoff = 90 
+		!this index will depend on your sampling
+		!should chose so between k = 1e-2 and 1e-3
+		k_less = k(k_idx_cutoff:)
+		!write(*,*) "k values:", k_less
 
-		CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
+		CALL calculate_HMcode(k_less, atab, pk, size(k_less), settings%nz, cosm, version=version)
 
+		norm_lin = pk_lin(k_idx_cutoff,:) / Pk_Delta(pk(1, :), k_less(1))
+		!write(*,*) "normalization difference:", norm_lin
+
+		DO j=1,size(k_less)
+			pk(j,:) = pk(j,:) * norm_lin
+		END DO
 
 		allocate(k_out(settings%nk))
 		allocate(z_out(settings%nz))
@@ -289,14 +304,23 @@ function execute(block,config) result(status)
 		z_out = ztab
 		allocate(p_out(settings%nk,settings%nz))
 
+
+
 		DO i=1,size(z_out)
+
+			!check that norm_lin is not far from 1
+			IF (norm_lin(i) .gt. 1.01 .or. norm_lin(i) .lt. 0.99) THEN
+				write(*,*) "WARNING: Norm between lin and nl power large: ratio =", norm_lin(i)
+				write(*,*) "at redshift =", z_out(i)
+			ENDIF
+
 			! To convert from the internal Delta^2 convention back to P(k) we use 
 			! the included function
-			p_out(:, i) = Pk_Delta(pk(:,i), k)
-		END DO
-
-		!p_out = p_in!evaluate_interpolator(k, atab, cosm%plin)
-		DO i=1,size(z_out)
+			DO j=k_idx_cutoff,settings%nk
+				p_out(j, i) = Pk_Delta(pk(j-k_idx_cutoff+1,i), k_less(j-k_idx_cutoff+1))
+				!write(*,*) "k difference:", k_less(j-k_idx_cutoff+1) -k(j) -> check, is zero
+			END DO
+		
 			! enforce linar solution on large scales
 			DO j=1,k_idx_cutoff
 				p_out(j, i) = p_in(j,i) !Pk_Delta(pk(j,i), k_less(j))
