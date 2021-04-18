@@ -18,6 +18,7 @@ module mead_settings_mod
 		logical :: optimize_nl_samples
 		!boolean switch to us cosmosis growth instead of internal mead growth
 		logical :: use_cosmosis_growth
+		logical :: verbose
 
 
 	end type mead_settings
@@ -53,6 +54,7 @@ function setup(options) result(result)
 	status = status + datablock_get_logical_default(options, option_section, "power_input_zdep", .true., settings%power_input_zdep)
 	status = status + datablock_get_logical_default(options, option_section, "optimize_nl_samples", .false., settings%optimize_nl_samples)
 	status = status + datablock_get_logical_default(options, option_section, "use_cosmosis_growth", .true., settings%use_cosmosis_growth)
+	status = status + datablock_get_logical_default(options, option_section, "verbose", .false., settings%verbose)
 
 
 
@@ -86,6 +88,7 @@ function execute(block,config) result(status)
     USE array_operations
     USE cosmology_functions
     USE HMx
+	USE interpolate
     USE camb_stuff
 
 	implicit none
@@ -118,8 +121,9 @@ function execute(block,config) result(status)
 	INTEGER, PARAMETER :: icos_default = 1
 	INTEGER :: icos
 	INTEGER :: version != HMcode2020_feedback
-	LOGICAL, PARAMETER :: verbose = .TRUE.
+	!LOGICAL, PARAMETER :: verbose = .TRUE.
 	REAL :: kmin, kmax, zmin, zmax
+	integer :: k_idx_cutoff
 
 	status = 0
 	call c_f_pointer(config, settings)
@@ -128,10 +132,14 @@ function execute(block,config) result(status)
 	! feedback setting switches between HMcode versions
 	if (settings%feedback ) then
 		version = HMcode2020_feedback
-		write(*,*) "HMcode2020_feedback"
+		IF (settings%verbose) THEN
+			WRITE (*, *) "HMcode2020_feedback"
+		 END IF
 	else 
 		version = HMcode2020
-		write(*,*) "HMcode2020"
+		IF (settings%verbose) THEN
+			WRITE (*, *) "HMcode2020"
+		 END IF
 	endif
 
 	!Fill in the cosmology parameters. We need to convert from CosmoSIS 8-byte reals
@@ -156,7 +164,7 @@ function execute(block,config) result(status)
 	endif
 
 	icos = icos_default
-	CALL assign_cosmology(icos, cosm, verbose)
+	CALL assign_cosmology(icos, cosm, settings%verbose)
 
 	!note: in Mead2016 the code defined the internal omega_m without neutrinos. This I think has changed and here we
 	!include neutrinos in omega_m so we can directly map cosm%Om_m=Om_m
@@ -259,6 +267,41 @@ function execute(block,config) result(status)
 		!case optimize_nl_samples -> we will only calculate the nl power at key points and rescale the linear model
 		!todo
 		write(*,*) "This part still needs to be written!!"
+		!create a and k arrays based on parameters
+		kmin = settings%kmin
+		kmax = settings%kmax
+		zmin = settings%zmin
+		zmax = settings%zmax
+		CALL fill_array_log(kmin, kmax, k, settings%nk)
+		CALL fill_array(zmin, zmax, ztab, settings%nz)
+		! need to calculate a = 1/(1+z)
+		atab = 1 /(1+ztab) 
+
+		k_idx_cutoff = 90
+		!k_less = k(k_switch:)
+
+		CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
+
+
+		allocate(k_out(settings%nk))
+		allocate(z_out(settings%nz))
+		k_out = k
+		z_out = ztab
+		allocate(p_out(settings%nk,settings%nz))
+
+		DO i=1,size(z_out)
+			! To convert from the internal Delta^2 convention back to P(k) we use 
+			! the included function
+			p_out(:, i) = Pk_Delta(pk(:,i), k)
+		END DO
+
+		!p_out = p_in!evaluate_interpolator(k, atab, cosm%plin)
+		DO i=1,size(z_out)
+			! enforce linar solution on large scales
+			DO j=1,k_idx_cutoff
+				p_out(j, i) = p_in(j,i) !Pk_Delta(pk(j,i), k_less(j))
+			END DO
+		END DO
 
 	endif
 
