@@ -4793,13 +4793,14 @@ CONTAINS
       agrow = 0.
 
       ! Do the integral up to table position i, which fills the accumulated growth table
+      ! Note that for external growth order of a is reverse so integral backwards
       DO i = 1, ng
          ! Do the integral using the arrays
-         IF (i > 1) THEN
-            agrow(i) = integrate_table(a, cosm%gnorm*growth/a, 1, i, iorder_agrow)
+         IF (i < ng) THEN
+            agrow(i) = -1.*integrate_table(a, cosm%gnorm*growth/a, i, ng, iorder_agrow)
          END IF
          ! Add missing section; g(a=0)/0 = 1, so you just add on a rectangle of height g*a/a=g
-         agrow(i) = agrow(i)+cosm%gnorm*growth(1)
+         agrow(i) = agrow(i)+cosm%gnorm*growth(ng)
       END DO
 
       CALL init_interpolator(a, agrow, cosm%agrow, &
