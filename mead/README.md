@@ -1,36 +1,75 @@
 # HMcode
-HMcode readme
-=============
 
-This code is produces the matter power spectrum using the halo-model approach described in Mead et al. (2015). Appendix B of that paper details the methods for doing the calculation.
+This code produces the `HMcode` non-linear matter power spectrum using the augmented halo-model approach described in Mead (2020; https://arxiv.org/abs/2009.01858). It can also produce `HMcode` results from Mead et al. (2016; https://arxiv.org/abs/1602.02154) or from Mead et al. (2015; https://arxiv.org/abs/1505.07833). Appendix B of the 2015 paper details the numerical methods used in the calculation. If you use this work, or this code, I would be very grateful if you were to cite the relevant papers. For the enthusiast, the code itself can also be cited: http://ascl.net/1508.001.
 
-It should compile with any fortran compiler, and it doesn't need to be pointed to any libraries. I use 'ifort' and compile with '>ifort HMcode.f90'.
+Clone the repository using
+```
+git clone --recursive https://github.com/alexander-mead/HMcode
+```
+the `--recursive` is important because that will also ensure that necessary libraries are cloned in to the `library/` subdirectory. `HMcode` can then be compiled using `make`. If you get an error: 
+```
+*** No rule to make target `build/precision.o', needed by `bin/HMcode'.
+```
+this is because you did not use the `-- recursive` flag. `HMcode` should compile with any `Fortran` compiler, the default is `gfortran`, but you can change the compiler within the `Makefile` if necessary. To run the compiled code type `./bin/HMcode`.
 
-For the calculation a 'numin' and 'numax' value need to be set. These govern the range in nu that the 1-halo integral is taken over. The defaults I set are numin=0.3 and numax=5. In testing I looked at the power up to k=100. and numin=0.3 was sufficient to get convergence at this wavenumber for a standard cosmological model at all redshifts z<4. If one were interested in higher wavenumbers then numin would need to be decreased until convergence was achieved. numin should never be set to 0 because the mass function used in the code diverges at nu=0. numax=5 seems suitable for all practical purposes (note this means you are accounting for the effect of ~5 sigma fluctuations on the power-spectrum, which is quite generous).
+Six cosmological parameters can be specified via the command line in the order: `Om_m`; `Om_b`; `h`; `ns`; `sig8`; `w`. If these are not specified then they take on default values: `Om_m = 0.30`; `Om_b = 0.05`; `h = 0.70`; `ns = 0.96`; `sig8 = 0.80`; `w = -1.0`. The cosmological model is taken to be flat *w*CDM, with constant *w* and flatness is enforced via the dark-energy density. These restrictions can be relaxed if necessary, and more complicated dark-energy models can be investigated, but adding this would require a small bit of hacking and thought. Please contact me if you are interested in this and have any trouble implementing it yourself. 
 
-When it starts the code fills up some arrays for k, z and power then calls 'assign_cosmology', which sets the cosmological parameters and tells the code where to look for an input linear power spectrum. The default is that this is taken from the Eistenstein + Hu (1998) approximation for the transfer function, but anything (e.g. a CAMB linear spectrum) could be wired in. See  the notes at the end of this README if you are interested in feeding HMcode a tabulated linear spectrum.
+In addition, a  `CAMB`-format linear power spectrum (two columns: *k* and *P(k)* with units *[h/Mpc]* and *[(Mpc/h)^3]* respectively, with a single leading *#* comment line) can be provided as a seventh command-line argument. This linear spectrum is taken to be at *z=0* and its amplitude at higher redshifts is calculated assuming a scale-independet growth factor that is calculated via the cosmological parameters. If a linear spectrum is specified in this way then it is assumed to be normalised correctly and the value of `sig8` provided via the command line will be ignored.
 
-The code then loops through 'z' outer and 'k' producing power at each redshift and wave number. The ordering of loops (z then k) is because for each new redshift the halo-model calculation needs to call 'halomod_init' to fill up look-up tables, but then these are used for any 'k' at the redshift. At each new redshift the input linear spectrum is also renormalised (via the routine 'normalisation') so that it has the correct sigma8(z). After 'normalisation' a routine called 'fill_sigtab' is called which fills a look-up table of sigma(R) vs. R, which is useful in future calculations. This is a relatively expensive function to evaluate, hence the look-up table. 'halomod_init' then fills some look-up tables of various halo properties, such as mass, radius, nu, concentration etc. which are used in the one-halo integral.
+To give a concrete example:
+```
+./bin/HMcode 0.32 0.049 0.67 0.97 0.81 -1.0 input/Planck_linearpower.dat
+```
+would return the non-linear power for a  cosmology with `Om_m = 0.32`; `Om_b = 0.049`; `h = 0.67`; `ns = 0.97`; `sig8 = 0.81`; `w = -1.0` with a linear spectrum taken from `input/Planck_linearpower.dat`.
 
-Once these tables have been evaluated the halo-model integral can then be carried out. This calculation is done by the routine 'halomod', which calls 'p_1h' and 'p_2h' to evaluate 1- and 2-halo terms and then uses these to compute the full power spectrum. The power spectrum at each k and z is then added to an array which is printed out to power.dat (k, pow(z1), pow(z2), ...) when the code finishes. 
+Initally the code fills up arrays for the wavenumbers, *k*, and scale-factors, *a*, for which the power spectrum is required. The code then calls the subroutine `assign_cosmology`, which sets the cosmological parameters - if you wish to make additional changes to the cosmological parameters then this needs to be done after `assign_cosmology` has been called, but before `init_cosmology` is called. The code calls the `calculate_HMcode` routine to do the halo-model calculation and finally writes results using the `write_power_a` routine. The data file is written to `data/power.dat`: the first line starts with ### and then lists the scale factors. The first column is the wavenumbers and subsquent columns are values of the power spectrum at the corresponding *k* and *a* values. These can be checked against the included `data/power_example.dat` file to check that they agree.
 
-In testing I was able to get 16 redshifts, with 200 k-points, in 0.72 seconds (using ifort with -O3 optimisation). 
+There are different options for the `version`: either `HMcode2020_feedback`, `HMcode2020`, `HMcode2016` or `HMcode2015`. By default the linear power is calculated from the approximate Eistenstein & Hu (1998; astro-ph/9709112) fitting function, which is accurate at only around the 5% level, with particular inaccuracy around the BAO scale. If this accuracy is not sufficient for your needs then you should use either the version of `HMcode` that is included within `CAMB` (https://github.com/cmbant/CAMB),that within `CLASS` (http://class-code.net/), or else specify a linear spectrum via the command line as described above. 
 
-The file 'plot.p' is a gnuplot script to plot the output. It can be run using "gnuplot> load 'plot.p'".
+Using HMcode within `CAMB` or `CLASS` is also the only way to get results for massive-neutrino cosmologies, because I could not find a suitably accurate fitting function for the linear matter power spectrum in the presence of massive neutrinos. If you know of one, and if this would be useful for your work, then please let me know.
+
+`HMcode2016` is compatabile with DGP and f(R) modified gravity cosmologies as detailed in the 2016 paper. These can be activated by setting the `cosm%img` flag and then setting relevant modified-gravity parameters in the code. Look in `cosmology_functions.f90` to see examples of how to do this and please contact me if you have any trouble.
+
+In testing I was able to get the power at 16 *a* and 128 *k* points in 0.15 seconds for a regular LCDM cosmology using `gfortran` on a 2018 Macbook with -O3 optimisation. 
+
+The `gnuplot` script `power.p` in the `plot/` directory can be used to plot the output. It can be run using `gnuplot > load 'plot/power.p`.
 
 Please let me know if you need any help running the code. Or if you have any questions whatsoever.
 
+The development of HMcode between 2017 and 2020 was assisted by the Horizon 2020 research and innovation programme of the European Union under Marie Sklodowska-Curie grant agreement No. 702971.
+
 Alexander Mead
-(am@roe.ac.uk)
+(alexander.j.mead@googlemail.com)
 
-######
+=== UPDATES ===
 
-Adding in a CAMB linear P(k)
+2021/01/14:
+Support for cosmological parameters and an external linear spectrum to be provided via the command line.
 
-Given the differences between CAMB and Eisenstein + Hu (1998) one might wish to make HMcode read in a linear CAMB power spectrum and work with that instead (or any other tabulated power spectrum). This is fine, and is what I did when comparing to Cosmic Emu in the paper (where the difference between CAMB and Eisenstein + Hu *was* important) but there is a subtle thing to bear in mind:
+2020/09/22:
+Added library as a `git submodule` so that they do not need to be cloned separately. Also support for `HMcode2020_feedback` was added some time between this update and that documented below.
 
-The halo-model calculation does integrals that are technically defined over the entire k range from 0 to inf. In practice contributions from very small and large scales are suppressed but the integration routines still need to know about the power at these scales sometimes, otherwise they may go bonkers. Obviously this is a problem given that one usually has a tabulated linear power spectrum defined on some finite range in k. The way I dealt with this was to read in the linear spectrum but then extrapolate if the code called 'p_lin' for k values below the minimum, or above the maximum, using physically motivated extrapolations. For example you know that the linear power spectrum is a power-law down to k->0 (\Delta^2 \propto k^{3+n}) and the high-k part can be approximated as \Delta^2 \propto k^{n-1}log(k)^2 . 
+2020/07/03:
+Complete rewrite of code. Lots of options listed below are now suppressed. Support for `HMcode2020`, `HMcode2016` and `HMcode2015` versions. Enabled support for modified gravity models for the `HMcode2016` version. New dependence on my library: https://github.com/alexander-mead/library. The old repository has been archived and can be found at https://github.com/alexander-mead/HMcode-old.
 
-I have left my routines to do this in as 'find_Tk' and 'find_pk', and these carry out the correct extrapolation beyond the boundaries of either a P(k) table or T(k) table. These can be switched on using the 'itk' variable. Originally itk=3, which means the code uses Eisenstein + Hu (1998). If itk=4 is set then the code will look for an input table of k/h vs. T(k) and if itk=5 is set it will look for k/h vs. P(k). These input files need to be specified at run time (e.g. ./a.out input_tk.dat).
+----
 
+=== OLD STUFF ===
 
+2018/02/14:
+Added support for a standard two-halo term. This can be activated by setting `ihm=3` in the code. Now `ihm=1` is the accurate calculation whereas `ihm=2` is the standard calculation but with a linear theory two-halo term. The variable `imead` has been removed. There is a new logical `verbose`. Also added option `ihm=0` to do linear theory only.
+
+2018/01/18:
+Added support for an input linear spectrum from `CAMB`. This can be input via the command line as described above.
+
+2016/08/02:
+Small update to the README and some very minor fixes in the code to facilitate direct comparisons with other halomodel power codes.
+
+2016/02/04:
+Included updates from Mead et al. (2016) including parameterising the two-halo damping term in terms of f(sigma_v) and slightly recalibrated values of *alpha* and *f_damp*. Now works for w(a)CDM models, where *w(a)=w_0+(1.-a)*w_a*.
+
+2016/01/23:
+Updated the code a little so that it no longer calculates a range in nu and simply converts a mass range into a nu range to do the integral. The mass range is fixed from haloes of *1e2* to *1e18* Solar masses, it is difficult to imagine an application of this code where this halo mass range would not be sufficient. This further helps when considering strange cosmological models at high redshift that suffer from a lack of haloes, for these models doing a *nu* to *M* inversion occasionally reached incredibly tiny halo masses that contribute negligbly to the power spectrum on cosmological scales due to their tiny sizes.
+
+2015/07/07:
+One user reported crashes that occured for quite extreme cosmological models (*n_s < 0.5*, *sig8 < 0.3*, *z>5*). I have fixed this rather crudely by adding IF statements that catch problems (which manifest themsevles as extreme parameter values). The physical reason for these problems is that models with these odd cosmological parameters have *R_nl << 1 Mpc* and so have very few haloes. Some of the routines I was using previously had assumed that *R_nl* would not be so tiny.

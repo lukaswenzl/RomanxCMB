@@ -4,12 +4,22 @@ module mead_settings_mod
 		real(8) :: kmin, kmax
 		integer :: nk
 
-		real(8) :: numin, numax
+		!real(8) :: numin, numax
 
 		real(8) :: zmin, zmax
 		integer :: nz
 
 		logical :: feedback
+
+		!boolean to switch between input p(k,z) and p(k, z=0)
+		!only meant for testing
+		logical :: power_input_zdep
+		!boolean switch to minimize the nl samples to calculate
+		logical :: optimize_nl_samples
+		!boolean switch to us cosmosis growth instead of internal mead growth
+		logical :: use_cosmosis_growth
+		logical :: verbose
+
 
 	end type mead_settings
 
@@ -37,10 +47,16 @@ function setup(options) result(result)
 	status = status + datablock_get(options, option_section, "kmax", settings%kmax)
 	status = status + datablock_get(options, option_section, "nk", settings%nk)
 
-	status = status + datablock_get_double_default(options, option_section, "numin", 0.1D0, settings%numin)
-	status = status + datablock_get_double_default(options, option_section, "numax", 5.0D0, settings%numax)
+	!status = status + datablock_get_double_default(options, option_section, "numin", 0.1D0, settings%numin)
+	!status = status + datablock_get_double_default(options, option_section, "numax", 5.0D0, settings%numax)
 
-	status = status + datablock_get_logical_default(options, option_section, "feedback", .false., settings%feedback)
+	status = status + datablock_get_logical_default(options, option_section, "feedback", .true., settings%feedback)
+	status = status + datablock_get_logical_default(options, option_section, "power_input_zdep", .true., settings%power_input_zdep)
+	status = status + datablock_get_logical_default(options, option_section, "optimize_nl_samples", .false., settings%optimize_nl_samples)
+	status = status + datablock_get_logical_default(options, option_section, "use_cosmosis_growth", .true., settings%use_cosmosis_growth)
+	status = status + datablock_get_logical_default(options, option_section, "verbose", .false., settings%verbose)
+
+
 
 	if (status .ne. 0) then
 		write(*,*) "One or more parameters not found for hmcode"
@@ -66,7 +82,14 @@ end function setup
 function execute(block,config) result(status)
 	use mead_settings_mod
 	use cosmosis_modules
-	use mhm
+	
+	USE constants
+    USE basic_operations
+    USE array_operations
+    USE cosmology_functions
+    USE HMx
+	!USE interpolate
+    USE camb_stuff
 
 	implicit none
 
@@ -77,126 +100,235 @@ function execute(block,config) result(status)
 	integer, parameter :: LINEAR_SPACING = 0
 	integer, parameter :: LOG_SPACING = 1
 	character(*), parameter :: cosmo = cosmological_parameters_section
-	character(*), parameter :: halo = halo_model_parameters_section
 	character(*), parameter :: linear_power = matter_power_lin_section
 	character(*), parameter :: nl_power = matter_power_nl_section
+	character(*), parameter :: growth_section = "growth_parameters"
 
-	real(4) :: p1h, p2h,pfull, plin, z
-	integer :: i,j, z_index
-	REAL, ALLOCATABLE :: k(:),  pmod(:), ztab(:)
-	TYPE(cosmology) :: cosi
-	TYPE(tables) :: lut
+	integer :: i,j, z_index, nk_lin
+	REAL, ALLOCATABLE :: k(:),  pk(:,:), ztab(:), atab(:)
+	REAL, ALLOCATABLE :: k_lin(:),  pk_lin(:,:),pk_lin_k_only(:), z_lin(:), a_lin(:)
+	REAL, ALLOCATABLE :: growth(:), rate(:), a_growth(:)
+	TYPE(cosmology) :: cosm
 	!CosmoSIS supplies double precision - need to convert
-	real(8) :: om_m, om_v, om_b, h, w, sig8, n_s, om_nu
-	real(8), ALLOCATABLE :: k_in(:), z_in(:), p_in(:,:)
-	real(8), ALLOCATABLE :: k_out(:), z_out(:), p_out(:,:)
-	real(8) :: Halo_as, halo_eta0
+	real(8) :: Om_m, Om_lam, Om_b, h, w,wa, sig8, n_s, Om_nu, omnuh2
+	real(8), ALLOCATABLE :: k_in(:), z_in(:), p_in(:,:), a_in(:)
+	real(8), ALLOCATABLE :: k_out(:), z_out(:), a_out(:), p_out(:,:)
+	real(8), ALLOCATABLE :: growth_in(:), rate_in(:), a_growth_in(:)
+	integer :: n_growth
+
+	!real(8) :: Halo_as, halo_eta0
+	real(8) :: log10T_AGN
+	INTEGER, PARAMETER :: icos_default = 1
+	INTEGER :: icos
+	INTEGER :: version != HMcode2020_feedback
+	!LOGICAL, PARAMETER :: verbose = .TRUE.
+	REAL :: kmin, kmax, zmin, zmax
+	integer :: k_idx_cutoff
+	REAL, ALLOCATABLE :: k_less(:), norm_lin(:)
 
 	status = 0
 	call c_f_pointer(config, settings)
 
-	feedback = settings%feedback
+
+	! feedback setting switches between HMcode versions
+	if (settings%feedback ) then
+		version = HMcode2020_feedback
+		IF (settings%verbose) THEN
+			WRITE (*, *) "HMcode2020_feedback"
+		 END IF
+	else 
+		version = HMcode2020
+		IF (settings%verbose) THEN
+			WRITE (*, *) "HMcode2020"
+		 END IF
+	endif
 
 	!Fill in the cosmology parameters. We need to convert from CosmoSIS 8-byte reals
 	!to HMcode 4-byte reals, hence the extra bit
-	status = status + datablock_get(block, cosmo, "omega_m", om_m)
-	status = status + datablock_get(block, cosmo, "omega_lambda", om_v)
-	status = status + datablock_get(block, cosmo, "omega_b", om_b)
-        status = status + datablock_get_double_default(block, cosmo, "omega_nu", 0.0D0, om_nu)
+	status = status + datablock_get(block, cosmo, "omega_m", Om_m)
+	status = status + datablock_get(block, cosmo, "omega_lambda", Om_lam)
+	status = status + datablock_get(block, cosmo, "omega_b", Om_b)
 	status = status + datablock_get(block, cosmo, "h0", h)
 	status = status + datablock_get(block, cosmo, "sigma_8", sig8)
 	status = status + datablock_get(block, cosmo, "n_s", n_s)
 	status = status + datablock_get_double_default(block, cosmo, "w", -1.0D0, w)
+	status = status + datablock_get_double_default(block, cosmo, "wa", 0.0D0, wa)
+	status = status + datablock_get_double_default(block, cosmo, "omnuh2", 0.0D0, omnuh2)
 
+	!The log10T_AGN is only used for HMcode2020_feedback, it is the free parameter for the baryon model
+	status = status + datablock_get_double_default(block, cosmo, "log10T_AGN", 7.8D0, log10T_AGN)
 
-	status = status + datablock_get_double_default(block, halo, "A", 3.13D0, halo_as)
-	status = status + datablock_get_double_default(block, halo, "eta_0", 0.603D0, halo_eta0)
 
 	if (status .ne. 0 ) then
 		write(*,*) "Error reading parameters for Mead code"
 		return
 	endif
 
-    cosi%om_m=om_m-om_nu !The halo modelling should include only cold matter components (i.e. DM and baryons)
-    cosi%om_v=om_v
-    cosi%om_b=om_b
-    cosi%h=h
-    cosi%w=w
-    cosi%sig8=sig8
-    cosi%n=n_s
+	icos = icos_default
+	CALL assign_cosmology(icos, cosm, settings%verbose)
 
-    cosi%eta_0 = halo_eta0
-    cosi%As = halo_as
+	!note: in Mead2016 the code defined the internal omega_m without neutrinos. This I think has changed and here we
+	!include neutrinos in omega_m so we can directly map cosm%Om_m=Om_m
+	!also note: lower case is multiplied by h2 (eg om_m), upper case is not (eg Om_m)
+	cosm%iw = iw_waCDM        ! Set to w_waCDM dark energy
+    cosm%Om_v = 0.           ! Force vacuum energy density to zero (note that DE density is non-zero)
+	cosm%Om_w=Om_lam
+	cosm%w=w
+	cosm%wa=wa
+
+	cosm%Om_m=Om_m
+    cosm%Om_b=Om_b
+    cosm%h=h
+    cosm%sig8=sig8
+    cosm%ns=n_s
+	cosm%m_nu= omnuh2 * 93.14
+
+	cosm%Theat=10**log10T_AGN
 
     !And get the cosmo power spectrum, again as double precision
     !Also the P is 2D as we get z also
 	status = status + datablock_get_double_grid(block, linear_power, &
         "k_h", k_in, "z", z_in, "p_k", p_in)
+	a_in = 1/(1+z_in)
+
+	if (settings%power_input_zdep) then
+		allocate(k_lin(size(k_in)))
+		allocate(a_lin(size(a_in)))
+		allocate(z_lin(size(z_in)))
+		allocate(pk_lin(size(k_in), size(z_in)))
+		k_lin = k_in
+		a_lin = a_in
+		z_lin = z_in
+		pk_lin = p_in
+		!note we are putting in the power spectrum. In future updates this function will likely change
+		!to the internal Delta^2, so for future updates a factor k^3 * 2pi^2 might be needed. 
+		CALL init_external_linear_power_tables(cosm, k_lin, a_lin, pk_lin)
+	else
+		write(*,*) "This code should not be used its only for testing. Please set power_input_zdep=True for HMcode "
+		allocate(k_lin(size(k_in)))
+		allocate(pk_lin_k_only(size(k_in)))
+        allocate(a_lin(1))
+        a_lin = 1.         
+		pk_lin_k_only = p_in(:, 1)
+        CALL init_external_linear_power_tables(cosm, k_lin, a_lin, reshape(pk_lin_k_only, [nk_lin, 1]))
+	endif
 
 	if (status .ne. 0 ) then
 		write(*,*) "Error reading P(k,z) for Mead code"
 		return
 	endif
 
-	!Copy in k
-	allocate(cosi%ktab(size(k_in)))
-	cosi%ktab = k_in
+	! Initialise cosmological model
+	CALL init_cosmology(cosm)
+	CALL print_cosmology(cosm)
 
-	!Find the index of z where z==0
-	if (z_in(1)==0.0) then
-		z_index=1
-	elseif (z_in(size(z_in))==0.0) then
-		z_index=size(z_in)
-	else
-		write(*,*) "P(k,z=0) not found - please calculate"
-		status = 1
-		return
+	!if desired can pipe the growth from cosmosis into the mead module. For wCDM with neutrinos 
+	!there shouldn't be any difference, but when using modified growth this can have an effect
+	!note this needs to be after init_cosmology
+	if(settings%use_cosmosis_growth) then
+		status = status + datablock_get_double_array_1d(block, growth_section, "d_z", growth_in, n_growth)
+		status = status + datablock_get_double_array_1d(block, growth_section, "f_z", rate_in, n_growth)
+		status = status + datablock_get_double_array_1d(block, growth_section, "a", a_growth_in, n_growth)
+		IF (settings%verbose) THEN
+			WRITE (*, *) 'loaded growth from cosmosis pipeline'
+		ENDIF
+		growth = growth_in
+		rate = rate_in
+		a_growth = a_growth_in
+		!WRITE (*, *) 'check is has growth is true before putting external growth: ', cosm%has_growth
+		!WRITE (*, *) 'check inormalization before putting external growth: ', growth(1)
+
+		CALL init_external_growth(a_growth, growth, rate, cosm)
+		!WRITE (*, *) 'check is has growth is true: ', cosm%has_growth
 	endif
-	!Copy in P(k) from the right part of P(k,z)
-	allocate(cosi%pktab(size(k_in)))
-    cosi%pktab = p_in(:, z_index) * (cosi%ktab**3.)/(2.*(pi**2.))
-    cosi%itk = 5
 
+	if (.NOT. settings%optimize_nl_samples) then
+		!create a and k arrays based on parameters
+		kmin = settings%kmin
+		kmax = settings%kmax
+		zmin = settings%zmin
+		zmax = settings%zmax
+		CALL fill_array_log(kmin, kmax, k, settings%nk)
+		CALL fill_array(zmin, zmax, ztab, settings%nz)
+		! need to calculate a = 1/(1+z)
+		atab = 1 /(1+ztab) 
 
-	!Set the output ranges in k and z
-	CALL fill_table(real(settings%kmin),real(settings%kmax),k,settings%nk,LOG_SPACING)
-	CALL fill_table(real(settings%zmin),real(settings%zmax),ztab,settings%nz,LINEAR_SPACING)
+		CALL calculate_HMcode(k, atab, pk, settings%nk, settings%nz, cosm, version=version)
 
-	!Fill table for output power
-	ALLOCATE(p_out(settings%nk,settings%nz))
+		!convert to double precision
+		allocate(k_out(settings%nk))
+		allocate(z_out(settings%nz))
+		k_out = k
+		z_out = ztab
+		allocate(p_out(settings%nk,settings%nz))
+		DO i=1,size(z_out)
+			! To convert from the internal Delta^2 convention back to P(k) we use 
+			! the included function
+			p_out(:, i) = Pk_Delta(pk(:,i), k)
+		END DO
+	else
+		!case optimize_nl_samples -> we will only calculate the nl power at key points and rescale the linear model
 
+		IF (size(k_lin) .ne. settings%nk) THEN
+			write(*,*) "ERROR: Linear and nonline power spectrum need same sampling to use optimize nl samples!"
+			return
+		ENDIF
+		!create a and k arrays based on parameters
+		kmin = settings%kmin
+		kmax = settings%kmax
+		zmin = settings%zmin
+		zmax = settings%zmax
+		CALL fill_array_log(kmin, kmax, k, settings%nk)
+		CALL fill_array(zmin, zmax, ztab, settings%nz)
+		! need to calculate a = 1/(1+z)
+		atab = 1 /(1+ztab) 
 
-	!Loop over redshifts
-	DO j=1,settings%nz
+		k_idx_cutoff = 90 
+		!this index will depend on your sampling
+		!should chose so between k = 1e-2 and 1e-3
+		k_less = k(k_idx_cutoff:)
+		!write(*,*) "k values:", k_less
 
-		!Sets the redshift
-		z=ztab(j)
+		CALL calculate_HMcode(k_less, atab, pk, size(k_less), settings%nz, cosm, version=version)
 
-		!Initiliasation for the halomodel calcualtion
-		!Also normalises power spectrum (via sigma_8)
-		!and fills sigma(R) tables
-		CALL halomod_init(z,real(settings%numin),real(settings%numax),lut,cosi)
+		norm_lin = pk_lin(k_idx_cutoff,:) / Pk_Delta(pk(1, :), k_less(1))
+		!write(*,*) "normalization difference:", norm_lin
 
-		!Loop over k values
-		DO i=1,SIZE(k)
-			plin=p_lin(k(i),cosi)        
-			CALL halomod(k(i),z,p1h,p2h,pfull,plin,lut,cosi)
-			!This outputs k^3 P(k).  We convert back.
-			p_out(i,j)=pfull / (k(i)**3.0) * (2.*(pi**2.))
+		DO j=1,size(k_less)
+			pk(j,:) = pk(j,:) * norm_lin
 		END DO
 
-		IF(j==1) THEN
-			if (settings%feedback) WRITE(*,fmt='(A5,A7)') 'i', 'z'
-			if (settings%feedback) WRITE(*,fmt='(A13)') '   ============'
-		END IF
-		 if (settings%feedback) WRITE(*,fmt='(I5,F8.3)') j, ztab(j)
-	END DO
+		allocate(k_out(settings%nk))
+		allocate(z_out(settings%nz))
+		k_out = k
+		z_out = ztab
+		allocate(p_out(settings%nk,settings%nz))
 
-	!convert to double precision
-	allocate(k_out(settings%nk))
-	allocate(z_out(settings%nz))
-	k_out = k
-	z_out = ztab
+
+
+		DO i=1,size(z_out)
+
+			!check that norm_lin is not far from 1
+			IF (norm_lin(i) .gt. 1.01 .or. norm_lin(i) .lt. 0.99) THEN
+				write(*,*) "WARNING: Norm between lin and nl power large: ratio =", norm_lin(i)
+				write(*,*) "at redshift =", z_out(i)
+			ENDIF
+
+			! To convert from the internal Delta^2 convention back to P(k) we use 
+			! the included function
+			DO j=k_idx_cutoff,settings%nk
+				p_out(j, i) = Pk_Delta(pk(j-k_idx_cutoff+1,i), k_less(j-k_idx_cutoff+1))
+				!write(*,*) "k difference:", k_less(j-k_idx_cutoff+1) -k(j) -> check, is zero
+			END DO
+		
+			! enforce linar solution on large scales
+			DO j=1,k_idx_cutoff
+				p_out(j, i) = p_in(j,i) !Pk_Delta(pk(j,i), k_less(j))
+			END DO
+		END DO
+
+	endif
+
 	!Convert k to k/h to match other modules
 	!Output results to cosmosis
 	status = datablock_put_double_grid(block,nl_power, "k_h", k_out, "z", z_out, "p_k", p_out)
@@ -210,11 +342,5 @@ function execute(block,config) result(status)
 	deallocate(p_in)
 	deallocate(k_out)
 	deallocate(z_out)
-	call deallocate_LUT(lut)
-    IF(ALLOCATED(cosi%rtab)) DEALLOCATE(cosi%rtab)
-    IF(ALLOCATED(cosi%sigtab)) DEALLOCATE(cosi%sigtab)   
-    IF(ALLOCATED(cosi%ktab)) DEALLOCATE(cosi%ktab)
-    IF(ALLOCATED(cosi%tktab)) DEALLOCATE(cosi%tktab)
-    IF(ALLOCATED(cosi%pktab)) DEALLOCATE(cosi%pktab)
 
 end function execute

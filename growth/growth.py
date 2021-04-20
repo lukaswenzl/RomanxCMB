@@ -33,13 +33,18 @@ def setup(options):
 def execute(block, config):
     gamma_parametrization = config["gamma_parametrization"]
 
-    z = config["sampling"]
-    a = 1/(1+z)
+    z_output = config["sampling"]
+    a_output = 1/(1+z_output)
 
     # Get parameters from sampler
     omega_m0 = block[cosmo, 'omega_m']
     omega_lambda0 = block[cosmo, 'omega_lambda']
-    
+    w0 = block[cosmo, 'w']
+    wa = block[cosmo, 'wa']
+
+    #internal sampling
+    a = np.linspace(0.,1., 100)
+
     if(gamma_parametrization):
         gamma0 = block[cosmo, 'gamma0']
         gammaa = block[cosmo, 'gammaa'] #set to 0 if only want to sample over gamma0
@@ -48,35 +53,46 @@ def execute(block, config):
     else:
         w0 = block[cosmo, 'w']
         wa = block[cosmo, 'wa']
-        #Linder2008: 0.55 + 0.05* (w(z=1))
+        #Linder2008: 0.55 + 0.05* (w(z=1)) 
+        #and for w<-1: 0.55 + 0.02* (w(z=1)) 
         #z = 1 -> a = 1/2
-        exponent_factor = 0.55 + 0.05 * (w0 + (1.- 1./2.)*wa)
-        print("consider case where this gets positive? or am i avoiding this here already")
+        weff = w0 + (1.- 1./2.)*wa
+        if (weff >= -1): 
+            exponent_factor = 0.55 + 0.05 * (1+weff)
+        else:
+            exponent_factor = 0.55 + 0.05 * (1+weff)
 
-    
+    #integrating growth rate to get growth function
+    #$$D(a)/a = exp(\int_0^a da/a [f(a) -1])$$
 
-    Hsquare = omega_m0 * a**(-3) + omega_lambda0
+    a[0] = 0.0001 #to avoid dividing by zero, will handle case a = 0 by hand further down
+
+    #friedman, for each component time scaling is a^(-3 (1+w(a)))
+    Hsquare = omega_m0 * a**(-3) + omega_lambda0 * a**(-3 * (1+   (w0 + (1. -a)*wa)))
     omega_m = omega_m0 * a**(-3) /(Hsquare)
 
     f = omega_m**exponent_factor
 
-    loga = np.log(a)
-    print("i might need finer sampling here and then downsample!")
-    print("THis code still needs to be tested, I am not sure if it is accurate (maybe z is reversed!)")
+    integrand = (f-1)/(a)
 
-    #D = np.exp(integrate.cumtrapz(f[::-1], loga[::-1], initial=0.))
-    #D = D[::-1]
-    D = np.exp(integrate.cumtrapz(f, loga, initial=0.))
-    D = 5.*(omega_m0)/2. * D #normalization
+    #limit a=0
+    f[0] = 1
+    integrand[0] = 0
+    a[0] = 0
+
+    D = (integrate.cumtrapz(integrand, a, initial=0.))
+    D = np.exp(D)
+    D = D*a
+
+
 
     # Save back to block
     output_section = config["output_section"]
-    block[output_section, 'a'] = a 
-    block[output_section, 'z'] = z
-    block[output_section, 'f_z'] = f
-    block[output_section, 'd_z'] = D
+    block[output_section, 'a'] = a_output
+    block[output_section, 'z'] = z_output
+    block[output_section, 'f_z'] = np.interp(a_output,a,f)
+    block[output_section, 'd_z'] = np.interp(a_output,a,D)
 
-    print("might need to do more sampling?!, but code should work now -> test")
     # signal that everything went fine
     return 0
 
