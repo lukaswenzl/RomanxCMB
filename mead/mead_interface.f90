@@ -243,6 +243,7 @@ function execute(block,config) result(status)
 	endif
 
 	if (.NOT. settings%optimize_nl_samples) then
+		write(*,*) "WARNING: Bug in code leads to unohysical supression for k< 1e-3, cosnider using a cutoff"
 		!create a and k arrays based on parameters
 		kmin = settings%kmin
 		kmax = settings%kmax
