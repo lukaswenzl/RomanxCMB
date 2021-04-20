@@ -11,14 +11,15 @@ from scipy.interpolate import interp1d
 
 output_folder = "modules/RomanxCMB/mead/plots/"
 
-whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence,growth_test,growth_gamma,mead_with_modified_growth,sampling_accuracy"
+whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence,growth_test,growth_gamma,mead_with_modified_growth,sampling_accuracy,sample_only_above_cutoff"
+#whattodo = "sampling_accuracy,sample_only_above_cutoff"
 #whattodo = ",halofit_comparison "
 #whattodo = "wdependence"
 #whattodo = "power_input_zdep,growth_test,growth_gamma,mead_with_modified_growth"
 #whattodo = "power_input_zdep"#halofit_comparison"
-whattodo = "mead_with_modified_growth"
-whattodo = "sampling_accuracy"
-whattodo = "sample_only_above_cutoff"
+#whattodo = "mead_with_modified_growth"
+#whattodo = "sampling_accuracy"
+#whattodo = "sample_only_above_cutoff"
 #whattodo = "halofit_comparison"
 
 
@@ -29,6 +30,8 @@ if ("power_input_zdep" in whattodo):
 
     # The easiest way to start a pipeline it from a parameter file.
     ini = Inifile("modules/RomanxCMB/mead/params_gammagrowth.ini")
+
+    ini.set("mead", "optimize_nl_samples",  "F")
 
     # You can modify things in the ini file object after loading.
     # In this case we will switch off some verbose output
@@ -731,6 +734,7 @@ if ("sampling_accuracy" in whattodo):
     ini = Inifile("modules/RomanxCMB/mead/params.ini")
     ini.set("mead", "nk",  "450")
     ini.set("mead", "na", "250")
+    ini.set("mead", "optimize_nl_samples",  "F")
 
     pipeline = LikelihoodPipeline(ini)
     pipeline.quiet = True
@@ -754,6 +758,7 @@ if ("sampling_accuracy" in whattodo):
         ini = Inifile("modules/RomanxCMB/mead/params.ini")
         ini.set("mead", "nk",  "{}".format(int(200*fraction)))
         ini.set("mead", "na", "{}".format(int(100*fraction)))
+        ini.set("mead", "optimize_nl_samples",  "F")
 
         pipeline = LikelihoodPipeline(ini)
         pipeline.quiet = True
