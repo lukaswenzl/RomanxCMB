@@ -394,6 +394,6 @@ if ("amplitude" in whattodo):
     plt.xscale("log")
     plt.yscale("log")
     plt.xlabel("z")
-    plt.ylabel("P_II /P (large scale) = A^2")
+    plt.ylabel("$P_II /P$ (k fixed) = $f^2_{red} A^2$")
     plt.legend()
     plt.savefig(output_folder+"plot_intrinsic_amplitudeRAW.pdf")
