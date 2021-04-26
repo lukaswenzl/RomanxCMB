@@ -338,8 +338,8 @@ class ClCov( object ):
         cl2_sum = self.get_cl2sum_ijkl( c_ij_12, c_kl_34, ij, kl, ell_vals, 
             noise_only=noise_only )
         n_modes = (2*ell_vals+1)
-        if(self.fsky != self.fsky_cmb):
-            print("We are applying a different fsky for cmb lensing. This still needs to be tested or shown!")
+        #if(self.fsky != self.fsky_cmb):
+        #    print("We are applying a different fsky for cmb lensing. This still needs to be tested or shown!")
         if(name1 == "cmbkappa_cl"):
             n_modes = np.sqrt(self.fsky_cmb) * n_modes
         else:
