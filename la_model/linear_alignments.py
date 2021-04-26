@@ -209,7 +209,7 @@ def krause_eifler_blazek(z_nl,z_nl_cutoff, k_nl, P_nl, A0, Omega_m, h, z0_IA, z1
     #we call this A_L0 since when plugging in L=L0 the luminsity scaling disappears
     #note rho_m = Omega_m *rho_crit
     A_L0 = - A0 * C1_RHOCRIT * Omega_m / growth 
-    print("check that this value: "+str(C1_RHOCRIT)+" is the same as the Krause et al 2016 value of 0.0134")
+    #print("check that this value: "+str(C1_RHOCRIT)+" is the same as the Krause et al 2016 value of 0.0134")
     A_L0 = A_L0 * ((1+z_nl_cutoff)/(1+z0_IA) )**eta #redshift scaling
 
     #luminosity scaling -> marginalize by integration, include red fraction factor for effiency
