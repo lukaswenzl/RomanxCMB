@@ -133,7 +133,7 @@ def calculate_L_lim(m_lim, D_L,k_corr,e_corr, h, galaxy_type="Sa", combine=False
     # needs the limiting magnitude of the survey and the luminosity distance function for cosmology D_L(z) [Mpc/h]
     
     z = D_L["z"]
-    print("right now we are using Sa galaxy k and e correction. This might be a pretty bad choice, only for code testing purposes!")
+    #print("we are using Sa galaxy k and e correction.")
     if (combine):
         k = 0.5*resample(k_corr[galaxy_type],k_corr["z"], z)+resample(e_corr[galaxy_type],e_corr["z"], z)
         k += 0.5*resample(k_corr["E"],k_corr["z"], z)+resample(e_corr["E"],e_corr["z"], z)
@@ -175,22 +175,17 @@ def integrate_luminosity_dependence(A_L0, phi_red, phi_all, L_lim_red, L_lim_all
 
     f = lambda logL : phi_red((logL+np.log(L_lim_red["L_lim"])),z) * ((np.exp(logL)+L_lim_red["L_lim"]) / L0)**beta
     lum_scaling = integrate.quad_vec(f, 0, 50, epsrel=1e-4) #integral goes from -inf to inf. Need to choose log space range large enough. values significant between e30 and e45
-    print("need to adapt upper and lower limit")
+
 
     f = lambda logL : phi_all((logL+np.log(L_lim_all["L_lim"])),z)
     lum_all = integrate.quad_vec(f, 0, 50, epsrel=1e-4)
-    print("hello i am here")
-    print(z)
-    print(lum_scaling[0])
-    print(lum_all[0])
-    print(lum_all)
+
 
     A_mlim_values = A_L0["A_L0"] * lum_scaling[0]/lum_all[0]
     
     #could implement a max redshift to avoid the nulls but does not seem to be necessary since already very fast
     A_mlim_values[np.isnan(A_mlim_values)] = 0 #TODO
 
-    print(A_mlim_values)
     return {"A_mlim":A_mlim_values, "z":A_L0["z"]}
 
 

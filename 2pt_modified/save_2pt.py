@@ -147,8 +147,10 @@ def setup(options):
         config["n_ell"] = n_ell
         ell_as_int = options.get_bool(option_section, "force_ell_limits_to_be_integer", True)
         config["cov_calc_multiply_range_instead_of_sum"] = options.get_bool(option_section, "cov_calc_multiply_range_instead_of_sum", False)
-        ell_lims, ell_mids = get_ell_scales( ell_min, ell_max, n_ell,
+        ell_lims, _ = get_ell_scales( ell_min, ell_max, n_ell,
             logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint, ell_as_int=ell_as_int )
+        _, ell_mids = get_ell_scales( ell_min, ell_max, n_ell,
+            logspaced=logspaced, two_thirds_midpoint=two_thirds_midpoint, ell_as_int=False )
         config['angle_lims'] = ell_lims
         config['angle_mids'] = ell_mids
         config['angle_lims_userunits'] = config['angle_lims']
@@ -220,6 +222,9 @@ The input value should be sigma_e_total = sqrt(2) * sigma_e_per_component""")
     config['cosmolike_metadata_file'] = options.get_string(option_section, "cosmolike_metadata_file", "")
     ## capability to load an external cosmolike covariance matrix
     config['cosmolike_covariance'] = options.get_string(option_section, "cosmolike_covariance", "")
+    ## capability to load ng part of an external cosmolike covariance matrix and add it to the gaussian one
+    config['add_ng_cosmolike_covariance'] = options.get_string(option_section, "add_ng_cosmolike_covariance", "")
+    
 
     config["new_fsky_cmb_lensing"] = options.get_double(option_section, "new_fsky_cmb_lensing", -1)
     config["cosmolike_overall_fsky"] = options.get_double(option_section, "cosmolike_overall_fsky", -1)
@@ -442,6 +447,29 @@ def execute(block, config):
         bin_cuts = config['bin_cuts']
     if scale_cuts or bin_cuts:
         data.mask_scales(scale_cuts, bin_cuts)
+
+
+    if(config["add_ng_cosmolike_covariance"] != ""):
+        #force internal cosmosis code to update the bin_pairs list
+        for i in range(len(spec_meas_list)):
+            spec_meas_list[i].bin_pairs = spec_meas_list[i].get_bin_pairs()
+            
+        #import pdb; pdb.set_trace()
+        #loading ng part to the covariance matrix
+        covmat_ng = cosmolike_metadata.rearrange_cov(config["add_ng_cosmolike_covariance"],spec_meas_list,config["cosmolike_metadata_file"], config["n_ell"])
+        if (config["cosmolike_overall_fsky"] >0 and config["new_fsky_cmb_lensing"] >0):
+            print("rescaling fsky for cmblensing!")
+            covmat_ng = cosmolike_metadata.rescale_fsky(covmat_ng,spectra=spec_meas_list, n_ell=config["n_ell"], cosmolike_overall_fsky=config["cosmolike_overall_fsky"], new_fsky_cmb_lensing=config["new_fsky_cmb_lensing"])
+        if(data.covmat.shape != covmat_ng.shape):
+            print("shape of cosmolike covariance does not match!")
+            print(data.covmat.shape)
+            print(data.covmat_info.covmat.shape)
+            print(covmat_ng.shape)
+            return 1
+        data.covmat = data.covmat + covmat_ng
+        data.covmat_info.covmat = data.covmat_info.covmat + covmat_ng
+
+
 
     data.to_fits(filename, overwrite=overwrite)
 
