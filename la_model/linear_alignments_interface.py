@@ -93,9 +93,12 @@ def execute(block, config):
         #    D_L_values[0] = 1000#this might not be a good idea
         D_L = {"D_L":D_L_values, "z":z_nl_cutoff}
 
-        P_II, P_GI, b_I, r_I, k_I, z_I = krause_eifler_blazek(
+        P_II, P_GI, b_I, r_I, k_I, z_I, A_IA, f_red = krause_eifler_blazek(
             z_nl,z_nl_cutoff, k_nl, p_nl, A, omega_m, h, z0_IA,z1_IA,M0,beta,eta,eta_highz,mlim, D_L,k_corr, e_corr)
-
+        block["intrinsic_alignment", "z"] = z_nl_cutoff
+        block["intrinsic_alignment", "Amplitude"] = A_IA
+        block["intrinsic_alignment", "fred"] = f_red
+    
     if grid_mode:
         block.put_grid(ia, "z", z_I, "k_h", k_I,  "b_I" + suffix, b_I)
         block.put_grid(ia, "z", z_I, "k_h", k_I, "r_I" + suffix, r_I)
