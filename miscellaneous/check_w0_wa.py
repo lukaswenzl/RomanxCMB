@@ -28,8 +28,16 @@ def execute(block, config):
         block[cosmo, 'w0'] = -1.
         block[cosmo, 'wa'] = 0.
         block[cosmo, 'set_likelihood_minus_infinity'] = True 
+        print("w0+wa>-1/3, crashing...")
+        raise ValueError
     else:
         block[cosmo, 'w0'] = w
         block[cosmo, 'set_likelihood_minus_infinity'] = False 
+
+    omnuh2 = block[cosmo, 'omnuh2']
+    if(omnuh2 > 0. and omnuh2 < 0.00003):
+        #low neutrinos do not work with our code
+        print("omnuh2 < 0.00003, crashing")
+        raise ValueError
 
     return 0
