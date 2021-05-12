@@ -1,12 +1,10 @@
-//int growth_de(int n, double *a, double *d_vec, double * f_vec);
-double growth_de (double a, double *gf);
+int growth_de (int n, double *a, double *d, double *f);
 
 double w (double a);
 double w_int(double z, void *param);
 //double DarkEnergy_a( double a );
 
 double mg_mu_t(double a);
-double growth_de (double a, double *gf);
 
 double Xde_int (double a ,void * params);
 double Xde (double a);
