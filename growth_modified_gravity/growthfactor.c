@@ -1,4 +1,6 @@
 //Adapted from existing code in CosmoSIS by Agnes Ferte to include mu
+//Further adapted (and optimized) by Chen Heinrich (2021)
+//TODO need to check if this works for varying w(a)
 
 #include <math.h>
 #include <stdlib.h>
@@ -10,10 +12,11 @@
 #include <gsl/gsl_odeiv.h>
 #include "growthfactor.h"
 
-//Code to calculate the linear growth factor D, and linear growth rate, f. Where a linear perturbation delta grows as
-//delta(a') = delta(a)*(D(a')/D(a))^2 and f = dlnD/dlna in the case of the (Sigma,Mu) parametrisation
-//with a time dependance such as mu = mu0 *omega_DE(a)
-//Note anyone using Komatsu's CRL library should note: growth_factor_crl = D *(1+z) and growth_rate_crl = f/(1+z)
+//Code to calculate the linear growth factor D, 
+//and linear growth rate, f = dlnD/dlna for modified gravity.
+//Currently supporting (Sigma,Mu) parametrisation
+//with a time dependance mu = 1 + mu(t) where
+// mu(t) = mu0 * omega_DE(a)
 
 double D;
 double linear_f;
@@ -23,47 +26,24 @@ double mg_mu;
 
 #define LIMIT_SIZE 1000
 
-
-//TODO to remove after this works
-int get_growthfactor_old(double a,double om, double w, double w2, double *gf,double mu)
-{
-	w0 = w;
-	wa = w2;
-	omega_m = om;
-	omega_lambda = 1.0 - omega_m;
-	mg_mu = mu;
-    growth_de(a,gf);
-	return 0;
-}
-
 int get_growthfactor(int n, double *a,double om, double ov, double w, double w2, double *d, double *f, double mu0)
 {
 	w0 = w;
 	wa = w2;
 	omega_m = om;
-	omega_lambda = 1.0 - omega_m; //TODO check ov same as omega_lambda?
+	omega_lambda = 1.0 - omega_m; 
 	mg_mu = mu0;
 
-    //double (*gf)[2];
-    double arr[2]; 
-    double *gf = arr;
+    int tmp;
+    tmp = growth_de(n, a, d, f);
 
-    int i;
-
-    for (i=0;i<n;i++){
-        growth_de(a[i],gf);
-        d[i] = gf[0];
-        f[i] = gf[1];
-    }
 	return 0;
 }
 
 //careful: this is the mu(t) in 1+mu(t) (mu(t) = 0 = GR)
 double mg_mu_t(double a)
 {
-//TODO double check with Agnes about this function
-//return mg_mu/(omega_lambda + (1.0 - omega_lambda)*pow(a,-3.0));
-return mg_mu;
+return mg_mu/(omega_lambda + (1.0 - omega_lambda)*pow(a,-3.0));
 }
 
 double w (double a)
@@ -102,7 +82,6 @@ double Xde (double a)
 
 int func (double t, const double y[], double f[], void *params)
 {
-	//double mu = *(double *)params;
 	f[0] = y[1];
 	f[1] = -( 3.5 - 1.5 * w(t)/( 1 + Xde(t) ) )*y[1]/t - 1.5 *( 1 - w(t) - Xde(t)*mg_mu_t(t) )/( 1 + Xde(t))*(y[0]/t/t);
 	return GSL_SUCCESS;
@@ -126,7 +105,7 @@ int jac (double t, const double y[], double *dfdy, double dfdt[], void *params)
 //---> here, m is df/dy, a 2 by 2 matrix.      
 
 
-double growth_de (double a, double *gf)
+int growth_de(int n, double *a, double *d, double *f)
 {
 	const gsl_odeiv_step_type * T 
 		= gsl_odeiv_step_rk4;
@@ -145,25 +124,30 @@ double growth_de (double a, double *gf)
 	//2 is the dimension of the system
 	//&mu is a pointer to the parameters of the system.
      
-	double t =1.e-3, t1 = a;
-	double h = 1e-6;
+	double t = 1.e-3;
+    double h = 1e-6;
 	double y[2] = {1.,0.}; 
      
-	while (t < t1)
-	{
-		int status = gsl_odeiv_evolve_apply (e, c, s, &sys, &t, t1, &h, y);
-		//evolve (e,&sys) from t and y using function step s. New time and position store in &t and y. 
-		//Initial step size = &h, modifided using control c. 
-		// t1 is the maximum time of timstep.
-		if (status != GSL_SUCCESS)
-			break;
-	}
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        double ti = a[i];
+        while (t < ti)
+        {
+            gsl_odeiv_evolve_apply (e, c, s, 
+                                    &sys, 
+                                    &t, ti, &h,
+                                    y);
+        }
+        d[i] = y[0]*a[i]; //D growth factor (= G*a)
+	    f[i] = y[1]*a[i]*a[i]/(y[0]*a[i]) +1.; // f = d ln D/ d ln a
+    }
+
 	gsl_odeiv_evolve_free (e);
 	gsl_odeiv_control_free (c);
 	gsl_odeiv_step_free (s);
 
-	gf[0] = y[0]*a; //D growth factor (= G*a)
-	gf[1] = y[1]*a*a/(y[0]*a) +1.; // f = d ln D/ d ln a
-	return y[0]*a;
+    return 0;
 
 }
