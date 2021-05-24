@@ -98,7 +98,9 @@ def calculate_L_lim(m_lim, D_L,k_corr,e_corr, h, galaxy_type="Sa"):
     
     z = D_L["z"]
     k = resample(k_corr[galaxy_type],k_corr["z"], z)+resample(e_corr[galaxy_type],e_corr["z"], z)# choice in galaxy type for correction makes little difference
-    M_lim = m_lim - ( 5.*np.log10(np.array(D_L["D_L"])/h)+25.+k) # important factor of h! camb distance is in Mpc so need to divide by h here
+    distances = np.array(D_L["D_L"])/h
+    distances = np.where(distances > 1., distances, 1.) #avoid taking log of 0
+    M_lim = m_lim - ( 5.*np.log10(distances)+25.+k) # important factor of h! camb distance is in Mpc so need to divide by h here
     L_lim_values = Magnitude_to_Luminosity(M_lim)
     if(z[0]==0):
         L_lim_values[0] = 1e30
