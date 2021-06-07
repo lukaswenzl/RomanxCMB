@@ -63,15 +63,15 @@ function setup(options) result(result)
 		stop
 	endif
 
-	WRITE(*,*) 'z min:', settings%zmin
-	WRITE(*,*) 'z max:', settings%zmax
-	WRITE(*,*) 'number of z:', settings%nz
-	WRITE(*,*)
+	! WRITE(*,*) 'z min:', settings%zmin
+	! WRITE(*,*) 'z max:', settings%zmax
+	! WRITE(*,*) 'number of z:', settings%nz
+	! WRITE(*,*)
 
-	WRITE(*,*) 'k min:', settings%kmin
-	WRITE(*,*) 'k max:', settings%kmax
-	WRITE(*,*) 'number of k:', settings%nk
-	WRITE(*,*)
+	! WRITE(*,*) 'k min:', settings%kmin
+	! WRITE(*,*) 'k max:', settings%kmax
+	! WRITE(*,*) 'number of k:', settings%nk
+	! WRITE(*,*)
 
 
 	result = c_loc(settings)

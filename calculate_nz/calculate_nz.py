@@ -26,8 +26,8 @@ def setup(options):
     full_distribution = Distribution(filename)
     use_only_one_sigma = options.get_bool(option_section, "use_only_one_sigma", False)
 
-    print(nsamples)
-    print(sampling)
+    # print(nsamples)
+    # print(sampling)
 
 
     print("Loaded file %s" % (filename))

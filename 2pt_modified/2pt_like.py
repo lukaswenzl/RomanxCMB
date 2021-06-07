@@ -180,10 +180,12 @@ class TwoPointLikelihood(GaussianLikelihood):
                 "No data was chosen to be used from 2-point data file {0}. It was either not selectedin data_sets or cut out".format(filename))
 
         if self.moped:
-            data_file = fits.open(filename)
-            self.moped_data = data_file['MOPED-DATA-{}'.format(self.moped)].data['moped']
-            self.moped_transform = data_file['MOPED-TRANSFORM-{}'.format(self.moped)].data
-            data_file.close()
+            # data_file = fits.open(filename)
+            # self.moped_data = data_file['MOPED-DATA-{}'.format(self.moped)].data['moped']
+            # self.moped_transform = data_file['MOPED-TRANSFORM-{}'.format(self.moped)].data
+            # data_file.close()
+            self.moped_data = np.load(self.moped + '_moped_data.npy')
+            self.moped_transform = np.load(self.moped + '_moped_transform.npy')
 
             return None, self.moped_data
 
