@@ -1,7 +1,6 @@
-#This is a template for module description files
 name: growth_factor
 version: 1
-purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa
+purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models with mu(a) = 1 + mu0 * Omega_DE(a)
 url: ""
 interface: interface.so
 attribution: [CosmoSIS Team]
@@ -9,10 +8,11 @@ rules: "If you use a file from a particular survey you should cite that survey"
 cite: []
 
 assumptions:
-    - "linear growth factor and rate in flat cosmology"
+    - "linear growth factor and rate in flat cosmology in modified gravity models with mu(a) = 1 + mu0 * Omega_DE(a)"
 
 explanation: |
-        "This simple module calculates the linear growth factor D, and linear growth rate, f, for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa. 
+        "This simple module calculates the linear growth factor D, and linear growth rate, f, for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa
+        for modified gravity models with mu(a) = 1 + mu0 * Omega_DE(a) where mu0 is a constant, and one recovrs GR for mu(a) = 1. 
         Where D, f are defined by the growth of a
         linear perturbation, delta, with scale factor a: delta(a') = delta(a)*(D(a')/D(a)) and f = dlnD/dlna"
 params:
@@ -28,6 +28,7 @@ inputs:
         omega_lambda:  "real, dark energy density today (default 1-omega_m)"
         w:  "real, w(z=0) equation of state of dark energy (default -1.0) "
         wa:  "real, equation of state parameter w(z) = w_0 + w_a z / (1+z)  (default 0.0)"
+        mu0: "real, amplitude of deviation from GR in the mu(a) = 1 + mu0 * Omega_DE(a)"
 
 outputs:
     growth_parameters:

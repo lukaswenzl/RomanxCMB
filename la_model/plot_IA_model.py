@@ -16,8 +16,9 @@ whattodo = "amplitude"
 #whattodo = "Cls"
 whattodo = "red_fraction"#,Cls,amplitude"
 whattodo ="la_model_param_dependence"
-whattodo = "Cl_param_dependence"
-
+whattodo = "la_model_param_dependence,Cl_param_dependence,Cl_old_model_param_dependence"
+whattodo = "la_model_param_dependence,Cl_param_dependence"
+whattodo = "Cl_components"
 
 if ("powerspectra" in whattodo):
     # The easiest way to start a pipeline it from a parameter file.
@@ -822,15 +823,13 @@ if ("Cl_param_dependence" in whattodo):
     # and get a Galaxy Galaxy-Lensing spectrum for each of them
        
     section = "intrinsic_alignment_parameters"
-    param = "A"
     vector = pipeline.start_vector()
     data = pipeline.run_parameters(vector)
 
 
     #tracer = "shear_cl"
     #bin = "bin_2_2"
-    #for tracer, bin in [("shear_cl", "bin_2_2"),("shear_cl", "bin_3_2"), ("shear_cl", "bin_6_1"),("galaxy_shear_cl", "bin_2_2"), ("galaxy_shear_cl", "bin_2_4")]:
-    for tracer, bin in [("shear_cmbkappa_cl", "bin_2_1")]:
+    for tracer, bin in [("shear_cl", "bin_2_2"),("shear_cl", "bin_3_2"), ("shear_cl", "bin_6_1"),("galaxy_shear_cl", "bin_2_2"), ("galaxy_shear_cl", "bin_2_4"),("shear_cmbkappa_cl", "bin_2_1")]:
     
         plt.figure() 
         ell = data[tracer, 'ell']
@@ -863,5 +862,136 @@ if ("Cl_param_dependence" in whattodo):
         plt.legend()
         plt.savefig(output_folder+"plot_Cl_model_dependence_"+tracer+"_"+bin+"_RAW.pdf")
 
+if ("Cl_components" in whattodo):
+    # The easiest way to start a pipeline it from a parameter file.
+    ini = Inifile("modules/RomanxCMB/la_model/params_IA.ini")
 
 
+    # You can modify things in the ini file object after loading.
+    # In this case we will switch off some verbose output
+    #ini.set("pipeline", "values",  "%(ROMANxCMB_SRC_DIR)s/values.ini")
+
+    # Make the pipeline itself
+    pipeline = LikelihoodPipeline(ini)
+    # You can also override these properties if useful
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+       
+    section = "intrinsic_alignment_parameters"
+    vector = pipeline.start_vector()
+    data = pipeline.run_parameters(vector)
+
+
+    tracer = "shear_cl_gi"
+    tracer = "shear_cl_gi"
+
+    #for comparison simple IA model
+    ini_old = Inifile("modules/RomanxCMB/la_model/params_oldIA.ini")
+    pipeline_old = LikelihoodPipeline(ini_old)
+    vector_old = pipeline_old.start_vector()
+    data_old = pipeline_old.run_parameters(vector_old)
+
+
+    #bin = "bin_2_2"
+    for tracer, bin in [("shear_cl", "bin_1_1"),("shear_cl", "bin_2_1"),("shear_cl", "bin_2_2"),("shear_cl", "bin_3_2"), ("shear_cl", "bin_5_5"), ("shear_cl", "bin_5_1"),("shear_cl", "bin_8_1")]:
+    
+        plt.figure() 
+        ell = data[tracer, 'ell']
+        factor = ell*(ell+1)/(2.*np.pi)
+        
+
+        plt.title(tracer+" "+bin)
+        #Cl55 = data['shear_cl', 'bin_5_5'] 
+
+        if (tracer == "shear_cl"):
+            suff = ["", "_gi","_ii", "_gg"]
+        for i in suff:
+            if (i == "_gg"):
+                Cl = np.abs(data[tracer, bin]) *factor - np.abs(data[tracer+"_gi", bin]) *factor - np.abs(data[tracer+"_ii", bin]) *factor
+            else:
+                Cl = np.abs(data[tracer+i, bin]) *factor
+            plt.plot(ell, Cl, label="full model "+i)
+
+            #ols IA model
+            if (i == "_gg"):
+                Cl_old = np.abs(data_old[tracer, bin]) *factor - np.abs(data_old[tracer+"_gi", bin]) *factor - np.abs(data_old[tracer+"_ii", bin]) *factor
+            else:
+                Cl_old = np.abs(data_old[tracer+i, bin]) *factor
+            plt.plot(ell, Cl_old,"--", label="simple IA "+i)
+
+        plt.yscale("log")
+        plt.xscale("log")
+        #plt.xlim(0, 3.5)
+        plt.legend()
+        plt.xlabel("l")
+        plt.ylabel("$l(l+1) C_l / (2\pi )$")
+        
+
+        #plt.legend()
+        plt.savefig(output_folder+"plot_Cl_components_"+tracer+"_"+bin+"_RAW.pdf")
+
+
+if ("Cl_old_model_param_dependence" in whattodo):
+    # The easiest way to start a pipeline it from a parameter file.
+    ini = Inifile("modules/RomanxCMB/la_model/params_oldIA.ini")
+
+
+    # You can modify things in the ini file object after loading.
+    # In this case we will switch off some verbose output
+    #ini.set("pipeline", "values",  "%(ROMANxCMB_SRC_DIR)s/values.ini")
+
+    # Make the pipeline itself
+    pipeline = LikelihoodPipeline(ini)
+    # You can also override these properties if useful
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    #pipeline.set_varied("cosmological_parameters", "omega_m", 0.2, 0.4)
+
+    # Let's look through different values of omega_m
+    # and get a Galaxy Galaxy-Lensing spectrum for each of them
+       
+    section = "intrinsic_alignment_parameters"
+    vector = pipeline.start_vector()
+    data = pipeline.run_parameters(vector)
+
+
+    #tracer = "shear_cl"
+    #bin = "bin_2_2"
+    for tracer, bin in [("shear_cl", "bin_2_2"),("shear_cl", "bin_3_2"), ("shear_cl", "bin_6_1"),("galaxy_shear_cl", "bin_2_2"), ("galaxy_shear_cl", "bin_2_4"), ("shear_cmbkappa_cl", "bin_2_1")]:
+    
+        plt.figure() 
+        ell = data[tracer, 'ell']
+        factor = ell*(ell+1)/(2.*np.pi)
+        Cl22 = np.abs(data[tracer, bin]) *factor
+
+        plt.title(tracer+" "+bin)
+        #Cl55 = data['shear_cl', 'bin_5_5'] 
+        
+
+        for param in ["A", "alpha" ]:
+            data_max, data_min = run_min_max_of_range(pipeline, section, param)
+            ell = data_min[tracer, 'ell']
+            observable_max = np.abs(data_max[tracer, bin]) *factor
+            observable_min = np.abs(data_min[tracer, bin]) *factor
+
+            high = np.maximum(np.maximum(observable_max, observable_min), Cl22)
+            low = np.minimum(np.minimum(observable_max, observable_min), Cl22)
+            plt.fill_between(ell, low, high, alpha = 0.3, label=param)
+
+        plt.plot(ell, Cl22,color="black", label="fiducial")
+
+        plt.yscale("log")
+        plt.xscale("log")
+        #plt.xlim(0, 3.5)
+        plt.xlabel("l")
+        plt.ylabel("$l(l+1) C_l / (2\pi )$")
+        
+
+        plt.legend()
+        plt.savefig(output_folder+"plot_Cl_old_model_dependence_"+tracer+"_"+bin+"_RAW.pdf")
+
+    

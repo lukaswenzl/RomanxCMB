@@ -266,6 +266,7 @@ def krause_eifler_blazek(z_nl,z_nl_cutoff, k_nl, P_nl, A0, Omega_m, h, z0_IA, z1
     # Finally calculate the intrinsic and stochastic bias terms from the power spectra (these are only used for grid mode...)
     R1 = P_II / P_nl
     b_I = -1.0 * np.sqrt(R1) * np.sign(A0)
-    r_I = P_GI / P_II * b_I
+    tmp = np.where(P_II > 1.e-100, P_II, 1.e-100) #avoid dividing by 0, 1e-100 is smaller than any ia value would be
+    r_I = P_GI / tmp * b_I
 
     return P_II, P_GI, b_I, r_I, k_nl, z_nl, A_IA, f_red
