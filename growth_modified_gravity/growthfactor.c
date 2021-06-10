@@ -56,7 +56,6 @@ double w_int(double z, void *param)
 	return (1. + w(1./(z+1)) )/( 1. + z);
 }
 
-
 double Xde_int (double a,void *params )
 {
     if (a == 0.) a = 1e-3;

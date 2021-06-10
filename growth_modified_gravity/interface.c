@@ -15,6 +15,7 @@
 const char * cosmo = COSMOLOGICAL_PARAMETERS_SECTION;
 const char * like = LIKELIHOODS_SECTION;
 const char * growthparameters = GROWTH_PARAMETERS_SECTION;
+const char * mg = "modified_gravity_parameters";
 
 typedef struct growth_config {
 	double zmin;
@@ -82,7 +83,7 @@ int execute(c_datablock * block, growth_config * config)
 	status |= c_datablock_get_double_default(block, cosmo, "wa", 0.0, &wa);
 	status |= c_datablock_get_double(block, cosmo, "omega_m", &omega_m);
 	status |= c_datablock_get_double_default(block, cosmo, "omega_lambda", 1-omega_m, &omega_v);
-	status |= c_datablock_get_double(block, cosmo, "mu0", &mu0);
+	status |= c_datablock_get_double(block, mg, "mu0", &mu0);
 	
 
 	if (status){

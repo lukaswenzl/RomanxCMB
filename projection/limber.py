@@ -115,6 +115,137 @@ def load_power_growth_chi(block, chi_of_z, section, k_name, z_name, p_name, k_gr
     power_spline = GSLSpline2d(chi, np.log(k), p.T, spline_type=BICUBIC)
     return power_spline, growth_spline
 
+#HACK
+#k probably not Limber'ed here; done later (go check the code)
+#TODO check where D(z) is being divided and multiplied
+def load_power_growth_chi_modified_gravity(block, chi_of_z, section, \
+    k_name, z_name, p_name, power_of_lensing_kernel, k_growth=1.e-3):
+    """Returns power_spline and growth_spline, where the power has 
+    one power of G, the multiplicative factor describing the modified gravity 
+    effects on one lensing kernel."""
+    
+    z,k,p = block.get_grid(section, z_name, k_name, p_name)
+    chi = chi_of_z(z)
+    growth_spline = growth_from_power(chi, k, p, k_growth)
+    G = get_lensing_kernel_factor_G(block, z, k) # shape is (nz, nk)
+    assert power_of_lensing_kernel in [0,1,2], \
+        ('modified_gravity_kernel_power='%power_of_lensing_kernel, \
+        'can only be 0, 1 of 2.')
+    p_modified = p * G**power_of_lensing_kernel
+    power_spline = GSLSpline2d(chi, np.log(k), p_modified.T, spline_type=BICUBIC)
+    return power_spline, growth_spline
+
+MG = "modified_gravity_parameters"
+COSMO = "cosmological_parameters"
+
+class MGModelNotFoundError(Exception):
+
+    def __init__(self, allowed_models):
+        self.message = 'Modified gravity model only supports {}'.format(allowed_models)
+        super().__init__(self.message)
+
+def get_lensing_kernel_factor_G(block, z, k):
+    """Returns a 2d numpy array of shape (nz, nk) or a 1d numpy array of shape
+    (nz, 1) for the multiplicative factor describing modified gravity effects
+    on one lensing kernel."""
+
+    allowed_models = [0, 1, 2]
+    model = block[MG, "model"] 
+    
+    if model not in allowed_models:
+        raise MGModelNotFoundError(allowed_models)
+    else:
+        if model == 0: # for testing
+            return get_G_constant(block, z, k)
+        elif model == 1:
+            return get_G_propto_dark_energy(block, z, k)
+        elif model == 2:
+            return get_G_f_of_R(block, z, k)
+
+
+def get_G_constant(block, z, k):
+    """Returns a 2d numpy array of shape (nz, 1) for the multiplicative
+    factor describing modified gravity effects on one lensing kernel 
+    from a model that has Sigma being a constant"""
+
+    sigma0 = block[MG, "sigma0"]
+    G = np.ones((z.size, 1)) * (1.0 + sigma0)
+
+    return G
+
+def get_G_propto_dark_energy(block, z, k):
+    """Returns a 2d numpy array of shape (nz, 1) for the multiplicative
+    factor describing modified gravity effects on one lensing kernel 
+    from a model that has Sigma proportional to dark energy density."""
+
+    sigma0 = block[MG, "sigma0"]
+    omega_lambda = block[COSMO, "omega_lambda"]
+
+    omega_m = (1.0 - omega_lambda)
+    omega_dark_energy_normalized = 1.0 / (omega_lambda + omega_m * (1.0+z)**(3.0))
+
+    sigma = 1.0 + sigma0 * omega_dark_energy_normalized
+    G = sigma[:,np.newaxis]
+
+    return G
+
+def get_G_f_of_R(block, z, k):
+    """Returns a 2d numpy array of shape (nz, nk) for the multiplicative
+    factor describing modified gravity effects on one lensing kernel 
+    from a f(R) model parametrized by n and fR (following Liu et al. 2021, 
+    arxiv 2101.08728)."""
+
+    scale_dependence = get_scale_dependence(block, z, k)
+    G = get_f_of_R_Sigma(scale_dependence)
+
+    return G
+
+def get_f_of_R_mu(scale_dependence):
+    """full mu(a) = Geff/G in f(R) gravity"""
+    return (1. + 4./3.*scale_dependence)/(1. + scale_dependence)
+
+def get_f_of_R_gamma(scale_dependence):
+    """full gamma(a) in f(R) gravity"""
+    return (1. + 2./3.*scale_dependence)/(1. + 4./3.*scale_dependence)
+
+def get_f_of_R_Sigma(scale_dependence): 
+    """full Sigma(a) in f(R) gravity"""
+
+    mu = get_f_of_R_mu(scale_dependence) 
+    gamma = get_f_of_R_gamma(scale_dependence) 
+
+    return 0.5 * mu * (1. + gamma)
+
+def get_scale_dependence(block, z, k):
+    
+    omega_lambda = block[COSMO, "omega_lambda"]
+    
+    fR = block[MG, "fR"]
+    n = block[MG, "n"]
+    
+    a = 1./(1.+z)
+
+    mass = get_f_of_R_mass_of_a(omega_lambda, n, fR, a)
+    scale_dependence = (k[np.newaxis, :]/(a*mass)[:, np.newaxis])**2
+
+    return scale_dependence
+
+def get_f_of_R_mass_of_a(omega_lambda, n, fR, a):
+    """Returns m(a) as a numpy array of same shape as a for f(R) model"""
+    omega_m = (1.0 - omega_lambda)
+    
+    term1 = ( omega_m + 4.*omega_lambda ) ** (-0.5*(n+1))
+    term2 = ((n+1) * fR) ** (-0.5)
+    term3 = (omega_m * a**(-3) + 4.*omega_lambda) ** (0.5 * (n+2))
+    
+    c = 1 
+    # TODO need to find the right unit for c; m needs to be same unit as k, 1/Mpc, or h/Mpc
+    # TODO might actually need H0/c instead
+    term4 = 1./c
+    
+    return term1 * term2 * term3 * term4
+
+
 def growth_from_power(chi, k, p, k_growth):
     "Get D(chi) from power spectrum"
     growth_ind=np.where(k>k_growth)[0][0]
