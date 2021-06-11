@@ -238,11 +238,10 @@ def get_f_of_R_mass_of_a(omega_lambda, n, fR, a):
     term2 = ((n+1) * fR) ** (-0.5)
     term3 = (omega_m * a**(-3) + 4.*omega_lambda) ** (0.5 * (n+2))
     
-    c = 1 
-    # TODO need to find the right unit for c; m needs to be same unit as k, 1/Mpc, or h/Mpc
-    # TODO might actually need H0/c instead
-    term4 = 1./c
-    
+    c_in_km_per_sec = 2.99792458e5
+    H0_over_c_in_hoverMpc = 100./c_in_km_per_sec
+    term4 = H0_over_c_in_hoverMpc
+
     return term1 * term2 * term3 * term4
 
 
