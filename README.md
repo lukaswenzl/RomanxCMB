@@ -50,5 +50,11 @@ then add:
 SUBDIRS+=RomanxCMB
 and save
 
+when using bayesfast
+
+* replace the cosmosis/samplers/fisher and cosmosis/samplers/importance with the contents of modified_fisher and modified_importance
+
+(these are slight changed that make the MOPED compression work and allow for thinned importance sampling)
+
 
 
