@@ -822,8 +822,11 @@ CONTAINS
          Ci = real(f*sin(x)-g*cos(x))
 
       ELSE
-
-         STOP 'CI: Something went very wrong'
+         !avoid crashing the code
+         WRITE (*, *) 'Ci in special_functions crashed. Returning -1 '
+         Ci = -1.
+         RETURN 
+         !STOP 'CI: Something went very wrong'
 
       END IF
 
