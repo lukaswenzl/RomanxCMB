@@ -115,8 +115,6 @@ def load_power_growth_chi(block, chi_of_z, section, k_name, z_name, p_name, k_gr
     power_spline = GSLSpline2d(chi, np.log(k), p.T, spline_type=BICUBIC)
     return power_spline, growth_spline
 
-#HACK
-#k probably not Limber'ed here; done later (go check the code)
 #TODO check where D(z) is being divided and multiplied
 def load_power_growth_chi_modified_gravity(block, chi_of_z, section, \
     k_name, z_name, p_name, power_of_lensing_kernel, k_growth=1.e-3):

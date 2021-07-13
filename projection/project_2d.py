@@ -144,9 +144,6 @@ class Spectrum(object):
     def compute(self, block, ell, bin1, bin2, relative_tolerance=1.e-3,
                 absolute_tolerance=0.):
 
-        # Get the required kernels
-        # maybe get from rescaled version of existing spectra
-        #HACK
         P, D = self.get_power_growth(block, bin1, bin2)
 
         K1 = self.source.kernels_A[self.kernels[0] + "_" + self.sample_a][bin1]
@@ -646,9 +643,10 @@ class SpectrumCalculator(object):
     def load_power_modified_gravity(self, block):
 
         for powerType in self.req_power:
-            # Not a great implementation because
+            # Note: Not the best implementation because
             # this relies on the mapping between spectrum to power used
             # (e.g. Wsource, Wsource --> matter_power_nl)
+            # but if that's never changed, it's fine.
             if powerType.section_name in ['matter_power_nl', 'matter_power_lin']:
                 power_of_lensing_kernel = 2
                 print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
@@ -736,8 +734,7 @@ class SpectrumCalculator(object):
             if self.save_kernel_zmax > 0:
                 self.save_kernels(block, self.save_kernel_zmax)
             
-            #self.load_power(block)
-            #HACK
+            #TODO could use a if/else for GR if useful: self.load_power(block)
             self.load_power_modified_gravity(block)
 
             for spectrum in self.req_spectra:
@@ -755,17 +752,3 @@ def setup(options):
 
 def execute(block, config):
     return config.execute(block)
-
-#HACK to transfer into notes and delete later:
-# setup: initialize SpectrumCalculator 
-#   - in the initialization a dictionary of Spectrum objects is created inside SpectrumCalculator
-#   - for each Spectrum objects, a power_3d name is given
-# execute:
-#    - load power spectrum 
-#    - compute_spectrum which computes Cl's and the function compute of the Sp
-# ectrumCalculator object 
-#    - We will modify compute
-# Option 1:
-#   modify at load_power and find a way to tell it which Cls 
-# Option 2:
-#   modify at compute () and find a way to return the same kind of pointer for P.
