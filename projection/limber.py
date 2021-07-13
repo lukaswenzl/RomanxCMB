@@ -189,6 +189,11 @@ def get_G_propto_dark_energy(block, z, k):
 
     return G
 
+# TODO this is actually 1 in the f(R) gravity, lensing kernel same as GR
+# See Appendix of https://arxiv.org/pdf/1311.5560.pdf
+# Probably want to just change get_G_f_of_R to return 1. 
+# But leaving these functions here for now, in case another model
+# needs a similar code. 
 def get_G_f_of_R(block, z, k):
     """Returns a 2d numpy array of shape (nz, nk) for the multiplicative
     factor describing modified gravity effects on one lensing kernel 
@@ -213,7 +218,6 @@ def get_f_of_R_Sigma(scale_dependence):
 
     mu = get_f_of_R_mu(scale_dependence) 
     gamma = get_f_of_R_gamma(scale_dependence) 
-
     return 0.5 * mu * (1. + gamma)
 
 def get_scale_dependence(block, z, k):
