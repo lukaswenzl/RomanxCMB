@@ -71,20 +71,29 @@ int execute(c_datablock * block, growth_config * config)
 
 	int i,status=0;
 	double w,wa,omega_m,omega_v;
-	double mu0;
+
 	int nz_lin = config->nz_lin;
 	int nz_log = config->nz_log;
 	int nz = nz_lin + nz_log;
 	double zmin_log = config->zmax + config->dz;
-	
 
+	int mg_model; 
+	double mu0;
+	int f_of_R_n; 
+	double f_of_R_fR;
+	double k_large_scale = 1e-4;
+	//TODO maybe store in array instead?
+	
 	//read cosmological params from datablock
 	status |= c_datablock_get_double_default(block, cosmo, "w", -1.0, &w);
 	status |= c_datablock_get_double_default(block, cosmo, "wa", 0.0, &wa);
 	status |= c_datablock_get_double(block, cosmo, "omega_m", &omega_m);
 	status |= c_datablock_get_double_default(block, cosmo, "omega_lambda", 1-omega_m, &omega_v);
+
+	status |= c_datablock_get_int(block, mg, "model", &mg_model);
 	status |= c_datablock_get_double(block, mg, "mu0", &mu0);
-	
+	status |= c_datablock_get_int(block, mg, "f_of_R_n", &f_of_R_n);
+	status |= c_datablock_get_double(block, mg, "f_of_R_fR", &f_of_R_fR);
 
 	if (status){
 		fprintf(stderr, "Could not get required parameters for growth function (%d)\n", status);
@@ -118,7 +127,8 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(a,nz);
 
 	// Compute D and f
-	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mu0);
+	//TODO might want to pass array or something else
+	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_large_scale);
 	
 	// Now reverse everything back to increasing z
 	// Note that we do not unreverse z as we never reversed it in the first place.
@@ -126,16 +136,56 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(dz,nz);
 	reverse(fz,nz);
 
-
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "d_z", dz, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "f_z", fz, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "z", z, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "a", a, nz);
 
+	//Add some loop
+
+	reverse(a,nz);
+
+	int nk;
+	double k_value;
+	double dk;
+	double kmin=1e-5; 
+	double kmax=10.0;
+	int nk_steps=200;
+
+	double *k = malloc(nk_steps*sizeof(double));
+	//TODO declare d_z_k
+	//TODO declare f_z_k
+
+	dk = (kmax - kmin)/nk_steps;
+	for (i = 0; i < nk_steps; i++)
+    {
+		k[i] = kmin + i*dk; 
+	}
+
+	for (i = 0; i < nk_steps; i++)
+    {
+		k_value = k[i];
+		status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
+		reverse(dz,nz);
+		reverse(fz,nz);
+
+		// TODO: Assign d_z_k 
+		// TODO: Assign f_z_k 
+	}
+	
+	// Now reverse everything back to increasing z
+	// Note that we do not unreverse z as we never reversed it in the first place.
+	
+	reverse(a,nz);
+	// TODO uncomment if d_z_k and f_z_k are declared and assigned above
+	//status |= c_datablock_put_double_grid(block,growthparameters, "z", nz, z, "k", nk, k, "d_z_k", d_z_k);
+	//status |= c_datablock_put_double_grid(block,growthparameters, "z", nz, z, "k", nk, k, "f_z_k", f_z_k);
+
 	free(fz);
 	free(dz);
 	free(z);
 	free(a);
+	
 
 return status;
 }

@@ -198,7 +198,7 @@ def get_G_f_of_R(block, z, k):
     from a f(R) model parametrized by n and fR (following Liu et al. 2021, 
     arxiv 2101.08728)."""
 
-    scale_dependence = get_scale_dependence(block, z, k)
+    scale_dependence = get_f_of_R_scale_dependence(block, z, k)
     G = get_f_of_R_Sigma(scale_dependence)
 
     return G
@@ -218,7 +218,7 @@ def get_f_of_R_Sigma(scale_dependence):
     gamma = get_f_of_R_gamma(scale_dependence) 
     return 0.5 * mu * (1. + gamma)
 
-def get_scale_dependence(block, z, k):
+def get_f_of_R_scale_dependence(block, z, k):
     
     omega_lambda = block[COSMO, "omega_lambda"]
     
