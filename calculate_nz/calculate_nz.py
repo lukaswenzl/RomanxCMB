@@ -102,17 +102,17 @@ class Distribution():
         #cumulative distribution (possibly not the most accurate...)
         self.z_min = z_min 
         self.z_max = z_max
-        mask = np.logical_and(self.mean>=z_min,  self.mean<=z_max)
+        mask = np.logical_and(self.high>=z_min,  self.mean<=z_max)#using high here to get closer to the cutoff
         cumsum = np.cumsum(self.value[mask])
-        step = cumsum[-1]/n
-        bin_cuts = np.arange(0, cumsum[-1]+step, step)
+        bin_cuts = np.linspace(0, cumsum[-1], num=n+1)
         return np.interp(bin_cuts, cumsum, self.high[mask])#high is working better than mean (makes sense)
+
         # low_cuts = np.interp(bin_cuts, cumsum, self.low)
         # high_cuts = np.interp(bin_cuts, cumsum, self.high)
         # return low_cuts, high_cuts
 
 
-def calc_bins(equal_bins, distribution, sampling=np.linspace(0,4, 100), sigma = 0.01, Delta_i = 0.0): #need to make Delta_i an array!
+def calc_bins(equal_bins, distribution, sampling=np.linspace(0,4, 100), sigma = 0.01, Delta_i = 0.0): 
     n_bins = len(equal_bins)-1
     if (not isinstance(Delta_i, list)):
         Delta_i = np.zeros(n_bins) + Delta_i
@@ -128,9 +128,11 @@ def calc_bins(equal_bins, distribution, sampling=np.linspace(0,4, 100), sigma = 
          #       p.set_z(sampling[zph_index])
           #      bins[i,zph_index ]  = integrate.quad(lambda z: distribution(z)*p(z), z_min, z_max, epsabs=1e-4, epsrel=1e-4)[0]
 
-        loc_range = np.arange(z_min, z_max, 1./400)
+        #loc_range = np.arange(z_min, z_max, 1./1000)
+        loc_range = np.linspace(z_min, z_max, 500)
         loc_dist = np.array([distribution(z) for z in loc_range])
-        loc_mask = np.logical_and(sampling > z_min - sigma[i]*5 - np.abs(Delta_i[i]), sampling < z_max + sigma[i]*5 + np.abs(Delta_i[i]))
+        loc_mask = np.logical_and(sampling > z_min - sigma[i]*10 - np.abs(Delta_i[i]), sampling < z_max + sigma[i]*10 + np.abs(Delta_i[i]))
+        #loc_mask = np.logical_and(loc_mask,sampling>=equal_bins[0] )
         for zph_index in range(len(sampling)):
             if(loc_mask[zph_index]):
                 p.set_z(sampling[zph_index])
