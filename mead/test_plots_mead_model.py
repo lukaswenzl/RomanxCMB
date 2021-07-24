@@ -21,6 +21,7 @@ whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence,growth
 #whattodo = "sampling_accuracy"
 #whattodo = "sample_only_above_cutoff"
 #whattodo = "halofit_comparison"
+whattodo = "cambvsEH99"
 
 
 
@@ -876,3 +877,130 @@ if ("sample_only_above_cutoff" in whattodo):
     plt.legend()
     
     plt.savefig(output_folder+"power_spectrum_sample_only_above_cutoff_RAW.pdf")
+
+
+if ("cambvsEH99" in whattodo):
+    #compare mead and halofit
+    # The easiest way to start a pipeline it from a parameter file.
+    
+
+    plt.figure()
+    filenames = ["modules/RomanxCMB/params.ini", "modules/RomanxCMB/params_halofit.ini", "modules/RomanxCMB/params_camb.ini"]
+    labels = ["mead with feedback", "halofit", "camb mead"]
+    data = []
+    for i in range(3):
+        ini = Inifile(filenames[i])
+
+        pipeline = LikelihoodPipeline(ini)
+        pipeline.quiet = True
+        pipeline.debug = False
+        pipeline.timing = False
+        params_names = pipeline.varied_params
+        # Make the pipeline itself
+        pipeline = LikelihoodPipeline(ini)
+        vector = pipeline.start_vector()
+        data.append( pipeline.run_parameters(vector))
+
+    k = data[0]['matter_power_lin', 'k_h']
+    z = data[0]['matter_power_lin', 'z']
+
+    def p_lin_of_z(data, idx,z_sample ):
+        p_lin = data[idx]['matter_power_lin', 'p_k']
+        z = data[idx]['matter_power_lin', 'z']
+        Pk_resamplez = interp1d(z, p_lin, axis=0)
+        return Pk_resamplez(z_sample)
+
+    def p_nl_of_z(data, idx,z_sample ):
+        p_nl = data[idx]['matter_power_nl', 'p_k']
+        z = data[idx]['matter_power_lin', 'z']
+        Pk_resamplez = interp1d(z, p_nl, axis=0)
+        return Pk_resamplez(z_sample)
+    
+
+    z_sample = 0.
+    for i in range(len(labels)):
+        plt.plot(k, p_lin_of_z(data, i, z_sample),label=labels[i]+", lin, z = {}".format(z_sample) )
+        plt.plot(k, p_nl_of_z(data, i, z_sample),label=labels[i]+", nl, z = {}".format(z_sample) )
+
+    z_sample = 1.
+    for i in range(len(labels)):
+        plt.plot(k, p_lin_of_z(data, i, z_sample),label=labels[i]+", lin, z = {}".format(z_sample) )
+        plt.plot(k, p_nl_of_z(data, i, z_sample),label=labels[i]+", nl, z = {}".format(z_sample) )
+    # plt.plot(k_halofit,Pk_halofit_resamplez(z_sample) /np.interp(k_halofit, k_mead, Pk_mead_resamplez(z_sample)),color="black", label="halofit at z= "+str(z_sample) )
+    # plt.plot(k_mead_feedback,Pk_mead_feedback_resamplez(z_sample) /np.interp(k_mead_feedback, k_mead, Pk_mead_resamplez(z_sample)),color="orange",label="mead with feedback at z= "+str(z_sample) )
+    
+    # z_sample = 1.
+    # plt.plot(k_halofit,Pk_halofit_resamplez(z_sample) /np.interp(k_halofit, k_mead, Pk_mead_resamplez(z_sample)),"--", color="black",label="halofit at z= "+str(z_sample) )
+    # plt.plot(k_mead_feedback,Pk_mead_feedback_resamplez(z_sample) /np.interp(k_mead_feedback, k_mead, Pk_mead_resamplez(z_sample)),"--", color="orange",label="mead with feedback at z= "+str(z_sample) )
+    
+    # z_sample = 4.
+    # plt.plot(k_halofit,Pk_halofit_resamplez(z_sample) /np.interp(k_halofit, k_mead, Pk_mead_resamplez(z_sample)),":",color="black",label="halofit at z= "+str(z_sample) )
+    # plt.plot(k_mead_feedback,Pk_mead_feedback_resamplez(z_sample) /np.interp(k_mead_feedback, k_mead, Pk_mead_resamplez(z_sample)),":", color="orange",label="mead with feedback at z= "+str(z_sample) )
+    
+    plt.title("fiducial cosmology - halofit vs mead vs camb mead")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    #plt.ylim(0.7,1.3)
+    #plt.ylabel("$P(k) / P_{mead} (k)$")
+    plt.yscale("log")
+    plt.axvline(10)
+    plt.text(11, 0.72, "extrapolated")
+
+    # Save our plot.
+    plt.legend()
+    plt.savefig(output_folder+"power_spectrum_camb_halofit_comparison_RAW.pdf")
+
+    plt.figure()
+    z_sample = 0.
+    for i in range(1,len(labels)):
+        plt.plot(k, p_lin_of_z(data, i, z_sample)/p_lin_of_z(data, 0, z_sample),label=labels[i]+"/"+labels[0]+", lin, z = {}".format(z_sample) )
+        plt.plot(k, p_nl_of_z(data, i, z_sample)/p_nl_of_z(data, 0, z_sample),label=labels[i]+"/"+labels[0]+", nl, z = {}".format(z_sample) )
+
+    # z_sample = 1.
+    # for i in range(len(labels)):
+    #     plt.plot(k, p_lin_of_z(data, i, z_sample),label=labels[i]+", lin, z = {}".format(z_sample) )
+    #     plt.plot(k, p_nl_of_z(data, i, z_sample),label=labels[i]+", nl, z = {}".format(z_sample) )
+
+    plt.title("fiducial cosmology - halofit vs mead vs camb mead")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.7,1.3)
+    plt.ylabel("$P(k) / P_{mead} (k)$")
+    #plt.yscale("log")
+    plt.axvline(10)
+    plt.text(11, 0.72, "extrapolated")
+
+    # Save our plot.
+    plt.legend()
+    plt.savefig(output_folder+"power_spectrum_camb_halofit_comparison_ratio_RAW.pdf")
+
+    plt.figure()
+    z_sample = 1.
+    for i in range(1,len(labels)):
+        plt.plot(k, p_lin_of_z(data, i, z_sample)/p_lin_of_z(data, 0, z_sample),label=labels[i]+"/"+labels[0]+", lin, z = {}".format(z_sample) )
+        plt.plot(k, p_nl_of_z(data, i, z_sample)/p_nl_of_z(data, 0, z_sample),label=labels[i]+"/"+labels[0]+", nl, z = {}".format(z_sample) )
+
+
+    plt.title("fiducial cosmology - halofit vs mead vs camb mead")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.7,1.3)
+    plt.ylabel("$P(k) / P_{mead} (k)$")
+    #plt.yscale("log")
+    plt.axvline(10)
+    plt.text(11, 0.72, "extrapolated")
+
+    # Save our plot.
+    plt.legend()
+    plt.savefig(output_folder+"power_spectrum_camb_halofit_comparison_ratio_z1_RAW.pdf")
+
+
+
+
+
+
+
+

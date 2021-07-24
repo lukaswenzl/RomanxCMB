@@ -236,14 +236,14 @@ function execute(block,config) result(status)
 		rate = rate_in
 		a_growth = a_growth_in
 		!WRITE (*, *) 'check is has growth is true before putting external growth: ', cosm%has_growth
-		!WRITE (*, *) 'check inormalization before putting external growth: ', growth(1)
+		!WRITE (*, *) 'check normalization before putting external growth: ', growth(1)
 
 		CALL init_external_growth(a_growth, growth, rate, cosm)
 		!WRITE (*, *) 'check is has growth is true: ', cosm%has_growth
 	endif
 
 	if (.NOT. settings%optimize_nl_samples) then
-		write(*,*) "WARNING: Bug in code leads to unohysical supression for k< 1e-3, cosnider using a cutoff"
+		write(*,*) "WARNING: Bug in code leads to unphysical suppression for k< 1e-3, consider using a cutoff"
 		!create a and k arrays based on parameters
 		kmin = settings%kmin
 		kmax = settings%kmax
@@ -271,7 +271,7 @@ function execute(block,config) result(status)
 		!case optimize_nl_samples -> we will only calculate the nl power at key points and rescale the linear model
 
 		IF (size(k_lin) .ne. settings%nk) THEN
-			write(*,*) "ERROR: Linear and nonline power spectrum need same sampling to use optimize nl samples!"
+			write(*,*) "ERROR: linear and non-linear power spectrum need same sampling to use optimize nl samples!"
 			return
 		ENDIF
 		!create a and k arrays based on parameters
