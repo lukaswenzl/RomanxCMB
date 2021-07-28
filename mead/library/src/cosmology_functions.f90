@@ -898,6 +898,9 @@ CONTAINS
          WRITE (*, *) '==========================================='
       END IF
 
+      ! error handling
+      cosm%status = 0
+      
       ! Set verbosity
       cosm%verbose = verbose
 

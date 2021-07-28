@@ -368,6 +368,9 @@ MODULE HMx
       ! HALOFIT
       REAL :: HALOFIT_knl, HALOFIT_neff, HALOFIT_ncur
 
+      ! Error handling
+      INTEGER :: status
+
    END TYPE halomod
 
    ! General
@@ -755,6 +758,9 @@ CONTAINS
       names(125) = 'HMcode (2020) unfitted with extended mass range'
 
       IF (verbose) WRITE (*, *) 'ASSIGN_HALOMOD: Assigning halomodel'
+
+      ! error handling
+      hmod%status = 0
 
       ! Default options
       hmod%mmin = 1e7  ! Lower mass limit for integration [Msun/h]
@@ -3321,6 +3327,9 @@ CONTAINS
          CALL print_halomod(hmod, cosm, verbose)
 
       END DO
+
+      !error handling
+      cosm%status = cosm%status + hmod%status
 
    END SUBROUTINE calculate_HMx_full
 
@@ -10766,8 +10775,11 @@ CONTAINS
             ELSE IF (abs(-1.d0+sum_new/sum_old) < acc) THEN
                pass = .TRUE.
             ELSE IF (j == jmax) THEN
-               pass = .FALSE.
-               STOP 'INTEGRATE_HMOD: Integration timed out'
+               !pass = .FALSE.
+               !STOP 'INTEGRATE_HMOD: Integration timed out'
+               pass = .TRUE.
+               WRITE (*, *) 'Warning INTEGRATE_HMOD: Integration timed out'
+               hmod%status = 1
             ELSE
                pass = .FALSE.
             END IF

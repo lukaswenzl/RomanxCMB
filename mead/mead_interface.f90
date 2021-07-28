@@ -330,9 +330,11 @@ function execute(block,config) result(status)
 
 	endif
 
+	status = status + cosm%status
+
 	!Convert k to k/h to match other modules
 	!Output results to cosmosis
-	status = datablock_put_double_grid(block,nl_power, "k_h", k_out, "z", z_out, "p_k", p_out)
+	status = status + datablock_put_double_grid(block,nl_power, "k_h", k_out, "z", z_out, "p_k", p_out)
 
 	!Free memory
 	deallocate(k)
