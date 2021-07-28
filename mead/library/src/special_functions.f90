@@ -727,6 +727,10 @@ CONTAINS
 
       ! Returns the 'sine integral' function: Si(x)=int_0^x sin(t)/t dt
       USE precision
+      use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
+      use, intrinsic :: iso_fortran_env, only: real32
+      REAL :: nan
+
       REAL, INTENT(IN) :: x
       REAL :: x2, y, f, g, si8
       REAL, PARAMETER :: x0 = 4. ! Transition between two different approximations
@@ -771,9 +775,13 @@ CONTAINS
 
       ELSE
 
-         STOP 'SI: Something went very wrong'
+         !avoid crashing the code: set to nan will lead to -inf likelihood
+         !WRITE (*, *) 'Si in special_functions crashed. Returning NaN value '
+         Si = IEEE_VALUE(nan, IEEE_QUIET_NAN)
+         RETURN 
+         !STOP 'SI: Something went very wrong'
 
-      END IF
+      END IF 
 
    END FUNCTION Si
 
@@ -781,6 +789,10 @@ CONTAINS
 
       ! Returns the 'cosine integral' function Ci(x): -int_x^inf cos(t)/t dt
       USE precision
+      use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
+      use, intrinsic :: iso_fortran_env, only: real32
+      REAL :: nan
+
       REAL, INTENT(IN) :: x
       REAL :: x2, y, f, g, ci8
       REAL, PARAMETER :: x0 = 4. ! Transition between two different approximations
@@ -822,9 +834,10 @@ CONTAINS
          Ci = real(f*sin(x)-g*cos(x))
 
       ELSE
-         !avoid crashing the code
-         WRITE (*, *) 'Ci in special_functions crashed. Returning -1 '
-         Ci = -1.
+         !avoid crashing the code by returning nan 
+         !(does NOT lead to -inf likelihood so also added print statement)
+         WRITE (*, *) 'Ci in special_functions crashed. Returning Nan '
+         Ci = IEEE_VALUE(nan, IEEE_QUIET_NAN)
          RETURN 
          !STOP 'CI: Something went very wrong'
 
