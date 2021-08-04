@@ -336,6 +336,23 @@ function execute(block,config) result(status)
 	!Output results to cosmosis
 	status = status + datablock_put_double_grid(block,nl_power, "k_h", k_out, "z", z_out, "p_k", p_out)
 
+	if (status .ne. 0 ) then
+		write(*,*) "Mead pipeline failed on parameters"
+		!print out parameters
+		cosm%verbose= .true.
+		CALL print_cosmology(cosm)
+	endif
+
+	if (status_shared .ne. 0 ) then
+		status = status + 1
+		write(*,*) "Integrations inside of Mead pipeline failed ", status_shared, " times on parameters: "
+		!print out parameters
+		cosm%verbose= .true.
+		CALL print_cosmology(cosm)
+	endif
+
+
+
 	!Free memory
 	deallocate(k)
 	deallocate(ztab)

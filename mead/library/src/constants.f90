@@ -66,5 +66,11 @@ MODULE constants
    REAL, PARAMETER :: Dv0 = 18.*pi**2                                      ! Einsten-de Sitter virialised collapse threshold ~178
    
    !!
+   INTEGER :: status_shared = 0                                 ! status object to forward error
+
+   contains      
+   subroutine set_error_status()          
+      status_shared = status_shared + 1
+   end subroutine set_error_status 
 
 END MODULE constants

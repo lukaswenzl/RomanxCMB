@@ -775,9 +775,10 @@ CONTAINS
 
       ELSE
 
-         !avoid crashing the code: set to nan will lead to -inf likelihood
+         !avoid crashing the code: set error code to 1 and return 1 here
          !WRITE (*, *) 'Si in special_functions crashed. Returning NaN value '
-         Si = IEEE_VALUE(nan, IEEE_QUIET_NAN)
+         Si = 1
+         CALL set_error_status()
          RETURN 
          !STOP 'SI: Something went very wrong'
 
@@ -834,10 +835,11 @@ CONTAINS
          Ci = real(f*sin(x)-g*cos(x))
 
       ELSE
-         !avoid crashing the code by returning nan 
+         !avoid crashing the code by setting error status and returning 1 
          !(does NOT lead to -inf likelihood so also added print statement)
-         WRITE (*, *) 'Ci in special_functions crashed. Returning Nan '
-         Ci = IEEE_VALUE(nan, IEEE_QUIET_NAN)
+         !WRITE (*, *) 'Ci in special_functions crashed. Returning Nan '
+         Ci = 1
+         CALL set_error_status()
          RETURN 
          !STOP 'CI: Something went very wrong'
 
