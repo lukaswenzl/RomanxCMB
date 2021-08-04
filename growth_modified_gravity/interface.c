@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "cosmosis/datablock/c_datablock.h"
 #include "cosmosis/datablock/section_names.h"
 #include "growthfactor.h"
@@ -145,7 +146,6 @@ int execute(c_datablock * block, growth_config * config)
 
 	reverse(a,nz);
 
-	int nk;
 	double k_value;
 	double dk;
 	double kmin=1e-5; 
@@ -153,8 +153,29 @@ int execute(c_datablock * block, growth_config * config)
 	int nk_steps=200;
 
 	double *k = malloc(nk_steps*sizeof(double));
-	//TODO declare d_z_k
-	//TODO declare f_z_k
+
+	int c = nz, r = nk_steps, j;
+	
+	//Debugging reference for double pointer:
+	// https://www.geeksforgeeks.org/dynamically-allocate-2d-array-c/
+	double **d_k_z;
+	double **f_k_z;
+	double *d_ptr; 
+	double *f_ptr; 
+
+	int len;
+	len = sizeof(double *) * r + sizeof(double) * c * r;
+	d_k_z = (double**) malloc(len);
+	f_k_z = (double**) malloc(len);
+
+	d_ptr = (double *)(d_k_z + r);
+	f_ptr = (double *)(f_k_z + r);
+
+	// for loop to point rows pointer to appropriate location in 2D array
+    for(i = 0; i < r; i++){
+        d_k_z[i] = (d_ptr + c * i);
+		f_k_z[i] = (f_ptr + c * i);
+	}
 
 	dk = (kmax - kmin)/nk_steps;
 	for (i = 0; i < nk_steps; i++)
@@ -165,28 +186,47 @@ int execute(c_datablock * block, growth_config * config)
 	for (i = 0; i < nk_steps; i++)
     {
 		k_value = k[i];
+
+		printf("i = %d", i);
+		printf("k = %f", k_value);
+
 		status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
 		reverse(dz,nz);
 		reverse(fz,nz);
 
-		// TODO: Assign d_z_k 
-		// TODO: Assign f_z_k 
+		for (j = 0; j < c; j++){
+			memcpy(&d_k_z[i], &dz, sizeof(dz));
+			memcpy(&f_k_z[i], &fz, sizeof(fz));
+			
+			printf("i = %d, j = %d \n", i, j);
+			printf("dz[j] = %f \n", dz[j]);
+			printf("d_k_z[i][j] = %f \n", d_k_z[i][j]);
+		}
+	}
+		
+	//TODO used for debugging, turn off when done
+	for (i = 0; i < r; i++){
+    	for (j = 0; j < c; j++){
+     		printf("d_k_z[i][j] = %f \n", d_k_z[i][j]);
+		}
 	}
 	
 	// Now reverse everything back to increasing z
 	// Note that we do not unreverse z as we never reversed it in the first place.
-	
 	reverse(a,nz);
-	// TODO uncomment if d_z_k and f_z_k are declared and assigned above
-	//status |= c_datablock_put_double_grid(block,growthparameters, "z", nz, z, "k", nk, k, "d_z_k", d_z_k);
-	//status |= c_datablock_put_double_grid(block,growthparameters, "z", nz, z, "k", nk, k, "f_z_k", f_z_k);
+
+	//TODO NEXT: need to debug what happens with this
+	//status |= c_datablock_put_double_grid(block,growthparameters, "k", nk_steps, k, "z", nz, z, "d_k_z", d_k_z);
+	//status |= c_datablock_put_double_grid(block,growthparameters, "k", nk_steps, k, "z", nz, z, "f_k_z", f_k_z);
+
+	free(d_k_z);
+	free(f_k_z);
 
 	free(fz);
 	free(dz);
 	free(z);
 	free(a);
 	
-
 return status;
 }
 
