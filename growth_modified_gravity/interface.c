@@ -216,11 +216,17 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(a,nz);
 
 	//TODO NEXT: need to debug what happens with this
-	//status |= c_datablock_put_double_grid(block,growthparameters, "k", nk_steps, k, "z", nz, z, "d_k_z", d_k_z);
-	//status |= c_datablock_put_double_grid(block,growthparameters, "k", nk_steps, k, "z", nz, z, "f_k_z", f_k_z);
 
+	printf("Before c_datablock_put_double_grid: status = %d\n", status);
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth", nk_steps, k, "z_growth", nz, z, "d_k_z", d_k_z);
+	printf("After c_datablock_put_double_grid for d_k_z: status = %d\n", status);
+	
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth2", nk_steps, k, "z_growth2", nz, z, "f_k_z", f_k_z);
+	printf("After c_datablock_put_double_grid for f_k_z: status = %d\n", status);
+	
 	free(d_k_z);
 	free(f_k_z);
+	free(k);
 
 	free(fz);
 	free(dz);
