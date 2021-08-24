@@ -82,8 +82,13 @@ int execute(c_datablock * block, growth_config * config)
 	double mu0;
 	int f_of_R_n; 
 	double f_of_R_fR;
-	double k_large_scale = 1e-4;
-	//TODO maybe store in array instead?
+
+	//TODO this is hard coded for now. 
+	//If changed for other modules, need to change here by hand
+	double kmin=1e-5; 
+	double kmax=10.0;
+
+	double k_large_scale = kmin;
 	
 	//read cosmological params from datablock
 	status |= c_datablock_get_double_default(block, cosmo, "w", -1.0, &w);
@@ -128,7 +133,6 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(a,nz);
 
 	// Compute D and f
-	//TODO might want to pass array or something else
 	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_large_scale);
 	
 	// Now reverse everything back to increasing z
@@ -142,22 +146,16 @@ int execute(c_datablock * block, growth_config * config)
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "z", z, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "a", a, nz);
 
-	//Add some loop
-
 	reverse(a,nz);
 
 	double k_value;
 	double dk;
-	double kmin=1e-5; 
-	double kmax=10.0;
 	int nk_steps=200;
 
 	double *k = malloc(nk_steps*sizeof(double));
 
 	int c = nz, r = nk_steps, j;
 	
-	//Debugging reference for double pointer:
-	// https://www.geeksforgeeks.org/dynamically-allocate-2d-array-c/
 	double **d_k_z;
 	double **f_k_z;
 	double *d_ptr; 
@@ -177,52 +175,33 @@ int execute(c_datablock * block, growth_config * config)
 		f_k_z[i] = (f_ptr + c * i);
 	}
 
-	dk = (kmax - kmin)/nk_steps;
+	dk = (log(kmax) - log(kmin))/(nk_steps-1);
 	for (i = 0; i < nk_steps; i++)
     {
-		k[i] = kmin + i*dk; 
+		k[i] = exp(log(kmin) + i*dk);
 	}
 
 	for (i = 0; i < nk_steps; i++)
     {
 		k_value = k[i];
 
-		printf("i = %d", i);
-		printf("k = %f", k_value);
-
 		status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
 		reverse(dz,nz);
 		reverse(fz,nz);
 
 		for (j = 0; j < c; j++){
-			memcpy(&d_k_z[i], &dz, sizeof(dz));
-			memcpy(&f_k_z[i], &fz, sizeof(fz));
-			
-			printf("i = %d, j = %d \n", i, j);
-			printf("dz[j] = %f \n", dz[j]);
-			printf("d_k_z[i][j] = %f \n", d_k_z[i][j]);
+			memcpy(&d_k_z[i][j], &dz[j], sizeof(dz[j]));
+			memcpy(&f_k_z[i][j], &fz[j], sizeof(fz[j]));
 		}
+
 	}
 		
-	//TODO used for debugging, turn off when done
-	for (i = 0; i < r; i++){
-    	for (j = 0; j < c; j++){
-     		printf("d_k_z[i][j] = %f \n", d_k_z[i][j]);
-		}
-	}
-	
 	// Now reverse everything back to increasing z
 	// Note that we do not unreverse z as we never reversed it in the first place.
 	reverse(a,nz);
 
-	//TODO NEXT: need to debug what happens with this
-
-	printf("Before c_datablock_put_double_grid: status = %d\n", status);
 	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth", nk_steps, k, "z_growth", nz, z, "d_k_z", d_k_z);
-	printf("After c_datablock_put_double_grid for d_k_z: status = %d\n", status);
-	
 	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth2", nk_steps, k, "z_growth2", nz, z, "f_k_z", f_k_z);
-	printf("After c_datablock_put_double_grid for f_k_z: status = %d\n", status);
 	
 	free(d_k_z);
 	free(f_k_z);

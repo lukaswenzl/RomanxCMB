@@ -72,12 +72,11 @@ double mg_mu_t_propto_de(double a)
 	return mg_mu0/(omega_lambda + (1.0 - omega_lambda)*pow(a,-3.0));
 }
 
-//TODO how to call with k???
 double mg_mu_t_f_of_R(double a)
 {
     double scale_dependence;
     scale_dependence = get_f_of_R_scale_dependence(a); 
-    return (1.0 + 4.0/3.0*scale_dependence)/(1.0 + scale_dependence);
+    return (1.0 + 4.0/3.0*scale_dependence)/(1.0 + scale_dependence) - 1.0;
 }
 
 double w (double a)

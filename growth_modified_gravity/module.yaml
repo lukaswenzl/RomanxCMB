@@ -1,6 +1,6 @@
 name: growth_factor
 version: 1
-purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models with mu(a) = 1 + mu0 * Omega_DE(a)
+purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models like mu(a) = 1 + mu0 * Omega_DE(a) and f(R).
 url: ""
 interface: interface.so
 attribution: [CosmoSIS Team]
@@ -8,7 +8,7 @@ rules: "If you use a file from a particular survey you should cite that survey"
 cite: []
 
 assumptions:
-    - "linear growth factor and rate in flat cosmology in modified gravity models with mu(a) = 1 + mu0 * Omega_DE(a)"
+    - "linear growth factor and rate in flat cosmology in modified gravity models: (1) mu(a) = 1 + mu0 * Omega_DE(a); (2) f(R) model with scale-dependent growth."
 
 explanation: |
         "This simple module calculates the linear growth factor D, and linear growth rate, f, for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa
@@ -35,3 +35,9 @@ outputs:
         d_z: "1D real array, linear growth factor D"
         f_z: "1D real array, linear growth rate f"
         z: "1D real array, redshift of samples "
+        d_k_z: "2D real array, linear growth factor D(k,z) for models with scale-dependent growth"
+        f_k_z: "1D real array, linear growth rate f(k,z) for models with scale-dependent growth"
+        k_growth: "1D real array, k_h for models with scale-dependent growth"
+        k_growth2: "1D real array, k_, for models with scale-dependent growth "
+        z_growth: "1D real array, redshift of samples for models with scale-dependent growth "
+        z_growth2: "1D real array, redshift of samples for models with scale-dependent growth "

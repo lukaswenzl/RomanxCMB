@@ -222,8 +222,8 @@ def get_f_of_R_scale_dependence(block, z, k):
     
     omega_lambda = block[COSMO, "omega_lambda"]
     
-    fR = block[MG, "fR"]
-    n = block[MG, "n"]
+    fR = block[MG, "f_of_R_fR"]
+    n = block[MG, "f_of_R_n"]
     
     a = 1./(1.+z)
 
