@@ -1,0 +1,26 @@
+#This is a template for module description files
+name: "sigma8_ofz_rescale"
+version: "1.1"
+interface: sigma8_rescale.py
+purpose: "Rescale structure measures to use a specified sigma_8"
+url: ""
+interface: rescale_Pk_fz.py
+attribution: ["Cyrille Doux"]
+rules: []
+cite: []
+assumptions:
+    - "Spectra scale quadratically with sigma_8"
+
+explanation: |
+    using z dependent sigma_8
+
+
+
+params: {}
+
+inputs:
+    matter_power_lin:
+        P_K: "real 1D or 2D array, matter power spectrum P(k,z)"
+outputs:
+    matter_power_lin:
+        P_K: "real 1D or 2D array, rescaled matter power spectrum P(k,z)"
