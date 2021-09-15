@@ -1,6 +1,6 @@
 name: growth_factor
 version: 1
-purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models like mu(a) = 1 + mu0 * Omega_DE(a) and f(R).
+purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models (supporting mu(a) = 1 + mu0 * Omega_DE(a) and f(R)).
 url: ""
 interface: interface.so
 attribution: [CosmoSIS Team]
@@ -21,6 +21,7 @@ params:
         dz: "Real, redshift binsize (default  = 0.01)"
         zmax_log: "Real, default=1100. redshift max for additional z values tacked above zmax, log space"
         nz_log: "int, default=0. number of log spaced values (if 0 then no log-spaced values)"
+        #TODO should we add kmin, kmax, k_large_scale here instead of having them hard-coded in interface.c?
 
 inputs: 
     cosmological_parameters:
@@ -28,16 +29,18 @@ inputs:
         omega_lambda:  "real, dark energy density today (default 1-omega_m)"
         w:  "real, w(z=0) equation of state of dark energy (default -1.0) "
         wa:  "real, equation of state parameter w(z) = w_0 + w_a z / (1+z)  (default 0.0)"
-        mu0: "real, amplitude of deviation from GR in the mu(a) = 1 + mu0 * Omega_DE(a)"
+        mu0: "real, amplitude of deviation from GR for the model 1: mu(a) = 1 + mu0 * Omega_DE(a)"
+        f_of_R_n: "real, parameter n for model 2: f(R) model"
+        f_of_R_fR: "real, parameter f_R for model 2: f(R) model"
 
 outputs:
     growth_parameters:
-        d_z: "1D real array, linear growth factor D"
-        f_z: "1D real array, linear growth rate f"
-        z: "1D real array, redshift of samples "
-        d_k_z: "2D real array, linear growth factor D(k,z) for models with scale-dependent growth"
-        f_k_z: "1D real array, linear growth rate f(k,z) for models with scale-dependent growth"
-        k_growth: "1D real array, k_h for models with scale-dependent growth"
-        k_growth2: "1D real array, k_, for models with scale-dependent growth "
-        z_growth: "1D real array, redshift of samples for models with scale-dependent growth "
-        z_growth2: "1D real array, redshift of samples for models with scale-dependent growth "
+        d_z: "1D real array, linear growth factor D(z) at kmin = 1e-5"
+        f_z: "1D real array, linear growth rate f(z) at kmin = 1e-5"
+        z: "1D real array, redshift of samples"
+        d_k_z: "2D real array of shape (nk, nz), linear growth factor D(k,z) for models with scale-dependent growth"
+        f_k_z: "2D real array of shape (nk, nz), linear growth rate f(k,z) for models with scale-dependent growth"
+        k_for_d_k_z: "1D real array, k_h for models with scale-dependent growth"
+        k_for_f_k_z: "1D real array, k_, for models with scale-dependent growth "
+        z_for_d_k_z: "1D real array, redshift of samples for models with scale-dependent growth"
+        z_for_f_k_z: "1D real array, redshift of samples for models with scale-dependent growth"

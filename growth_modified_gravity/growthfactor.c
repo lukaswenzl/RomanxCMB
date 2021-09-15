@@ -12,11 +12,14 @@
 #include <gsl/gsl_odeiv.h>
 #include "growthfactor.h"
 
-//Code to calculate the linear growth factor D, 
-//and linear growth rate, f = dlnD/dlna for modified gravity.
-//Currently supporting (Sigma,Mu) parametrisation
-//with a time dependance mu = 1 + mu(t) where
-// mu(t) = mu0 * omega_DE(a)
+//Code to calculate the scale-indep. and dependent 
+//  - linear growth factor D, 
+//  - linear growth rate, f = dlnD/dlna for modified gravity models.
+
+//Currently supporting:
+//   Model 1: (Sigma,Mu) parametrisation
+//     with a time dependance mu = 1 + mu(t) where mu(t) = mu0 * omega_DE(a)
+//   Model 2: f(R) model parametrized by n and f_R
 
 double D;
 double linear_f;
@@ -32,8 +35,6 @@ double k;
 
 #define LIMIT_SIZE 1000
 
-//TODO Very suboptimal way of implementing multiple models...
-// Need a better solution! Pass as array?
 int get_growthfactor(int n, double *a,double om, double ov, double w, double w2, double *d, double *f, int model, double mu0, int f_of_R_n, double f_of_R_fR, double k_in)
 {
 	w0 = w;
@@ -186,9 +187,8 @@ int growth_de(int n, double *a, double *d, double *f)
 
 //f(R) model
 
-//TODO suboptimal implementation right now, 
-// where for different k values, the m(a) is calculated all over again
-// for the same a.
+//TODO suboptimal implementation for now where for different 
+// k values, the m(a) is calculated all over again for the same a.
 double get_f_of_R_scale_dependence(double a)
 {
     double mass; 

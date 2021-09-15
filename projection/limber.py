@@ -115,9 +115,8 @@ def load_power_growth_chi(block, chi_of_z, section, k_name, z_name, p_name, k_gr
     power_spline = GSLSpline2d(chi, np.log(k), p.T, spline_type=BICUBIC)
     return power_spline, growth_spline
 
-#TODO check where D(z) is being divided and multiplied
 def load_power_growth_chi_modified_gravity(block, chi_of_z, section, \
-    k_name, z_name, p_name, power_of_lensing_kernel, k_growth=1.e-3):
+    k_name, z_name, p_name, exponent_of_lensing_kernel, k_growth=1.e-3):
     """Returns power_spline and growth_spline, where the power has 
     one power of G, the multiplicative factor describing the modified gravity 
     effects on one lensing kernel."""
@@ -125,12 +124,15 @@ def load_power_growth_chi_modified_gravity(block, chi_of_z, section, \
     z,k,p = block.get_grid(section, z_name, k_name, p_name)
     chi = chi_of_z(z)
     growth_spline = growth_from_power(chi, k, p, k_growth)
+
     G = get_lensing_kernel_factor_G(block, z, k) # shape is (nz, nk)
-    assert power_of_lensing_kernel in [0,1,2], \
-        ('modified_gravity_kernel_power='%power_of_lensing_kernel, \
+    assert exponent_of_lensing_kernel in [0,1,2], \
+        ('modified_gravity_kernel_power='%exponent_of_lensing_kernel, \
         'can only be 0, 1 of 2.')
-    p_modified = p * G**power_of_lensing_kernel
+    p_modified = p * G**exponent_of_lensing_kernel
+
     power_spline = GSLSpline2d(chi, np.log(k), p_modified.T, spline_type=BICUBIC)
+
     return power_spline, growth_spline
 
 MG = "modified_gravity_parameters"
@@ -187,16 +189,17 @@ def get_G_propto_dark_energy(block, z, k):
 
     return G
 
-# TODO this is actually 1 in the f(R) gravity, lensing kernel same as GR
-# See Appendix of https://arxiv.org/pdf/1311.5560.pdf
-# Probably want to just change get_G_f_of_R to return 1. 
-# But leaving these functions here for now, in case another model
-# needs a similar code. 
 def get_G_f_of_R(block, z, k):
+    """Returns one as we expect no modified gravity effects on the 
+    lensing kernel from a f(R) model parametrized by n and fR 
+    (following Liu et al. 2021, arxiv 2101.08728)."""
+    return 1.0
+
+def get_G_f_of_R_should_be_one(block, z, k):
     """Returns a 2d numpy array of shape (nz, nk) for the multiplicative
     factor describing modified gravity effects on one lensing kernel 
     from a f(R) model parametrized by n and fR (following Liu et al. 2021, 
-    arxiv 2101.08728)."""
+    arxiv 2101.08728). This should actually be exactly 1."""
 
     scale_dependence = get_f_of_R_scale_dependence(block, z, k)
     G = get_f_of_R_Sigma(scale_dependence)

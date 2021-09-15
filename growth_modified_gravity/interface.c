@@ -6,13 +6,6 @@
 #include "cosmosis/datablock/section_names.h"
 #include "growthfactor.h"
 
-
-//Module to calculate the linear growth factor D, and linear growth rate, f. Where D, f are defined by the growth of a
-//linear perturbation, delta, with scale factor a: 
-//delta(a') = delta(a)*(D(a')/D(a)) and f = dlnD/dlna
-//Anyone using Komatsu's CRL library should note: growth_factor_crl = D *(1+z) and growth_rate_crl = f/(1+z)
-
-
 const char * cosmo = COSMOLOGICAL_PARAMETERS_SECTION;
 const char * like = LIKELIHOODS_SECTION;
 const char * growthparameters = GROWTH_PARAMETERS_SECTION;
@@ -83,11 +76,10 @@ int execute(c_datablock * block, growth_config * config)
 	int f_of_R_n; 
 	double f_of_R_fR;
 
-	//TODO this is hard coded for now. 
+	//TODO this is hard coded for now. Might want to make a parameter
 	//If changed for other modules, need to change here by hand
 	double kmin=1e-5; 
 	double kmax=10.0;
-
 	double k_large_scale = kmin;
 	
 	//read cosmological params from datablock
@@ -200,8 +192,8 @@ int execute(c_datablock * block, growth_config * config)
 	// Note that we do not unreverse z as we never reversed it in the first place.
 	reverse(a,nz);
 
-	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth", nk_steps, k, "z_growth", nz, z, "d_k_z", d_k_z);
-	status |= c_datablock_put_double_grid(block,growthparameters, "k_growth2", nk_steps, k, "z_growth2", nz, z, "f_k_z", f_k_z);
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_d_k_z", nk_steps, k, "z_for_d_k_z", nz, z, "d_k_z", d_k_z);
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_f_k_z", nk_steps, k, "z_for_f_k_z", nz, z, "f_k_z", f_k_z);
 	
 	free(d_k_z);
 	free(f_k_z);
