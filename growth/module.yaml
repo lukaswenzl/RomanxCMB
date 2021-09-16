@@ -8,7 +8,7 @@ attribution: ["Lukas Wenzl"]
 rules: []
 cite: []
 assumptions:
-    - "Growth scale-dependent and parametrized by gamma or w0wa. Assumes flat spacetime"
+    - "Growth scale independent and parametrized by gamma or w0wa. Assumes flat spacetime"
 
 explanation: |
     Gives back the growth function based on a fitting function. 
@@ -41,6 +41,3 @@ outputs:
         d_z: "1D real array, linear growth factor D"
         f_z: "1D real array, linear growth rate f"
         z: "1D real array, redshift of samples "
-        k: "1D real array, wavenumbers "
-        d_k_z: "2D real array, linear growth factor D(k,z)"
-        f_k_z: "2D real array, linear growth rate f(k,z)"

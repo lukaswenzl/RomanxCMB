@@ -5,7 +5,7 @@ Replace P(k) by P(k)*(D(k,z)/D(k=kmin, z))^2. To be used in combination with eis
 import numpy as np
 from scipy.interpolate.interpolate import interp2d, interp1d
 
-do_plot = True # for debugging only
+do_plot = False # for debugging only
 growth_section = "GROWTH_PARAMETERS"
 MG = 'modified_gravity_parameters'
 
