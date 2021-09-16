@@ -734,8 +734,12 @@ class SpectrumCalculator(object):
             if self.save_kernel_zmax > 0:
                 self.save_kernels(block, self.save_kernel_zmax)
             
-            #TODO could use a if/else for GR if useful: self.load_power(block)
-            self.load_power_modified_gravity(block)
+            MG = "modified_gravity_parameters"
+            if(block.has_value(MG, 'model') and block[MG, "model"] >= 0):
+                self.load_power_modified_gravity(block)
+            else:
+                #use GR calculation
+                self.load_power(block)
 
             for spectrum in self.req_spectra:
                 if self.verbose:
