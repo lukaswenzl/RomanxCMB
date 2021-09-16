@@ -649,13 +649,15 @@ class SpectrumCalculator(object):
             # but if that's never changed, it's fine.
             if powerType.section_name in ['matter_power_nl', 'matter_power_lin']:
                 power_of_lensing_kernel = 2
-                print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
+                if(self.verbose):
+                    print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
                 self.load_one_power_modified_gravity(block, powerType, \
                     power_of_lensing_kernel)
 
             elif powerType.section_name in ['matter_galaxy_power', 'matter_intrinsic_power']:
                 power_of_lensing_kernel = 1
-                print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
+                if(self.verbose):
+                    print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
                 self.load_one_power_modified_gravity(block, powerType, \
                     power_of_lensing_kernel)
 

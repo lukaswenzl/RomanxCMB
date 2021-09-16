@@ -100,7 +100,7 @@ int execute(c_datablock * block, growth_config * config)
 
 	//TODO set this to false depending on the model number?
 	bool do_scale_dep_growth = false;
-	fprintf(stderr, "mg_model = (%d)\n", mg_model);
+	//fprintf(stderr, "mg_model = (%d)\n", mg_model);
 	
 	if (mg_model == 2){
 		do_scale_dep_growth = true;
