@@ -98,6 +98,14 @@ int execute(c_datablock * block, growth_config * config)
 		return status;
 	}
 
+	//TODO set this to false depending on the model number?
+	bool do_scale_dep_growth = false;
+	fprintf(stderr, "mg_model = (%d)\n", mg_model);
+	
+	if (mg_model == 2){
+		do_scale_dep_growth = true;
+	}
+
 	//allocate memory for single D, f and arrays as function of z
 	double *a = malloc(nz*sizeof(double));
 	double *dz = malloc(nz*sizeof(double));
@@ -138,66 +146,70 @@ int execute(c_datablock * block, growth_config * config)
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "z", z, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "a", a, nz);
 
-	reverse(a,nz);
+	if (do_scale_dep_growth == true) {
+		fprintf(stderr, "Solving for scale dependent growth\n");
 
-	double k_value;
-	double dk;
-	int nk_steps=200;
+		reverse(a,nz);
 
-	double *k = malloc(nk_steps*sizeof(double));
+		double k_value;
+		double dk;
+		int nk_steps=200;
 
-	int c = nz, r = nk_steps, j;
-	
-	double **d_k_z;
-	double **f_k_z;
-	double *d_ptr; 
-	double *f_ptr; 
+		double *k = malloc(nk_steps*sizeof(double));
 
-	int len;
-	len = sizeof(double *) * r + sizeof(double) * c * r;
-	d_k_z = (double**) malloc(len);
-	f_k_z = (double**) malloc(len);
+		int c = nz, r = nk_steps, j;
+		
+		double **d_k_z;
+		double **f_k_z;
+		double *d_ptr; 
+		double *f_ptr; 
 
-	d_ptr = (double *)(d_k_z + r);
-	f_ptr = (double *)(f_k_z + r);
+		int len;
+		len = sizeof(double *) * r + sizeof(double) * c * r;
+		d_k_z = (double**) malloc(len);
+		f_k_z = (double**) malloc(len);
 
-	// for loop to point rows pointer to appropriate location in 2D array
-    for(i = 0; i < r; i++){
-        d_k_z[i] = (d_ptr + c * i);
-		f_k_z[i] = (f_ptr + c * i);
-	}
+		d_ptr = (double *)(d_k_z + r);
+		f_ptr = (double *)(f_k_z + r);
 
-	dk = (log(kmax) - log(kmin))/(nk_steps-1);
-	for (i = 0; i < nk_steps; i++)
-    {
-		k[i] = exp(log(kmin) + i*dk);
-	}
-
-	for (i = 0; i < nk_steps; i++)
-    {
-		k_value = k[i];
-
-		status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
-		reverse(dz,nz);
-		reverse(fz,nz);
-
-		for (j = 0; j < c; j++){
-			memcpy(&d_k_z[i][j], &dz[j], sizeof(dz[j]));
-			memcpy(&f_k_z[i][j], &fz[j], sizeof(fz[j]));
+		// for loop to point rows pointer to appropriate location in 2D array
+		for(i = 0; i < r; i++){
+			d_k_z[i] = (d_ptr + c * i);
+			f_k_z[i] = (f_ptr + c * i);
 		}
 
-	}
-		
-	// Now reverse everything back to increasing z
-	// Note that we do not unreverse z as we never reversed it in the first place.
-	reverse(a,nz);
+		dk = (log(kmax) - log(kmin))/(nk_steps-1);
+		for (i = 0; i < nk_steps; i++)
+		{
+			k[i] = exp(log(kmin) + i*dk);
+		}
 
-	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_d_k_z", nk_steps, k, "z_for_d_k_z", nz, z, "d_k_z", d_k_z);
-	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_f_k_z", nk_steps, k, "z_for_f_k_z", nz, z, "f_k_z", f_k_z);
-	
-	free(d_k_z);
-	free(f_k_z);
-	free(k);
+		for (i = 0; i < nk_steps; i++)
+		{
+			k_value = k[i];
+
+			status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
+			reverse(dz,nz);
+			reverse(fz,nz);
+
+			for (j = 0; j < c; j++){
+				memcpy(&d_k_z[i][j], &dz[j], sizeof(dz[j]));
+				memcpy(&f_k_z[i][j], &fz[j], sizeof(fz[j]));
+			}
+
+		}
+			
+		// Now reverse everything back to increasing z
+		// Note that we do not unreverse z as we never reversed it in the first place.
+		reverse(a,nz);
+
+		status |= c_datablock_put_double_grid(block,growthparameters, "k_for_d_k_z", nk_steps, k, "z_for_d_k_z", nz, z, "d_k_z", d_k_z);
+		status |= c_datablock_put_double_grid(block,growthparameters, "k_for_f_k_z", nk_steps, k, "z_for_f_k_z", nz, z, "f_k_z", f_k_z);
+		
+		free(d_k_z);
+		free(f_k_z);
+		free(k);
+	}	
 
 	free(fz);
 	free(dz);
