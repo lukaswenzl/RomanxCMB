@@ -144,8 +144,6 @@ class Spectrum(object):
     def compute(self, block, ell, bin1, bin2, relative_tolerance=1.e-3,
                 absolute_tolerance=0.):
 
-        # Get the required kernels
-        # maybe get from rescaled version of existing spectra
         P, D = self.get_power_growth(block, bin1, bin2)
 
         K1 = self.source.kernels_A[self.kernels[0] + "_" + self.sample_a][bin1]
@@ -465,6 +463,7 @@ class SpectrumCalculator(object):
                     self.req_spectra.append(spectrum(self, power3D, kernel_a, kernel_b, save_name))
                     print("Calculating Limber: Kernel 1 = {}, Kernel 2 = {}, P_3D = {} --> Output: {}".format(
                         kernel_a, kernel_b, power3D.section_name, save_name))
+
                 except:
                     raise
                     raise ValueError("To specify a P(k)->C_ell projection with one or more sets of two different n(z) samples use the form shear-shear=sample1-sample2 sample3-sample4 ....  Otherwise just use shear-shear=T to use the standard form.")
@@ -628,14 +627,40 @@ class SpectrumCalculator(object):
 
         return kernel
 
-
     def load_one_power(self,  block, powerType):
         self.power[powerType], self.growth[powerType] = limber.load_power_growth_chi(
             block, self.chi_of_z, powerType.section_name, "k_h", "z", "p_k")
 
+    def load_one_power_modified_gravity(self,  block, powerType, power_of_lensing_kernel):
+        self.power[powerType], self.growth[powerType] = limber.load_power_growth_chi_modified_gravity(
+            block, self.chi_of_z, powerType.section_name, "k_h", "z", "p_k", \
+            power_of_lensing_kernel)
+
     def load_power(self, block):
         for powerType in self.req_power:
             self.load_one_power(block, powerType)
+
+    def load_power_modified_gravity(self, block):
+
+        for powerType in self.req_power:
+            # Note: Not the best implementation because
+            # this relies on the mapping between spectrum to power used
+            # (e.g. Wsource, Wsource --> matter_power_nl)
+            # but if that's never changed, it's fine.
+            if powerType.section_name in ['matter_power_nl', 'matter_power_lin']:
+                power_of_lensing_kernel = 2
+                print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
+                self.load_one_power_modified_gravity(block, powerType, \
+                    power_of_lensing_kernel)
+
+            elif powerType.section_name in ['matter_galaxy_power', 'matter_intrinsic_power']:
+                power_of_lensing_kernel = 1
+                print('Loading %s with power_of_lensing_kernel=%s'%(powerType.section_name, power_of_lensing_kernel))
+                self.load_one_power_modified_gravity(block, powerType, \
+                    power_of_lensing_kernel)
+
+            else:
+                self.load_one_power(block, powerType)
 
     def compute_spectra(self, block, spectrum):
         spectrum_name = spectrum.get_name()
@@ -708,7 +733,10 @@ class SpectrumCalculator(object):
                 return 1
             if self.save_kernel_zmax > 0:
                 self.save_kernels(block, self.save_kernel_zmax)
-            self.load_power(block)
+            
+            #TODO could use a if/else for GR if useful: self.load_power(block)
+            self.load_power_modified_gravity(block)
+
             for spectrum in self.req_spectra:
                 if self.verbose:
                     print("Computing spectrum: {} -> {}".format(spectrum.__class__.__name__, spectrum.get_name()))
@@ -724,4 +752,3 @@ def setup(options):
 
 def execute(block, config):
     return config.execute(block)
-

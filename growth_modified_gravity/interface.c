@@ -1,20 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "cosmosis/datablock/c_datablock.h"
 #include "cosmosis/datablock/section_names.h"
 #include "growthfactor.h"
 
-
-//Module to calculate the linear growth factor D, and linear growth rate, f. Where D, f are defined by the growth of a
-//linear perturbation, delta, with scale factor a: 
-//delta(a') = delta(a)*(D(a')/D(a)) and f = dlnD/dlna
-//Anyone using Komatsu's CRL library should note: growth_factor_crl = D *(1+z) and growth_rate_crl = f/(1+z)
-
-
 const char * cosmo = COSMOLOGICAL_PARAMETERS_SECTION;
 const char * like = LIKELIHOODS_SECTION;
 const char * growthparameters = GROWTH_PARAMETERS_SECTION;
+const char * mg = "modified_gravity_parameters";
 
 typedef struct growth_config {
 	double zmin;
@@ -70,20 +65,33 @@ int execute(c_datablock * block, growth_config * config)
 
 	int i,status=0;
 	double w,wa,omega_m,omega_v;
-	double mu0;
+
 	int nz_lin = config->nz_lin;
 	int nz_log = config->nz_log;
 	int nz = nz_lin + nz_log;
 	double zmin_log = config->zmax + config->dz;
-	
 
+	int mg_model; 
+	double mu0;
+	int f_of_R_n; 
+	double f_of_R_fR;
+
+	//TODO this is hard coded for now. Might want to make a parameter
+	//If changed for other modules, need to change here by hand
+	double kmin=1e-5; 
+	double kmax=10.0;
+	double k_large_scale = kmin;
+	
 	//read cosmological params from datablock
 	status |= c_datablock_get_double_default(block, cosmo, "w", -1.0, &w);
 	status |= c_datablock_get_double_default(block, cosmo, "wa", 0.0, &wa);
 	status |= c_datablock_get_double(block, cosmo, "omega_m", &omega_m);
 	status |= c_datablock_get_double_default(block, cosmo, "omega_lambda", 1-omega_m, &omega_v);
-	status |= c_datablock_get_double(block, cosmo, "mu0", &mu0);
-	
+
+	status |= c_datablock_get_int(block, mg, "model", &mg_model);
+	status |= c_datablock_get_double(block, mg, "mu0", &mu0);
+	status |= c_datablock_get_int(block, mg, "f_of_R_n", &f_of_R_n);
+	status |= c_datablock_get_double(block, mg, "f_of_R_fR", &f_of_R_fR);
 
 	if (status){
 		fprintf(stderr, "Could not get required parameters for growth function (%d)\n", status);
@@ -117,7 +125,7 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(a,nz);
 
 	// Compute D and f
-	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mu0);
+	status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_large_scale);
 	
 	// Now reverse everything back to increasing z
 	// Note that we do not unreverse z as we never reversed it in the first place.
@@ -125,17 +133,77 @@ int execute(c_datablock * block, growth_config * config)
 	reverse(dz,nz);
 	reverse(fz,nz);
 
-
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "d_z", dz, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "f_z", fz, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "z", z, nz);
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "a", a, nz);
 
+	reverse(a,nz);
+
+	double k_value;
+	double dk;
+	int nk_steps=200;
+
+	double *k = malloc(nk_steps*sizeof(double));
+
+	int c = nz, r = nk_steps, j;
+	
+	double **d_k_z;
+	double **f_k_z;
+	double *d_ptr; 
+	double *f_ptr; 
+
+	int len;
+	len = sizeof(double *) * r + sizeof(double) * c * r;
+	d_k_z = (double**) malloc(len);
+	f_k_z = (double**) malloc(len);
+
+	d_ptr = (double *)(d_k_z + r);
+	f_ptr = (double *)(f_k_z + r);
+
+	// for loop to point rows pointer to appropriate location in 2D array
+    for(i = 0; i < r; i++){
+        d_k_z[i] = (d_ptr + c * i);
+		f_k_z[i] = (f_ptr + c * i);
+	}
+
+	dk = (log(kmax) - log(kmin))/(nk_steps-1);
+	for (i = 0; i < nk_steps; i++)
+    {
+		k[i] = exp(log(kmin) + i*dk);
+	}
+
+	for (i = 0; i < nk_steps; i++)
+    {
+		k_value = k[i];
+
+		status = get_growthfactor(nz, a, omega_m, omega_v, w, wa, dz, fz, mg_model, mu0, f_of_R_n, f_of_R_fR, k_value);
+		reverse(dz,nz);
+		reverse(fz,nz);
+
+		for (j = 0; j < c; j++){
+			memcpy(&d_k_z[i][j], &dz[j], sizeof(dz[j]));
+			memcpy(&f_k_z[i][j], &fz[j], sizeof(fz[j]));
+		}
+
+	}
+		
+	// Now reverse everything back to increasing z
+	// Note that we do not unreverse z as we never reversed it in the first place.
+	reverse(a,nz);
+
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_d_k_z", nk_steps, k, "z_for_d_k_z", nz, z, "d_k_z", d_k_z);
+	status |= c_datablock_put_double_grid(block,growthparameters, "k_for_f_k_z", nk_steps, k, "z_for_f_k_z", nz, z, "f_k_z", f_k_z);
+	
+	free(d_k_z);
+	free(f_k_z);
+	free(k);
+
 	free(fz);
 	free(dz);
 	free(z);
 	free(a);
-
+	
 return status;
 }
 
