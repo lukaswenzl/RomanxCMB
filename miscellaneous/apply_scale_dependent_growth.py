@@ -7,27 +7,32 @@ from scipy.interpolate.interpolate import interp2d, interp1d
 
 do_plot = False # for debugging only
 growth_section = "GROWTH_PARAMETERS"
+MG = 'modified_gravity_parameters'
 
 def setup(options):
     return {}
 
 def execute(block, config):
 
-    z, k, P = block.get_grid('matter_power_lin', 'z', 'k_h', 'p_k')
+    if block[MG, "model"] == 2.0: 
 
-    d_z = get_d_z_splined(block, z)
-    d_z_k = get_d_z_k_splined(block, z, k)
+        z, k, P = block.get_grid('matter_power_lin', 'z', 'k_h', 'p_k')
 
-    P_new = P * (d_z_k / d_z[:,np.newaxis])**2
-    block.replace_grid('matter_power_lin', 'z', z, 'k_h', k, 'p_k', P_new)
+        d_z = get_d_z_splined(block, z)
+        d_z_k = get_d_z_k_splined(block, z, k)
 
-    if do_plot == True:
-        mkdir_p('./tmp')
-        pfname = './tmp/plot_matter_power_vs_GR.png'
-        plot_check_p(z, k, P_new, pfname=pfname)
-        plot_check_p_from_file(pfname=pfname)
+        P_new = P * (d_z_k / d_z[:,np.newaxis])**2
+        block.replace_grid('matter_power_lin', 'z', z, 'k_h', k, 'p_k', P_new)
 
-    return 0
+        if do_plot == True:
+            mkdir_p('./tmp')
+            pfname = './tmp/plot_matter_power_vs_GR.png'
+            plot_check_p(z, k, P_new, pfname=pfname)
+            plot_check_p_from_file(pfname=pfname)
+
+        return 0
+    else: 
+        return 0
 
 def get_d_z_splined(block, z):
 
@@ -82,7 +87,7 @@ def plot_check_interp_p(z, k, P, P_new):
 
     fig = plt.figure()
     gspec = gridspec.GridSpec(ncols=1, nrows=2, figure=fig, \
-        wspace=0.0, hspace=0.0, height_ratios=[4,1])
+        wspace=0.0, hspace=0.0, height_ratios=[4,1.5])
     ax1 = fig.add_subplot(gspec[0, 0])
     ax2 = fig.add_subplot(gspec[1, 0])
 
@@ -131,7 +136,7 @@ def plot_check_p(z, k, P_new, pfname):
 
     fig = plt.figure()
     gspec = gridspec.GridSpec(ncols=1, nrows=2, figure=fig, \
-        wspace=0.0, hspace=0.0, height_ratios=[4,1])
+        wspace=0.0, hspace=0.0, height_ratios=[4,1.5])
     ax1 = fig.add_subplot(gspec[0, 0])
     ax2 = fig.add_subplot(gspec[1, 0])
 
