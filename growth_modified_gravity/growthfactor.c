@@ -12,27 +12,41 @@
 #include <gsl/gsl_odeiv.h>
 #include "growthfactor.h"
 
-//Code to calculate the linear growth factor D, 
-//and linear growth rate, f = dlnD/dlna for modified gravity.
-//Currently supporting (Sigma,Mu) parametrisation
-//with a time dependance mu = 1 + mu(t) where
-// mu(t) = mu0 * omega_DE(a)
+//Code to calculate the scale-indep. and dependent 
+//  - linear growth factor D, 
+//  - linear growth rate, f = dlnD/dlna for modified gravity models.
+
+//Currently supporting:
+//   Model 1: (Sigma,Mu) parametrisation
+//     with a time dependance mu = 1 + mu(t) where mu(t) = mu0 * omega_DE(a)
+//   Model 2: f(R) model parametrized by n and f_R
 
 double D;
 double linear_f;
 double w0,wa;
 double omega_m,omega_lambda;
-double mg_mu;
+
+int mg_model; 
+double mg_mu0;
+int mg_f_of_R_n;
+double mg_f_of_R_fR; 
+
+double k;  
 
 #define LIMIT_SIZE 1000
 
-int get_growthfactor(int n, double *a,double om, double ov, double w, double w2, double *d, double *f, double mu0)
+int get_growthfactor(int n, double *a,double om, double ov, double w, double w2, double *d, double *f, int model, double mu0, int f_of_R_n, double f_of_R_fR, double k_in)
 {
 	w0 = w;
 	wa = w2;
 	omega_m = om;
 	omega_lambda = 1.0 - omega_m; 
-	mg_mu = mu0;
+
+	mg_model = model; 
+	mg_mu0 = mu0;
+	mg_f_of_R_n = f_of_R_n;
+	mg_f_of_R_fR = f_of_R_fR;
+	k = k_in;
 
     int tmp;
     tmp = growth_de(n, a, d, f);
@@ -43,7 +57,27 @@ int get_growthfactor(int n, double *a,double om, double ov, double w, double w2,
 //careful: this is the mu(t) in 1+mu(t) (mu(t) = 0 = GR)
 double mg_mu_t(double a)
 {
-return mg_mu/(omega_lambda + (1.0 - omega_lambda)*pow(a,-3.0));
+	if (mg_model == 0){
+		return mg_mu0;
+	}
+	else if (mg_model == 1){
+		return mg_mu_t_propto_de(a);
+	}
+	else if (mg_model == 2){
+		return mg_mu_t_f_of_R(a);
+	}
+}
+
+double mg_mu_t_propto_de(double a)
+{
+	return mg_mu0/(omega_lambda + (1.0 - omega_lambda)*pow(a,-3.0));
+}
+
+double mg_mu_t_f_of_R(double a)
+{
+    double scale_dependence;
+    scale_dependence = get_f_of_R_scale_dependence(a); 
+    return (1.0 + 4.0/3.0*scale_dependence)/(1.0 + scale_dependence) - 1.0;
 }
 
 double w (double a)
@@ -55,7 +89,6 @@ double w_int(double z, void *param)
 {
 	return (1. + w(1./(z+1)) )/( 1. + z);
 }
-
 
 double Xde_int (double a,void *params )
 {
@@ -150,4 +183,33 @@ int growth_de(int n, double *a, double *d, double *f)
 
     return 0;
 
+}
+
+//f(R) model
+
+//TODO suboptimal implementation for now where for different 
+// k values, the m(a) is calculated all over again for the same a.
+double get_f_of_R_scale_dependence(double a)
+{
+    double mass; 
+    double scale_dependence; 
+
+    mass = get_f_of_R_mass_of_a(a);
+    scale_dependence = pow(k/(a*mass), 2);
+
+    return scale_dependence;
+}
+
+double get_f_of_R_mass_of_a(double a)
+{
+    double term1, term2, term3, term4; 
+    double c_in_km_per_sec = 2.99792458e5;
+    double H0_over_c_in_hoverMpc = 100./c_in_km_per_sec;
+
+    term1 = pow(omega_m + 4.*omega_lambda, -0.5*(mg_f_of_R_n+1));
+    term2 = pow((mg_f_of_R_n+1)*mg_f_of_R_fR, -0.5);
+    term3 = pow(omega_m * pow(a, -3) + 4.*omega_lambda, 0.5 * (mg_f_of_R_n+2));
+    term4 = H0_over_c_in_hoverMpc;
+
+    return term1 * term2 * term3 * term4; 
 }
