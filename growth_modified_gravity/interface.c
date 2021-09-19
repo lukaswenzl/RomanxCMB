@@ -83,8 +83,6 @@ int execute(c_datablock * block, growth_config * config)
 	int f_of_R_n; 
 	double f_of_R_fR;
 
-	//TODO this is hard coded for now. Might want to make a parameter
-	//If changed for other modules, need to change here by hand
 	double kmin=config->kmin; 
 	double kmax=config->kmax;
 	double k_large_scale = kmin;
