@@ -18,6 +18,9 @@ typedef struct growth_config {
 	int nz_lin;
 	double zmax_log;
 	int nz_log;
+	double kmin;
+	double kmax;
+	int nk_steps;
 } growth_config;
 
 void reverse(double * x, int n)
@@ -38,6 +41,10 @@ growth_config * setup(c_datablock * options)
 	status |= c_datablock_get_double_default(options, OPTION_SECTION, "dz", 0.01, &(config->dz));
 	status |= c_datablock_get_double_default(options, OPTION_SECTION, "zmax_log", 1100.0, &(config->zmax_log));
 	status |= c_datablock_get_int_default(options, OPTION_SECTION, "nz_log", 0, &(config->nz_log));
+	status |= c_datablock_get_double_default(options, OPTION_SECTION, "kmin", 1.e-5, &(config->kmin));
+	status |= c_datablock_get_double_default(options, OPTION_SECTION, "kmax", 10., &(config->kmax));
+	status |= c_datablock_get_int_default(options, OPTION_SECTION, "nk_steps", 200, &(config->nk_steps));
+
 
 	config->nz_lin = (int)((config->zmax-config->zmin)/config->dz)+1;
 
@@ -78,8 +85,8 @@ int execute(c_datablock * block, growth_config * config)
 
 	//TODO this is hard coded for now. Might want to make a parameter
 	//If changed for other modules, need to change here by hand
-	double kmin=1e-5; 
-	double kmax=10.0;
+	double kmin=config->kmin; 
+	double kmax=config->kmax;
 	double k_large_scale = kmin;
 	
 	//read cosmological params from datablock
@@ -98,7 +105,7 @@ int execute(c_datablock * block, growth_config * config)
 		return status;
 	}
 
-	//TODO set this to false depending on the model number?
+	//note: update this flag when implementing a new model
 	bool do_scale_dep_growth = false;
 	//fprintf(stderr, "mg_model = (%d)\n", mg_model);
 	
@@ -153,7 +160,7 @@ int execute(c_datablock * block, growth_config * config)
 
 		double k_value;
 		double dk;
-		int nk_steps=200;
+		int nk_steps=config->nk_steps;
 
 		double *k = malloc(nk_steps*sizeof(double));
 
