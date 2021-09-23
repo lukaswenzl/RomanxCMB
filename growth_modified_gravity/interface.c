@@ -152,7 +152,7 @@ int execute(c_datablock * block, growth_config * config)
 	status |= c_datablock_put_double_array_1d(block,growthparameters, "a", a, nz);
 
 	if (do_scale_dep_growth == true) {
-		fprintf(stderr, "Solving for scale dependent growth\n");
+		//fprintf(stderr, "Solving for scale dependent growth\n");
 
 		reverse(a,nz);
 
