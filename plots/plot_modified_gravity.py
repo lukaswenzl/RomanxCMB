@@ -29,13 +29,13 @@ plt.rc('axes', prop_cycle=(cycler('color', cmap_wBLACK) ))
 
 fig, ax = plt.subplots(2, 6, sharex="col", sharey="row", figsize=(8.5,4), gridspec_kw={'height_ratios': [1, 4]})
 
-ax[0,0].set_title("$\delta_{\rm {g 5}}  \delta_{\rm {g 5}}$")
+ax[0,0].set_title("$\delta_{\textrm{g 5}}  \delta_{\textrm{g 5}}$")
 ax[0,0].set_ylabel("$|C_l|$")
 #ax[0,0].set_xlabel("l")
 
-ax[0,1].set_title("$\delta_{\rm{ g 3}} \gamma_7$")
+ax[0,1].set_title("$\delta_{\textrm{ g 3}} \gamma_7$")
 ax[0,2].set_title("$\gamma_5 \gamma_5$")
-ax[0,3].set_title("$\delta_{\rm{ g 5}} \kappa$")
+ax[0,3].set_title("$\delta_{\textrm{ g 5}} \kappa$")
 ax[0,4].set_title("$\gamma_5 \kappa$")
 ax[0,5].set_title("$\kappa \kappa$")
 
@@ -253,7 +253,10 @@ for mu0 in [ 0.,-0.2, 0.2]:
     vector[index] = mu0
 
     data = pipeline.run_parameters(vector)
-    all_data.append(data)
+    loc_dict = {}
+    for key in data.keys():
+        loc_dict[key] = data[key]
+    all_data.append(loc_dict)
 
     # data is a DataBlock - can get things out of it as in any
     # cosmosis module:
@@ -321,7 +324,10 @@ for sigma0 in [ -0.05, 0.05]: #approximately the 1 sigma constraint
     vector[index] = sigma0
 
     data = pipeline.run_parameters(vector)
-    all_data.append(data)
+    loc_dict = {}
+    for key in data.keys():
+        loc_dict[key] = data[key]
+    all_data.append(loc_dict)
     all_data_label.append("$\Sigma_0$="+str(sigma0))
 
     # data is a DataBlock - can get things out of it as in any
@@ -389,7 +395,10 @@ for fR in [ 1.e-6]: #approximately the 1 sigma constraint
     vector[index] = fR
 
     data = pipeline.run_parameters(vector)
-    all_data.append(data)
+    loc_dict = {}
+    for key in data.keys():
+        loc_dict[key] = data[key]
+    all_data.append(loc_dict)
 
     # data is a DataBlock - can get things out of it as in any
     # cosmosis module:
@@ -447,5 +456,7 @@ plt.savefig(output_folder+"Clall_modgrav_dependenceRAW.pdf")
 
 
 import pickle as pkl
-pkl.dump(all_data,  output_folder+"modified_gravity_plot_data.pkl")
-pkl.dump(all_data_label, output_folder+"modified_gravity_plot_data_labels.pkl")
+pkl.dump(all_data,  open( output_folder+"modified_gravity_plot_data.pkl", "wb" ) )
+pkl.dump(all_data_label, open( output_folder+"modified_gravity_plot_data_labels.pkl", "wb"))
+np.savetxt(output_folder+"modified_gravity_plot_data_labels.npy", all_data_label,  fmt='%s')
+print(all_data_label)

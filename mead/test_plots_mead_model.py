@@ -22,6 +22,8 @@ whattodo = "power_input_zdep,neutrino_test,halofit_comparison,wdependence,growth
 #whattodo = "sample_only_above_cutoff"
 #whattodo = "halofit_comparison"
 whattodo = "cambvsEH99"
+whattodo = "neutriopiping_nl_nofeedback"
+
 
 
 
@@ -999,8 +1001,211 @@ if ("cambvsEH99" in whattodo):
 
 
 
+if ("neutriopiping_nl" in whattodo):
+    #compare different samplings
+
+    plt.figure()
+
+    ini = Inifile("modules/RomanxCMB/params.ini")
+
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    index = params_names.index("cosmological_parameters--omnuh2")
+    vector[index] = 0.0000
+    data = pipeline.run_parameters(vector)
+
+    k_h = data['matter_power_nl', 'k_h']
+    z = data['matter_power_nl', 'z']
+    p_nl = data['matter_power_nl', 'p_k'] 
+    Pk_noneutrino = interp1d(z, p_nl, axis=0)
+
+    for i, neutrinomass in enumerate([0.0006155, 0.003]):
+        ## cosmosis growth piped into mead
+
+        pipeline = LikelihoodPipeline(ini)
+        pipeline.quiet = True
+        pipeline.debug = False
+        pipeline.timing = False
+
+        params_names = pipeline.varied_params
+        vector = pipeline.start_vector()
+        #index = params_names.index("cosmological_parameters--omnuh2")
+        vector[index] = neutrinomass
+        data = pipeline.run_parameters(vector)
+
+        k = data['matter_power_nl', 'k_h']
+        z = data['matter_power_nl', 'z']
+        p_nl = data['matter_power_nl', 'p_k'] 
+        Pk = interp1d(z, p_nl, axis=0)
+
+        z_sample = 0.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 1.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),"--",label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 5.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 10.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        
+
+    
+
+
+    plt.title("Effects of neutrino")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.8,1.2)
+    plt.ylabel("$P_{nl} / P_{nl} (no neutrinos)$")
+
+    # Save our plot.
+    plt.legend()
+    
+    plt.savefig(output_folder+"neutrino_piping_test_RAW.pdf")
 
 
 
+if ("neutriopiping" in whattodo):
+    #compare different samplings
 
+    plt.figure()
+
+    ini = Inifile("modules/RomanxCMB/params.ini")
+
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    index = params_names.index("cosmological_parameters--omnuh2")
+    vector[index] = 0.0000
+    data = pipeline.run_parameters(vector)
+
+    k_h = data['matter_power_lin', 'k_h']
+    z = data['matter_power_lin', 'z']
+    p_nl = data['matter_power_lin', 'p_k'] 
+    Pk_noneutrino = interp1d(z, p_nl, axis=0)
+
+    for i, neutrinomass in enumerate([0.0006155, 0.003]):
+        ## cosmosis growth piped into mead
+
+        pipeline = LikelihoodPipeline(ini)
+        pipeline.quiet = True
+        pipeline.debug = False
+        pipeline.timing = False
+
+        params_names = pipeline.varied_params
+        vector = pipeline.start_vector()
+        #index = params_names.index("cosmological_parameters--omnuh2")
+        vector[index] = neutrinomass
+        data = pipeline.run_parameters(vector)
+
+        k = data['matter_power_lin', 'k_h']
+        z = data['matter_power_lin', 'z']
+        p_nl = data['matter_power_lin', 'p_k'] 
+        Pk = interp1d(z, p_nl, axis=0)
+
+        z_sample = 0.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 1.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),"--",label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 5.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 10.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        
+
+    
+
+
+    plt.title("Effects of neutrino")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.8,1.2)
+    plt.ylabel("$P_{lin} / P_{lin} (no neutrinos)$")
+
+    # Save our plot.
+    plt.legend()
+    
+    plt.savefig(output_folder+"neutrino_piping_test_linearpowerspec_RAW.pdf")
+
+
+
+if ("neutriopiping_nl_nofeedback" in whattodo):
+    #compare different samplings
+
+    plt.figure()
+
+    ini = Inifile("modules/RomanxCMB/params.ini")
+
+    ini.set("mead", "feedback",  "F")
+    pipeline = LikelihoodPipeline(ini)
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    params_names = pipeline.varied_params
+    vector = pipeline.start_vector()
+    index = params_names.index("cosmological_parameters--omnuh2")
+    vector[index] = 0.0000
+    data = pipeline.run_parameters(vector)
+
+    k_h = data['matter_power_nl', 'k_h']
+    z = data['matter_power_nl', 'z']
+    p_nl = data['matter_power_nl', 'p_k'] 
+    Pk_noneutrino = interp1d(z, p_nl, axis=0)
+
+    for i, neutrinomass in enumerate([0.0006155, 0.003]):
+        ## cosmosis growth piped into mead
+
+        ini.set("mead", "feedback",  "F")
+        pipeline = LikelihoodPipeline(ini)
+        pipeline.quiet = True
+        pipeline.debug = False
+        pipeline.timing = False
+
+        params_names = pipeline.varied_params
+        vector = pipeline.start_vector()
+        #index = params_names.index("cosmological_parameters--omnuh2")
+        vector[index] = neutrinomass
+        data = pipeline.run_parameters(vector)
+
+        k = data['matter_power_nl', 'k_h']
+        z = data['matter_power_nl', 'z']
+        p_nl = data['matter_power_nl', 'p_k'] 
+        Pk = interp1d(z, p_nl, axis=0)
+
+        z_sample = 0.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 1.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),"--",label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 5.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        z_sample = 10.
+        plt.plot(k, Pk(z_sample)/Pk_noneutrino(z_sample),":", label="omnuh2 = {}, z = {}".format(neutrinomass,z_sample) )
+        
+
+    
+
+
+    plt.title("Effects of neutrino")
+    plt.xscale("log")
+    plt.xlim(10.**(-5), 100.)
+    plt.xlabel("k/h")
+    plt.ylim(0.8,1.2)
+    plt.ylabel("$P_{nl} / P_{nl} (no neutrinos)$")
+
+    # Save our plot.
+    plt.legend()
+    
+    plt.savefig(output_folder+"neutrino_piping_test_no_feedback_RAW.pdf")
+    
 

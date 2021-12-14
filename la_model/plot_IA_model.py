@@ -19,6 +19,7 @@ whattodo ="la_model_param_dependence"
 whattodo = "la_model_param_dependence,Cl_param_dependence,Cl_old_model_param_dependence"
 whattodo = "la_model_param_dependence,Cl_param_dependence"
 whattodo = "Cl_components"
+whattodo = "IAbetaAdegen"
 
 if ("powerspectra" in whattodo):
     # The easiest way to start a pipeline it from a parameter file.
@@ -995,3 +996,69 @@ if ("Cl_old_model_param_dependence" in whattodo):
         plt.savefig(output_folder+"plot_Cl_old_model_dependence_"+tracer+"_"+bin+"_RAW.pdf")
 
     
+if ("IAbetaAdegen" in whattodo):
+    # The easiest way to start a pipeline it from a parameter file.
+    ini = Inifile("modules/RomanxCMB/params.ini")
+    #ini_original = Inifile("modules/RomanxCMB/la_model/params_oldIA.ini")
+
+
+    # You can modify things in the ini file object after loading.
+    # In this case we will switch off some verbose output
+    #ini.set("pipeline", "values",  "%(ROMANxCMB_SRC_DIR)s/values.ini")
+
+    # Make the pipeline itself
+    pipeline = LikelihoodPipeline(ini)
+   
+    # You can also override these properties if useful
+    pipeline.quiet = True
+    pipeline.debug = False
+    pipeline.timing = False
+
+    #pipeline.set_varied("cosmological_parameters", "omega_m", 0.2, 0.4)
+
+    # Let's look through different values of omega_m
+    # and get a Galaxy Galaxy-Lensing spectrum for each of them
+
+
+    params_names = pipeline.varied_params
+    #print(params_names)
+    index_A = params_names.index("intrinsic_alignment_parameters--a")
+    index_beta = params_names.index("intrinsic_alignment_parameters--beta")
+
+    print("the index is")
+    print(index_A)
+    for A in [ 1., 2., 4., 5.95, 8., 10.]: #
+    #for A in [0.1, 1., 5.95]:
+
+
+        vector = pipeline.start_vector()
+        vector[index_A] = A
+
+        data = pipeline.run_parameters(vector)
+
+        A_data = data["intrinsic_alignment", "amplitude"]
+        fred = data["intrinsic_alignment", "fred"]
+        z = data["intrinsic_alignment", "z"]
+
+        plt.plot(z, -1.*A_data, label="A = {}".format(A))
+
+    for beta in [-0.1, 0.,0.5, 1., 1.5,2., 3.]: #2., 3., 4., 5., 
+    #for A in [0.1, 1., 5.95]:
+
+
+        vector = pipeline.start_vector()
+        vector[index_beta] = beta
+
+        data = pipeline.run_parameters(vector)
+
+        A_data = data["intrinsic_alignment", "amplitude"]
+        fred = data["intrinsic_alignment", "fred"]
+        z = data["intrinsic_alignment", "z"]
+
+        plt.plot(z, -1.*A_data, "--",label="beta = {}".format(beta))
+
+    plt.xlabel("z")
+    plt.ylabel("A")
+    plt.legend()
+    plt.savefig(output_folder+"IAbetaAdegeneracy_RAW.pdf")
+
