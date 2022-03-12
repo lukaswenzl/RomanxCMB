@@ -1,5 +1,5 @@
 name: growth_factor
-version: 1
+version: "1extended"
 purpose: returns linear growth factor and growth rate for flat cosmology with either const w or variable DE eos w(a) = w + (1-a)*wa in modified gravity models (supporting mu(a) = 1 + mu0 * Omega_DE(a) and f(R)).
 url: ""
 interface: interface.so

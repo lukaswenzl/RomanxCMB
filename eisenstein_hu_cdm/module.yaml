@@ -1,0 +1,52 @@
+name: eisenstein_hu_cdm
+version: "1"
+purpose: Compute the power spectrum using EH fitting formula.
+url: "http://zuserver2.star.ucl.ac.uk/~lahav/nu_matter_power.f"
+interface: nowiggle_module.so
+attribution: [Lukas Wenzl (cosmosis wrapper only)]
+rules: ""
+cite:
+        - "http://zuserver2.star.ucl.ac.uk/~lahav/nu_matter_power.f"
+        - "Eisenstein & Hu (1998, astro-ph/9710252)"
+assumptions:
+    - "DEPENDENCIES: You need to run a module to compute the growth rate before this one."
+
+explanation: |
+        "
+        This is faster but less accurate than a Boltzmann code like CAMB.
+
+        Note this wrapper is based on the default module cosmosis-standard-library/structure/crl_eisenstein_hu
+
+        Note that this wrapper was only tested for a specific use case. Be careful when using.
+
+        "
+
+params:
+        zmin: "Real, min value of redshift to save P(k,z) (default = 0.0)"
+        zmax: "Real, max value of redshift to save P(k,z) (default = 5.0)"
+        nz_steps: "Integer, number of steps used between zmin-zmax (default = 800)"
+        kmin: "Real, min value of k_h (Mpc/h) to save P(k,z) (default = 1.0*10^-5)"
+        kmax: "Real, min value of k_h (Mpc/h) to save P(k,z) (default = 10.0)"
+        nk_steps: "Integer, number of steps used between kmin-kmax (default = 800)"
+
+
+inputs:
+        growth_parameters:
+            d_z: "1D real array, linear growth factor D"
+            f_z: "1D real array, linear growth rate f"
+            z: "1D real array, redshift of samples "
+        cosmological_parameters:
+            omega_b: "real scalar, baryon content"
+            omega_m: "real scalar, matter content"
+            w: "real scalar, dark energy EoS.  Optional; default=-1"
+            h0: "real scalar, Hubble/100km/s/Mpc"
+            n_s: "real scalar, scalar spectral index"
+            n_run: "real scalar, scalar spectral index running. Options; default=-1"
+            a_s: "real scalar, primordial amplitude"
+
+outputs:
+        matter_power_lin:
+                z: "1D real array, redshifts of samples"
+                k_h: "1D real array, k wavenumbers of samples in Mpc/h"
+                p_k: "2D real array, matter power spectrum at samples in (Mpc/h)^-3"
+
