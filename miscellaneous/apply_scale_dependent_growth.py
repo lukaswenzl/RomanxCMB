@@ -27,12 +27,10 @@ def execute(block, config):
         if do_plot == True:
             mkdir_p('./tmp')
             pfname = './tmp/plot_matter_power_vs_GR.png'
-            plot_check_p(z, k, P_new, pfname=pfname)
+            plot_check_p(z, k, P_new, z0=z, k0=k, P0=P, pfname=pfname)
             plot_check_p_from_file(pfname=pfname)
 
-        return 0
-    else: 
-        return 0
+    return 0
 
 def get_d_z_splined(block, z):
 
@@ -61,6 +59,7 @@ def get_d_z_k_splined(block, z, k):
 def plot_check_interp_d(z2, k2, d_z_k, z, k, d_z_k_splined):
 
     import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots()
 
     for iz in range(0, z.size, 49):
@@ -121,12 +120,12 @@ def load_data(dir_name, fname):
     fn = os.path.join(dir_name, fname)
     return np.genfromtxt(fn, skip_header=1)
 
-def plot_check_p(z, k, P_new, pfname):
+def plot_check_p(z, k, P_new, z0=None, k0=None, P0=None, pfname=None):
 
     import matplotlib.pyplot as plt
     import matplotlib.gridspec as gridspec
 
-    dir_GR = './6x2pt_Roman_SO_GR_log_k/matter_power_lin/'
+    dir_GR = './6x2pt_Roman_SO_GR/matter_power_lin/'
     P_GR = load_data(dir_GR, 'p_k.txt')
     k_GR = load_data(dir_GR, 'k_h.txt')
     z_GR = load_data(dir_GR, 'z.txt')
@@ -134,18 +133,29 @@ def plot_check_p(z, k, P_new, pfname):
     func_P_GR = interp2d(np.log(k_GR), z_GR, np.log(P_GR), kind='cubic')
     P_GR_splined = np.exp(func_P_GR(np.log(k), z))
 
+    do_plot2 = (z0 is not None)
+
+    if do_plot2 is True:
+        func_P0 = interp2d(np.log(k0), z0, np.log(P0), kind='cubic')
+        P0_splined = np.exp(func_P0(np.log(k), z))
+
     fig = plt.figure()
     gspec = gridspec.GridSpec(ncols=1, nrows=2, figure=fig, \
         wspace=0.0, hspace=0.0, height_ratios=[4,1.5])
     ax1 = fig.add_subplot(gspec[0, 0])
     ax2 = fig.add_subplot(gspec[1, 0])
+    ax1.xaxis.set_visible(False)
 
     ax1.loglog([], [], ls='-', color='k', lw=2, label='f(R)')
     ax1.loglog([], [], ls=':', color='k', lw=1, label='GR')
+    if do_plot2 is True:
+        ax1.loglog([], [], ls='--', color='k', lw=2, label='before module')
 
     for iz in range(0, 100, 20): #z.size,
         z_tmp = z[iz]
-        ax1.loglog(k, P_new[iz,:], ls='-', lw=2, label='z=%.2f'%z_tmp)
+        line, = ax1.loglog(k, P_new[iz,:], ls='-', lw=2, label='z=%.2f'%z_tmp)
+        if do_plot2 is True:
+            ax1.loglog(k, P0_splined[iz,:], ls='--', lw=2, color=line.get_color())
         ax1.loglog(k, P_GR_splined[iz,:], ls=':', color='k', lw=1)
     
     ax1.legend(ncol=2)
@@ -155,7 +165,10 @@ def plot_check_p(z, k, P_new, pfname):
     for iz in range(0, 100, 20): #z.size
         z_tmp = z[iz]
         frac_diff = (P_new[iz,:]/P_GR_splined[iz,:])-1
-        ax2.semilogx(k, frac_diff, ls='-', lw=1)
+        if do_plot2 is True:
+            frac_diff2 = (P_new[iz,:]/P0_splined[iz,:])-1
+            ax2.semilogx(k, frac_diff2, ls='--', lw=1)
+        ax2.semilogx(k, frac_diff, ls=':', lw=1, color='k')
         ax2.grid(True)
     
     ax2.set_xlabel(r'$k [h/Mpc]$')
@@ -164,6 +177,9 @@ def plot_check_p(z, k, P_new, pfname):
 
     ax1.set_xlim([1e-5, 10])
     ax2.set_xlim([1e-5, 10])
+
+    ax2.set_yticks([0.0, 0.1, 0.2])
+    ax1.set_title('Test apply_scale_dependent_growth module\n f(R) model (fR = 1e-4, n=1)')
     
     fig.savefig(pfname)
     print('Saved plot: {}'.format(pfname))
