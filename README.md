@@ -3,7 +3,7 @@ Nancy Grace Roman Space Telescope x CMB lensing Forecast
 
 This repository contains the main components of the code used in Wenzl et al. 2021 https://arxiv.org/abs/2112.07681
 Feel free to make use of this code under the condition of citing this paper in any resulting publications. If you make use of modules that are based on external codes please also acknowledge them.
-Also, feel free to contact the corresponding author for additional assistance.
+For additional assistance feel free to contact the corresponding author.
 
 ## Introduction
 
@@ -22,34 +22,29 @@ recommended installation for both: use the provided Docker installation, see htt
 External codes included in this repo due to required adaptations. Please make sure to cite the original source.
 
 * HMcode (see mead folder) https://github.com/alexander-mead/HMcode
-* SO noise models (see cmb folder) https://github.com/simonsobs/so_noise_models
+* SO noise models (see SO_noise_curves folder) https://github.com/simonsobs/so_noise_models
 * Eisenstein & Hu (1998, astro-ph/9710252) fitting formula (see eisenstein_hu_cdm folder)
 
-additional details can be found in the module.yaml files in each module!
+additional details can be found in the module.yaml file in each module!
 
 
 
 ## Capabilities
 
-Create a datavector with gaussian covaraince matrix build directly with cosmosis
+* Calculate observables of a 6x2pt analysis for a set of cosmological and nuisance parameters
 
-```
-cosmosis modules/RomanxCMB/create_datavector_gaussian_covariance.ini
-```
+* Create a fiducial datavector with an estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
 
-Create datavector using covariance matrix from cosmolike
+* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script)
 
-```
-cosmosis modules/RomanxCMB/create_datavector.ini
-```
+This repo contains a range of modules that could be useful for other applications:
 
-Run forecast
-
-```
-cosmosis modules/RomanxCMB/params.ini
-```
-
-
+* Cosmosis wrapper for HMcode2020 (mead folder)
+* Cosmosis wrapper for Eisenstein & Hu (1998, astro-ph/9710252) (eisenstein_hu_cdm folder)
+* Modules to calculate the effects of a range of modified gravity models on the growth and CMB lensing kernel
+* Modules to sample over sigma8 and sigma8_of_z  (sample_sigma8 and sample_sigma8_of_z folders)
+* An implementation of the Intrinsic Alignment model in Krause, Eifler & Blazek 2016 
+* various small helpful scrips in miscellaneous folder 
 
 # How to use
 
@@ -76,12 +71,14 @@ SUBDIRS = RomanxCMB
 -include Makefile.modules
 ```
 
+Then recompile cosmosis in the cosmosis home directory with make
 
 To avoid crashes for non-existent folders create the standard output folder manually:
 
 ```bash
 cd .. #back to cosmosis home directory.
 mkdir 6x2pt_Roman_SO
+mkdir 6x2pt_Roman_SO_gaussian
 ```
 
 This should make it possible to run the cosmosis pipeline to calculate a likelihood. Cosmosis comes with samplers like polychord that should work now. In the paper we use an optimized sampling approach to reduce computation time. To make this work you need to install bayesfast ( https://github.com/HerculesJack/bayesfast ) on your system and adapt the fisher and importance samplers. 
@@ -90,12 +87,32 @@ For the latter replace the files in cosmosis/samplers/fisher and cosmosis/sample
 
 ## Example files
 
-covariance matrix and other large files are not included in the repo.
-Output files and other large files are not included in the github repo. Examples can be downloaded from TODO
+Non-gaussian covariance matrix and other large files are not included in the repo.
+We provide a shared folder with the non-gaussian contributions to the covariance matrix to be able to run the code to build the full datavector. We also provide example datavectors to run the likelihood pipeline.
+The folder can be found under https://drive.google.com/drive/folders/102bFeT5nDoF8aKmel2shVDkLQH5l53af?usp=sharing (created in 2022, should be functional for at least a few years.) 
+
 
 ## Run single sample
 
-Ini files specify the full pipeline to calculate the observables based on a set of input parameters. Making use of a pre-calculated data vector and covariance the cosmosis also calculates the likelihood. For our forecast the fiducial data vector and the estimated covariance matrix are used.
+Ini files specify the full pipeline to calculate the observables based on a set of input parameters. Making use of a pre-calculated data vector and covariance matrix cosmosis also calculates the likelihood. For a forecast the fiducial data vector and the estimated covariance matrix are used.
+
+To create the datavector for a <scenario> run the corresponding create_datavetor_<scenario>.ini file. Then, run the pipeline with the corresponding params_<scenario>.ini file.
+
+In the paper we consider 3 survey scenarios: HLS optimistic corresponds to no extension; HLS conservative corresponds to the _pessim extension; Wide scenario corresponds to the _wide extension.
+
+To make the code run without downloading the large files reference above the example below only calculate the gaussian covariance matrix.
+
+First create a datavector.
+
+```
+cosmosis modules/RomanxCMB/create_datavector_gaussian_covariance.ini
+```
+
+Run the test sampler which calculates one likelihood and outputs all observables into a folder named 6x2pt_Roman_SO_gaussian
+
+```
+cosmosis modules/RomanxCMB/params.ini
+```
 
 
 
