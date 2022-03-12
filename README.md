@@ -14,8 +14,6 @@ This code contains the main components to forecast parameter constraints on a 6x
 
 * CosmoSIS https://bitbucket.org/joezuntz/cosmosis/
 * cosmosis-standard-library https://bitbucket.org/joezuntz/cosmosis-standard-library/
-recommended installation for both: use the provided Docker installation, see https://cosmosis.readthedocs.io/en/latest/installation/docker.html
-
 * Bayesfast https://github.com/HerculesJack/bayesfast
 * cosmolike (Non public code needed to calculate non-gaussian corrections to covariance matrix for new survey scenarios. Not included in this repo.)
 
@@ -33,9 +31,9 @@ additional details can be found in the module.yaml file in each module!
 
 * Calculate observables of a 6x2pt analysis for a set of cosmological and nuisance parameters
 
-* Create a fiducial datavector with an estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
+* Create a fiducial datavector and estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
 
-* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script)
+* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script TODO)
 
 This repo contains a range of modules that could be useful for other applications:
 
@@ -50,8 +48,9 @@ This repo contains a range of modules that could be useful for other application
 
 ## Installation
 
-This code is written as a module for CosmoSIS. 
-To install it, navigate to your cosmosis folder, then clone this repo into the modules folder:
+This code is written as a module for CosmoSIS. CosmoSIS can be installed in a variety of ways, a convenient option is the provided Docker installation, see https://cosmosis.readthedocs.io/en/latest/installation/docker.html
+
+To install this code, navigate to your cosmosis folder, then clone this repo into the modules folder:
 
 ```bash
 cd modules
@@ -87,7 +86,6 @@ For the latter replace the files in cosmosis/samplers/fisher and cosmosis/sample
 
 ## Example files
 
-Non-gaussian covariance matrix and other large files are not included in the repo.
 We provide a shared folder with the non-gaussian contributions to the covariance matrix to be able to run the code to build the full datavector. We also provide example datavectors to run the likelihood pipeline.
 The folder can be found under https://drive.google.com/drive/folders/102bFeT5nDoF8aKmel2shVDkLQH5l53af?usp=sharing (created in 2022, should be functional for at least a few years.) 
 
