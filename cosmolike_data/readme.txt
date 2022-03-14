@@ -1,11 +1,12 @@
-covariances_WFIRST_SO_gold: original test from Cyrille, not positive definite
-covariances_WFIRST_SO_gold_prec_nearest: next preliminary test from Cyrille, some bugs fixed but still only forced to be positve definite
+Note: the cosmolike data is not included in the git repo. Download it from the provided drive link and add it to this folder. Only the non-gaussian contributions are provided for download.
 
-covariances_WFIRST_SO_gold_ng_zgauss_v2 non gaussian, positive definite, optimistic case, cov from Cyrille
+File name conventions as follows:
+
+covariances_WFIRST_SO_gold_ng_zgauss_v2 full covariance for optimistic case, cov from Cyrille
 _ng is only the non gaussian part
 _g is only the gaussian part
 
-covariances_WFIRST_SO_gold_ng_zgauss_pessim full covariance for pessimistic case, cov from Cyrille
+covariances_WFIRST_SO_gold_ng_zgauss_pessim full covariance for conservative case, cov from Cyrille
 _ng is only the non gaussian part
 _g is only the gaussian part
 
