@@ -9,6 +9,23 @@ For additional assistance feel free to contact the corresponding author.
 
 This code contains the main components to forecast parameter constraints on a 6x2pt analysis of Roman weak lensing and clustering data as well as CMB lensing data from Simons Observatory. The code is written as a range of modules.
 
+**Capabilities**
+
+* Calculate observables of a 6x2pt analysis for a set of cosmological and nuisance parameters
+
+* Create a fiducial datavector and estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
+
+* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script TODO)
+
+This repo contains a range of modules that could be useful for other applications:
+
+* Cosmosis wrapper for HMcode2020 (mead folder)
+* Cosmosis wrapper for Eisenstein & Hu (1998, astro-ph/9710252) (eisenstein_hu_cdm folder)
+* Modules to calculate the effects of a range of modified gravity models on the growth and CMB lensing kernel
+* Modules to sample over sigma8 and sigma8_of_z  (sample_sigma8 and sample_sigma8_of_z folders)
+* An implementation of the Intrinsic Alignment model in Krause, Eifler & Blazek 2016 
+* various small helpful scrips in miscellaneous folder 
+
 
 ## Requirements
 
@@ -26,23 +43,6 @@ External codes included in this repo due to required adaptations. Please make su
 additional details can be found in the module.yaml file in each module!
 
 
-
-## Capabilities
-
-* Calculate observables of a 6x2pt analysis for a set of cosmological and nuisance parameters
-
-* Create a fiducial datavector and estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
-
-* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script TODO)
-
-This repo contains a range of modules that could be useful for other applications:
-
-* Cosmosis wrapper for HMcode2020 (mead folder)
-* Cosmosis wrapper for Eisenstein & Hu (1998, astro-ph/9710252) (eisenstein_hu_cdm folder)
-* Modules to calculate the effects of a range of modified gravity models on the growth and CMB lensing kernel
-* Modules to sample over sigma8 and sigma8_of_z  (sample_sigma8 and sample_sigma8_of_z folders)
-* An implementation of the Intrinsic Alignment model in Krause, Eifler & Blazek 2016 
-* various small helpful scrips in miscellaneous folder 
 
 # How to use
 
