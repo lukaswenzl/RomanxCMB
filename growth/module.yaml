@@ -14,7 +14,7 @@ explanation: |
     Gives back the growth function based on a fitting function. 
     You will need to calculate the scale dependent neutrino effect separately.
     Can handle both w0wa or alternatively independent gamma0/gammaa parametrization of deviation from LambdaCDM
-    todo discuss normalization
+    
 
 
 

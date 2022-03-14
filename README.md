@@ -15,7 +15,7 @@ This code contains the main components to forecast parameter constraints on a 6x
 
 * Create a fiducial datavector and estimate covariance matrix (gaussian contributions calculated with cosmosis. For the smaller non-gaussian contributions cosmolike is needed)
 
-* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script TODO)
+* Create forecast for parameter constraints of the analysis. Can use fisher, emcee, polychord, etc. included in cosmosis or use our optimized approach based on bayesfast (included script)
 
 This repo contains a range of modules that could be useful for other applications:
 

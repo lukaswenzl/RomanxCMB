@@ -181,7 +181,7 @@
            !Pk(i) = 2.D0*PI*PI*hn*Anorm*Tcbnu(i)*Tcbnu(i)*K(i)**N_s
            k_ov_h = K(i)
            !A_s = 2.1e-9
-           !om0 = 0.3156  !unclear!! todo
+           !om0 = 0.3156  
            Pk(i) =A_s*(2d0*k_ov_h**2d0*2998d0**2d0/5d0/om0)**2d0 &
              *Tcbnu(i)**2d0*(k_ov_h*H/0.05d0)**(N_s-1d0) &
              *2d0*PI**2d0/k_ov_h**3d0
