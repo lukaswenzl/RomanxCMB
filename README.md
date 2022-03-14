@@ -1,7 +1,7 @@
 # RomanxCMB
 Nancy Grace Roman Space Telescope x CMB lensing Forecast
 
-This repository contains the main components of the code used in Wenzl et al. 2021 https://arxiv.org/abs/2112.07681
+This repository contains the main components of the code used in Wenzl et al. 2021 https://arxiv.org/abs/2112.07681 . 
 Feel free to make use of this code under the condition of citing this paper in any resulting publications. If you make use of modules that are based on external codes please also acknowledge them.
 For additional assistance feel free to contact the corresponding author.
 
@@ -112,7 +112,15 @@ Run the test sampler which calculates one likelihood and outputs all observables
 cosmosis modules/RomanxCMB/params.ini
 ```
 
+It is in principle simple to then run parameter inference using various samplers. One example is provided using polychord. However, doing so requires significant computational resources. To test this one can change the values and prior files to only vary a small number of parameters to test it on a laptop.
 
+
+```
+cosmosis modules/RomanxCMB/polychord_example.ini
+```
+
+In the paper we use an optimized sampling strategy combining a fisher forecast, bayesfast and importance sampling. To use this additional installations are necessary (see above). We refer to the paper for details on the approach and provide an example in the parameter_inference folder that can serve as a guide to implement it on other supercomputers.
+In the example files we provide the output chains of our baseline 6x2pt forecast in the optimistic HLS scenario as an example. 
 
 
 
