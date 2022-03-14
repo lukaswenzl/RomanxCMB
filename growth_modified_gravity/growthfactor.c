@@ -1,6 +1,6 @@
 //Adapted from existing code in CosmoSIS by Agnes Ferte to include mu
 //Further adapted (and optimized) by Chen Heinrich (2021)
-//TODO need to check if this works for varying w(a)
+//
 
 #include <math.h>
 #include <stdlib.h>

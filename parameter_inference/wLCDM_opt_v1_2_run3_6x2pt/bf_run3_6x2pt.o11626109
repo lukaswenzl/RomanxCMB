@@ -1,0 +1,3033 @@
+Job 11626109.pbspl1.nas.nasa.gov started on Wed Aug 25 08:28:33 PDT 2021
+The job requested the following resources:
+    ncpus=28
+    place=scatter:excl
+    walltime=08:00:00
+
+PBS set the following environment variables:
+        FORT_BUFFERED = 1
+                   TZ = PST8PDT
+
+On r617i1n16:
+Current directory is XXXX/RomanxCMB_scripts/wLCDM_opt_v1_2_run3_6x2pt
+Current directory is XXXX/RomanxCMB_scripts/wLCDM_opt_v1_2_run3_6x2pt
+------------------------------------------------------
+PBS: job identifier is XXXX.pbspl1.nas.nasa.gov
+PBS: job name is bf_run3_6x2pt
+PBS: current home directory is /home5/lwenzl
+PBS: using 14 cores
+PBS_NODEFILE is XXXX
+------------------------------------------------------
+Using python in /home5/lwenzl/.conda/envs/cosmosis/bin/python
+Using mpiexec in /home5/lwenzl/.conda/envs/cosmosis/bin/mpiexec
+PATH = /home5/lwenzl/cosmosis/bin:/home5/lwenzl/.conda/envs/cosmosis/bin:/nasa/jupyter/4.4/miniconda/condabin:/nasa/pkgsrc/sles12/2018Q3/views/python/3.7.0/bin:/nasa/intel/Compiler/2018.3.222/compilers_and_libraries_2018.3.222/linux/bin/intel64:/nasa/hpe/mpt/2.21/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/PBS/bin:/usr/sbin:/opt/c3/bin:/opt/sgi/sbin:/opt/sgi/bin:/home5/lwenzl/bin
+------------------------------------------------------
+Version control:      target version    actually used
+cosmosis                  22a90585       22a90585
+cosmosis-standard-library bd8bb6a       697e14f
+RomanxCMB                 e79a65b       f0fc7b4
+RomanxCMB_scripts used version: 599b1fd
+------------------------------------------------------
+/home5/lwenzl/bayesfast/bayesfast/__init__.py
+##BF starting main
+Reading included ini file: `params.ini'
+Reading included ini file: `values.ini'
+Reading included ini file: `priors.ini'
+KeysView(<cosmosis.runtime.config.Inifile object at 0x2aaac76116a0>)
+init_mu is  [ 3.15600e-01  6.72700e-01  4.91685e-02  9.64500e-01  8.31000e-01
+  6.15500e-04 -1.00000e+00  0.00000e+00  7.80000e+00  1.30000e+00
+  1.40000e+00  1.50000e+00  1.60000e+00  1.70000e+00  1.80000e+00
+  1.90000e+00  2.00000e+00  2.10000e+00  2.20000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  5.95000e+00
+  4.90000e-01  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  1.00000e-02  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  1.00000e-02]
+parameters are ['cosmological_parameters--omega_m' 'cosmological_parameters--h0'
+ 'cosmological_parameters--omega_b' 'cosmological_parameters--n_s'
+ 'cosmological_parameters--sigma8_input' 'cosmological_parameters--omnuh2'
+ 'cosmological_parameters--w' 'cosmological_parameters--wa'
+ 'cosmological_parameters--log10t_agn' 'bin_bias--b1' 'bin_bias--b2'
+ 'bin_bias--b3' 'bin_bias--b4' 'bin_bias--b5' 'bin_bias--b6'
+ 'bin_bias--b7' 'bin_bias--b8' 'bin_bias--b9' 'bin_bias--b10'
+ 'shear_calibration_parameters--m1' 'shear_calibration_parameters--m2'
+ 'shear_calibration_parameters--m3' 'shear_calibration_parameters--m4'
+ 'shear_calibration_parameters--m5' 'shear_calibration_parameters--m6'
+ 'shear_calibration_parameters--m7' 'shear_calibration_parameters--m8'
+ 'shear_calibration_parameters--m9' 'shear_calibration_parameters--m10'
+ 'intrinsic_alignment_parameters--a' 'intrinsic_alignment_parameters--eta'
+ 'intrinsic_alignment_parameters--eta_highz' 'wl_photoz_errors--bias_1'
+ 'wl_photoz_errors--bias_2' 'wl_photoz_errors--bias_3'
+ 'wl_photoz_errors--bias_4' 'wl_photoz_errors--bias_5'
+ 'wl_photoz_errors--bias_6' 'wl_photoz_errors--bias_7'
+ 'wl_photoz_errors--bias_8' 'wl_photoz_errors--bias_9'
+ 'wl_photoz_errors--bias_10' 'wl_photoz_errors--sigma'
+ 'lens_photoz_errors--bias_1' 'lens_photoz_errors--bias_2'
+ 'lens_photoz_errors--bias_3' 'lens_photoz_errors--bias_4'
+ 'lens_photoz_errors--bias_5' 'lens_photoz_errors--bias_6'
+ 'lens_photoz_errors--bias_7' 'lens_photoz_errors--bias_8'
+ 'lens_photoz_errors--bias_9' 'lens_photoz_errors--bias_10'
+ 'lens_photoz_errors--sigma']
+quadratic parameters are ['cosmological_parameters--omega_m', 'cosmological_parameters--h0', 'cosmological_parameters--omega_b', 'cosmological_parameters--n_s', 'cosmological_parameters--sigma8_input', 'cosmological_parameters--omnuh2', 'cosmological_parameters--w', 'cosmological_parameters--wa', 'intrinsic_alignment_parameters--a', 'intrinsic_alignment_parameters--eta', 'intrinsic_alignment_parameters--eta_highz', 'cosmological_parameters--log10t_agn', 'bin_bias--b1', 'bin_bias--b2', 'bin_bias--b3', 'bin_bias--b4', 'bin_bias--b5', 'bin_bias--b6', 'bin_bias--b7', 'bin_bias--b8', 'bin_bias--b9', 'bin_bias--b10']
+cubic parameters are []
+NL params
+Reading included ini file: `values.ini'
+Reading included ini file: `priors.ini'
+
+Parameter Priors
+----------------
+cosmological_parameters--omega_m                 ~ U(0.1, 0.6)
+cosmological_parameters--h0                      ~ U(0.55, 0.9)
+cosmological_parameters--omega_b                 ~ U(0.01, 0.12)
+cosmological_parameters--n_s                     ~ U(0.87, 1.07)
+cosmological_parameters--a_s                     ~ delta(2.1e-09)
+cosmological_parameters--sigma8_input            ~ U(0.6, 1.1)
+cosmological_parameters--omnuh2                  ~ U(6e-05, 0.01)
+cosmological_parameters--w                       ~ U(-2.5, 0.5)
+cosmological_parameters--massive_nu              ~ delta(1)
+cosmological_parameters--massless_nu             ~ delta(2.046)
+cosmological_parameters--omega_k                 ~ delta(0.0)
+cosmological_parameters--tau                     ~ delta(0.08)
+cosmological_parameters--wa                      ~ U(-2.5, 2.5)
+cosmological_parameters--k_s                     ~ delta(0.05)
+cosmological_parameters--yhe                     ~ delta(0.245341)
+cosmological_parameters--gamma0                  ~ delta(0.545)
+cosmological_parameters--gammaa                  ~ delta(0)
+cosmological_parameters--log10t_agn              ~ U(7.6, 8.3)
+bin_bias--b1                                     ~ U(0.8, 3.0)
+bin_bias--b2                                     ~ U(0.8, 3.0)
+bin_bias--b3                                     ~ U(0.8, 3.0)
+bin_bias--b4                                     ~ U(0.8, 3.0)
+bin_bias--b5                                     ~ U(0.8, 3.0)
+bin_bias--b6                                     ~ U(0.8, 3.0)
+bin_bias--b7                                     ~ U(0.8, 3.0)
+bin_bias--b8                                     ~ U(0.8, 3.0)
+bin_bias--b9                                     ~ U(0.8, 3.0)
+bin_bias--b10                                    ~ U(0.8, 3.0)
+shear_calibration_parameters--m1                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m2                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m3                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m4                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m5                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m6                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m7                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m8                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m9                 ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+shear_calibration_parameters--m10                ~ N(0.0, 0.002 ** 2)   [-0.01 < x < 0.01]
+intrinsic_alignment_parameters--mlim             ~ delta(25.3)
+intrinsic_alignment_parameters--z0               ~ delta(0.3)
+intrinsic_alignment_parameters--z1               ~ delta(0.7)
+intrinsic_alignment_parameters--m0               ~ delta(-22.0)
+intrinsic_alignment_parameters--cutoff_redshift  ~ delta(10.0)
+intrinsic_alignment_parameters--a                ~ U(0.0, 10.0)
+intrinsic_alignment_parameters--beta             ~ delta(1.1)
+intrinsic_alignment_parameters--eta              ~ U(-10.0, 10.0)
+intrinsic_alignment_parameters--eta_highz        ~ U(-1.0, 1.0)
+wl_photoz_errors--bias_1                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_2                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_3                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_4                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_5                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_6                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_7                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_8                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_9                         ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--bias_10                        ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+wl_photoz_errors--sigma                          ~ N(0.01, 0.002 ** 2)   [0.0 < x < 0.02]
+lens_photoz_errors--bias_1                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_2                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_3                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_4                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_5                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_6                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_7                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_8                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_9                       ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--bias_10                      ~ N(0.0, 0.001 ** 2)   [-0.005 < x < 0.005]
+lens_photoz_errors--sigma                        ~ N(0.01, 0.002 ** 2)   [0.0 < x < 0.02]
+
+
+
+
+
+
+
+
+
+
+Loaded file /home5/lwenzl/cosmosis/modules/RomanxCMB/calculate_nz/zdistri_WFIRST_clustering_fine_bin.txt
+
+Loaded file /home5/lwenzl/cosmosis/modules/RomanxCMB/calculate_nz/zdistri_WFIRST_lensing_fine_bin.txt
+
+
+
+Calculating Limber: Kernel 1 = source, Kernel 2 = source, P_3D = matter_power_nl --> Output: 
+Calculating Limber: Kernel 1 = source, Kernel 2 = source, P_3D = matter_intrinsic_power --> Output: 
+Calculating Limber: Kernel 1 = source, Kernel 2 = source, P_3D = intrinsic_power --> Output: 
+Calculating Limber: Kernel 1 = lens, Kernel 2 = lens, P_3D = galaxy_power --> Output: 
+Calculating Limber: Kernel 1 = lens, Kernel 2 = source, P_3D = matter_galaxy_power --> Output: 
+Calculating Limber: Kernel 1 = lens, Kernel 2 = source, P_3D = galaxy_intrinsic_power --> Output: 
+Calculating Limber: Kernel 1 = source, Kernel 2 = cmb, P_3D = matter_power_nl --> Output: 
+Calculating Limber: Kernel 1 = cmb, Kernel 2 = cmb, P_3D = matter_power_nl --> Output: 
+Calculating Limber: Kernel 1 = source, Kernel 2 = cmb, P_3D = matter_intrinsic_power --> Output: 
+Calculating Limber: Kernel 1 = lens, Kernel 2 = cmb, P_3D = matter_galaxy_power --> Output: 
+Will project these spectra into 2D:
+    -  shear_cl
+    -  shear_cl_gi
+    -  shear_cl_ii
+    -  galaxy_cl
+    -  galaxy_shear_cl
+    -  galaxy_intrinsic_cl
+    -  shear_cmbkappa_cl
+    -  cmbkappa_cl
+    -  intrinsic_cmbkappa_cl
+    -  galaxy_cmbkappa_cl
+
+Applying bin biases to C_ell values
+
+
+The add_intrinsic module will try to combine IA terms into these spectra:
+ - shear-shear.
+ - position-shear.
+ - shear-CMB kappa 
+
+
+
+The shear_m_bias module will use calibration values from shear_calibration_parameters and look for 
+shear-shear spectra in shear_cl and position-shear in galaxy_shear_cl
+
+No cut specified for shear_cl bin (1,1)
+No cut specified for shear_cl bin (1,2)
+No cut specified for shear_cl bin (1,3)
+No cut specified for shear_cl bin (1,4)
+No cut specified for shear_cl bin (1,5)
+No cut specified for shear_cl bin (1,6)
+No cut specified for shear_cl bin (1,7)
+No cut specified for shear_cl bin (1,8)
+No cut specified for shear_cl bin (1,9)
+No cut specified for shear_cl bin (1,10)
+No cut specified for shear_cl bin (2,2)
+No cut specified for shear_cl bin (2,3)
+No cut specified for shear_cl bin (2,4)
+No cut specified for shear_cl bin (2,5)
+No cut specified for shear_cl bin (2,6)
+No cut specified for shear_cl bin (2,7)
+No cut specified for shear_cl bin (2,8)
+No cut specified for shear_cl bin (2,9)
+No cut specified for shear_cl bin (2,10)
+No cut specified for shear_cl bin (3,3)
+No cut specified for shear_cl bin (3,4)
+No cut specified for shear_cl bin (3,5)
+No cut specified for shear_cl bin (3,6)
+No cut specified for shear_cl bin (3,7)
+No cut specified for shear_cl bin (3,8)
+No cut specified for shear_cl bin (3,9)
+No cut specified for shear_cl bin (3,10)
+No cut specified for shear_cl bin (4,4)
+No cut specified for shear_cl bin (4,5)
+No cut specified for shear_cl bin (4,6)
+No cut specified for shear_cl bin (4,7)
+No cut specified for shear_cl bin (4,8)
+No cut specified for shear_cl bin (4,9)
+No cut specified for shear_cl bin (4,10)
+No cut specified for shear_cl bin (5,5)
+No cut specified for shear_cl bin (5,6)
+No cut specified for shear_cl bin (5,7)
+No cut specified for shear_cl bin (5,8)
+No cut specified for shear_cl bin (5,9)
+No cut specified for shear_cl bin (5,10)
+No cut specified for shear_cl bin (6,6)
+No cut specified for shear_cl bin (6,7)
+No cut specified for shear_cl bin (6,8)
+No cut specified for shear_cl bin (6,9)
+No cut specified for shear_cl bin (6,10)
+No cut specified for shear_cl bin (7,7)
+No cut specified for shear_cl bin (7,8)
+No cut specified for shear_cl bin (7,9)
+No cut specified for shear_cl bin (7,10)
+No cut specified for shear_cl bin (8,8)
+No cut specified for shear_cl bin (8,9)
+No cut specified for shear_cl bin (8,10)
+No cut specified for shear_cl bin (9,9)
+No cut specified for shear_cl bin (9,10)
+No cut specified for shear_cl bin (10,10)
+
+Cutting galaxy_shear_cl bin pair (1,3) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,4) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,5) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,6) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,7) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,8) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,9) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (1,10) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_shear_cl bin pair (2,4) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,5) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,6) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,7) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,8) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,9) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (2,10) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_shear_cl bin pair (3,5) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (3,6) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (3,7) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (3,8) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (3,9) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (3,10) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_shear_cl bin pair (4,7) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_shear_cl bin pair (4,8) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_shear_cl bin pair (4,9) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_shear_cl bin pair (4,10) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_shear_cl bin pair (5,8) to angle range (30.0 - 1702.1): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (5,9) to angle range (30.0 - 1702.1): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (5,10) to angle range (30.0 - 1702.1): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (6,9) to angle range (30.0 - 1910.8): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (6,10) to angle range (30.0 - 1910.8): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (7,10) to angle range (30.0 - 2112.0): this removes 2 values out of 20
+Cutting galaxy_shear_cl bin pair (8,10) to angle range (30.0 - 2316.0): this removes 1 values out of 20
+
+No cut specified for shear_cmbkappa_cl bin (1,1)
+No cut specified for shear_cmbkappa_cl bin (2,1)
+No cut specified for shear_cmbkappa_cl bin (3,1)
+No cut specified for shear_cmbkappa_cl bin (4,1)
+No cut specified for shear_cmbkappa_cl bin (5,1)
+No cut specified for shear_cmbkappa_cl bin (6,1)
+No cut specified for shear_cmbkappa_cl bin (7,1)
+No cut specified for shear_cmbkappa_cl bin (8,1)
+No cut specified for shear_cmbkappa_cl bin (9,1)
+No cut specified for shear_cmbkappa_cl bin (10,1)
+
+Cutting galaxy_cl bin pair (1,1) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_cl bin pair (2,2) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_cl bin pair (3,3) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_cl bin pair (4,4) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_cl bin pair (5,5) to angle range (30.0 - 1702.1): this removes 2 values out of 20
+Cutting galaxy_cl bin pair (6,6) to angle range (30.0 - 1910.8): this removes 2 values out of 20
+Cutting galaxy_cl bin pair (7,7) to angle range (30.0 - 2112.0): this removes 2 values out of 20
+Cutting galaxy_cl bin pair (8,8) to angle range (30.0 - 2316.0): this removes 1 values out of 20
+Cutting galaxy_cl bin pair (9,9) to angle range (30.0 - 2557.8): this removes 1 values out of 20
+Cutting galaxy_cl bin pair (10,10) to angle range (30.0 - 2880.4): this removes 0 values out of 20
+
+Cutting galaxy_cmbkappa_cl bin pair (1,1) to angle range (30.0 - 689.8): this removes 6 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (2,1) to angle range (30.0 - 997.9): this removes 5 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (3,1) to angle range (30.0 - 1252.5): this removes 4 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (4,1) to angle range (30.0 - 1483.8): this removes 3 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (5,1) to angle range (30.0 - 1702.1): this removes 2 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (6,1) to angle range (30.0 - 1910.8): this removes 2 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (7,1) to angle range (30.0 - 2112.0): this removes 2 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (8,1) to angle range (30.0 - 2316.0): this removes 1 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (9,1) to angle range (30.0 - 2557.8): this removes 1 values out of 20
+Cutting galaxy_cmbkappa_cl bin pair (10,1) to angle range (30.0 - 2880.4): this removes 0 values out of 20
+
+No cut specified for cmbkappa_cl bin (1,1)
+
+Found these data sets in the file:
+    - shear_cl  1100 data points after cuts   [using in likelihood]
+    - galaxy_shear_cl  508 data points after cuts   [using in likelihood]
+    - shear_cmbkappa_cl  200 data points after cuts   [using in likelihood]
+    - galaxy_cl  174 data points after cuts   [using in likelihood]
+    - galaxy_cmbkappa_cl  174 data points after cuts   [using in likelihood]
+    - cmbkappa_cl  20 data points after cuts   [using in likelihood]
+Total data points used = 2176
+Including -0.5*|C| normalization in 2pt likelihood where |C| = -0.0
+Using compressed data from MOPED algorithm: 54 data points
+
+##BF run cosmosis pipeline on start vector
+{'cosmological_parameters--omega_m': 0.3156, 'cosmological_parameters--h0': 0.6727, 'cosmological_parameters--omega_b': 0.0491685, 'cosmological_parameters--n_s': 0.9645, 'cosmological_parameters--sigma8_input': 0.831, 'cosmological_parameters--omnuh2': 0.0006155, 'cosmological_parameters--w': -1.0, 'cosmological_parameters--wa': 0.0, 'cosmological_parameters--log10t_agn': 7.8, 'bin_bias--b1': 1.3, 'bin_bias--b2': 1.4, 'bin_bias--b3': 1.5, 'bin_bias--b4': 1.6, 'bin_bias--b5': 1.7, 'bin_bias--b6': 1.8, 'bin_bias--b7': 1.9, 'bin_bias--b8': 2.0, 'bin_bias--b9': 2.1, 'bin_bias--b10': 2.2, 'shear_calibration_parameters--m1': 0.0, 'shear_calibration_parameters--m2': 0.0, 'shear_calibration_parameters--m3': 0.0, 'shear_calibration_parameters--m4': 0.0, 'shear_calibration_parameters--m5': 0.0, 'shear_calibration_parameters--m6': 0.0, 'shear_calibration_parameters--m7': 0.0, 'shear_calibration_parameters--m8': 0.0, 'shear_calibration_parameters--m9': 0.0, 'shear_calibration_parameters--m10': 0.0, 'intrinsic_alignment_parameters--a': 5.95, 'intrinsic_alignment_parameters--eta': 0.49, 'intrinsic_alignment_parameters--eta_highz': 0.0, 'wl_photoz_errors--bias_1': 0.0, 'wl_photoz_errors--bias_2': 0.0, 'wl_photoz_errors--bias_3': 0.0, 'wl_photoz_errors--bias_4': 0.0, 'wl_photoz_errors--bias_5': 0.0, 'wl_photoz_errors--bias_6': 0.0, 'wl_photoz_errors--bias_7': 0.0, 'wl_photoz_errors--bias_8': 0.0, 'wl_photoz_errors--bias_9': 0.0, 'wl_photoz_errors--bias_10': 0.0, 'wl_photoz_errors--sigma': 0.01, 'lens_photoz_errors--bias_1': 0.0, 'lens_photoz_errors--bias_2': 0.0, 'lens_photoz_errors--bias_3': 0.0, 'lens_photoz_errors--bias_4': 0.0, 'lens_photoz_errors--bias_5': 0.0, 'lens_photoz_errors--bias_6': 0.0, 'lens_photoz_errors--bias_7': 0.0, 'lens_photoz_errors--bias_8': 0.0, 'lens_photoz_errors--bias_9': 0.0, 'lens_photoz_errors--bias_10': 0.0, 'lens_photoz_errors--sigma': 0.01}
+Also building surrogate for extra parameters: [['cosmological_parameters', 'a_s']]
+##BF model definitions
+# Cosmosis pipeline took (seconds) :  23.361395
+BF posterior density, cosmosis posterior: 177.95516922624907, 177.95516922624898
+These should match closely!!
+Checking size of polynomial inputs. There are 54 model paramters and 55 data points
+##BF surrogate model definitions
+##BF surrogate model training points
+extending the sigma for neutrinos by factor 3.0
+Using fisher file to sample surrogate training points [[ 1.69838385e+06  4.67276805e+05 -2.41216944e+06 ...  3.71618475e+04
+   1.39759700e+04 -6.44367305e+06]
+ [ 4.67276805e+05  1.88828370e+05 -9.02197719e+05 ...  1.22747143e+04
+   4.88879217e+03 -2.12177909e+06]
+ [-2.41216944e+06 -9.02197719e+05  4.51626142e+06 ... -5.34818144e+04
+  -2.03860490e+04  1.09185688e+07]
+ ...
+ [ 3.71618475e+04  1.22747143e+04 -5.34818144e+04 ...  1.00761924e+06
+  -7.60131578e-01 -2.20974024e+05]
+ [ 1.39759700e+04  4.88879217e+03 -2.03860490e+04 ... -7.60131578e-01
+   1.00116523e+06 -5.30929406e+04]
+ [-6.44367305e+06 -2.12177909e+06  1.09185688e+07 ... -2.20974024e+05
+  -5.30929406e+04  6.40389388e+07]]
+[ 3.15600e-01  6.72700e-01  4.91685e-02  9.64500e-01  8.31000e-01
+  6.15500e-04 -1.00000e+00  0.00000e+00  7.80000e+00  1.30000e+00
+  1.40000e+00  1.50000e+00  1.60000e+00  1.70000e+00  1.80000e+00
+  1.90000e+00  2.00000e+00  2.10000e+00  2.20000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  5.95000e+00
+  4.90000e-01  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  1.00000e-02  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+  0.00000e+00  0.00000e+00  0.00000e+00  1.00000e-02]
+##BF checking that points are inside bounds
+(5000, 54)
+removed any points with w0+wa >= 0. New shape:
+(5000, 54)
+##BF OptimizeStep
+##BF start run
+08:29AM PDT on Aug 25, 2021
+
+ *** StaticSample: returning the #0 SampleStep. *** 
+
+
+ *** SampleStep proceeding: iter #0 finished. *** 
+
+
+ *** StaticSample: returning the #1 SampleStep. *** 
+
+
+ *** SampleStep proceeding: iter #1 finished. *** 
+
+
+ *** StaticSample: iter #2, no more SampleStep. *** 
+
+
+ ***** SampleStep finished. ***** 
+
+
+ ***** PostStep finished. ***** 
+
+##BF finish run
+11:48AM PDT on Aug 25, 2021
+# Cosmosis pipeline took (seconds) :  23.599294
+# Cosmosis pipeline took (seconds) :  23.596533
+# Cosmosis pipeline took (seconds) :  23.543951
+# Cosmosis pipeline took (seconds) :  23.385809
+# Cosmosis pipeline took (seconds) :  23.467762
+# Cosmosis pipeline took (seconds) :  24.08787
+# Cosmosis pipeline took (seconds) :  23.539196
+# Cosmosis pipeline took (seconds) :  23.743619
+# Cosmosis pipeline took (seconds) :  23.540766
+# Cosmosis pipeline took (seconds) :  23.496554
+# Cosmosis pipeline took (seconds) :  23.466441
+# Cosmosis pipeline took (seconds) :  23.525557
+# Cosmosis pipeline took (seconds) :  23.645267
+# Cosmosis pipeline took (seconds) :  23.546083
+# Cosmosis pipeline took (seconds) :  23.447083
+# Cosmosis pipeline took (seconds) :  23.653392
+# Cosmosis pipeline took (seconds) :  23.493296
+# Cosmosis pipeline took (seconds) :  23.359985
+# Cosmosis pipeline took (seconds) :  23.651235
+# Cosmosis pipeline took (seconds) :  23.826266
+# Cosmosis pipeline took (seconds) :  23.449697
+# Cosmosis pipeline took (seconds) :  23.553989
+# Cosmosis pipeline took (seconds) :  23.563887
+# Cosmosis pipeline took (seconds) :  23.61493
+# Cosmosis pipeline took (seconds) :  23.421168
+# Cosmosis pipeline took (seconds) :  23.995664
+# Cosmosis pipeline took (seconds) :  23.27224
+# Cosmosis pipeline took (seconds) :  23.635804
+# Cosmosis pipeline took (seconds) :  24.707843
+# Cosmosis pipeline took (seconds) :  23.41222
+# Cosmosis pipeline took (seconds) :  23.56273
+# Cosmosis pipeline took (seconds) :  23.25713
+# Cosmosis pipeline took (seconds) :  23.924667
+# Cosmosis pipeline took (seconds) :  23.251864
+# Cosmosis pipeline took (seconds) :  24.232232
+# Cosmosis pipeline took (seconds) :  23.387595
+# Cosmosis pipeline took (seconds) :  23.165134
+# Cosmosis pipeline took (seconds) :  23.327984
+# Cosmosis pipeline took (seconds) :  23.381511
+# Cosmosis pipeline took (seconds) :  23.399398
+# Cosmosis pipeline took (seconds) :  23.512326
+# Cosmosis pipeline took (seconds) :  23.511885
+# Cosmosis pipeline took (seconds) :  23.316559
+# Cosmosis pipeline took (seconds) :  23.757139
+# Cosmosis pipeline took (seconds) :  23.636696
+# Cosmosis pipeline took (seconds) :  23.635737
+# Cosmosis pipeline took (seconds) :  23.387696
+# Cosmosis pipeline took (seconds) :  23.665143
+# Cosmosis pipeline took (seconds) :  23.23244
+# Cosmosis pipeline took (seconds) :  23.991877
+# Cosmosis pipeline took (seconds) :  23.686934
+# Cosmosis pipeline took (seconds) :  23.567279
+# Cosmosis pipeline took (seconds) :  24.025612
+# Cosmosis pipeline took (seconds) :  23.215965
+# Cosmosis pipeline took (seconds) :  24.016916
+# Cosmosis pipeline took (seconds) :  23.33983
+# Cosmosis pipeline took (seconds) :  23.287586
+# Cosmosis pipeline took (seconds) :  23.216534
+# Cosmosis pipeline took (seconds) :  23.608182
+# Cosmosis pipeline took (seconds) :  23.502867
+# Cosmosis pipeline took (seconds) :  23.617681
+# Cosmosis pipeline took (seconds) :  23.410828
+# Cosmosis pipeline took (seconds) :  23.613575
+# Cosmosis pipeline took (seconds) :  23.47279
+# Cosmosis pipeline took (seconds) :  23.82645
+# Cosmosis pipeline took (seconds) :  23.593515
+# Cosmosis pipeline took (seconds) :  23.463629
+# Cosmosis pipeline took (seconds) :  23.409918
+# Cosmosis pipeline took (seconds) :  23.573321
+# Cosmosis pipeline took (seconds) :  23.346924
+# Cosmosis pipeline took (seconds) :  23.391091
+# Cosmosis pipeline took (seconds) :  23.942402
+# Cosmosis pipeline took (seconds) :  23.447704
+# Cosmosis pipeline took (seconds) :  23.46666
+# Cosmosis pipeline took (seconds) :  23.716984
+# Cosmosis pipeline took (seconds) :  23.479868
+# Cosmosis pipeline took (seconds) :  23.70125
+# Cosmosis pipeline took (seconds) :  23.451191
+# Cosmosis pipeline took (seconds) :  23.473816
+# Cosmosis pipeline took (seconds) :  23.568756
+# Cosmosis pipeline took (seconds) :  23.201569
+# Cosmosis pipeline took (seconds) :  23.483761
+# Cosmosis pipeline took (seconds) :  23.447312
+# Cosmosis pipeline took (seconds) :  23.595393
+# Cosmosis pipeline took (seconds) :  24.329463
+# Cosmosis pipeline took (seconds) :  24.049864
+# Cosmosis pipeline took (seconds) :  23.384671
+# Cosmosis pipeline took (seconds) :  23.471989
+ CHAIN #10 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 643.60 seconds, while divergence encountered in 229 sample(s).
+ CHAIN #10 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 647.52 seconds.
+ CHAIN #10 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 644.12 seconds.
+ CHAIN #10 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 633.07 seconds.
+ CHAIN #10 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3196.93 seconds.
+# Cosmosis pipeline took (seconds) :  23.657375
+# Cosmosis pipeline took (seconds) :  23.463039
+# Cosmosis pipeline took (seconds) :  23.578798
+# Cosmosis pipeline took (seconds) :  23.619619
+# Cosmosis pipeline took (seconds) :  23.608892
+# Cosmosis pipeline took (seconds) :  23.215897
+# Cosmosis pipeline took (seconds) :  23.454653
+# Cosmosis pipeline took (seconds) :  23.531381
+# Cosmosis pipeline took (seconds) :  24.373451
+# Cosmosis pipeline took (seconds) :  21.355833
+# Cosmosis pipeline took (seconds) :  23.608675
+# Cosmosis pipeline took (seconds) :  23.651998
+# Cosmosis pipeline took (seconds) :  23.565634
+# Cosmosis pipeline took (seconds) :  23.391467
+# Cosmosis pipeline took (seconds) :  23.468715
+# Cosmosis pipeline took (seconds) :  19.197843
+# Cosmosis pipeline took (seconds) :  23.655185
+# Cosmosis pipeline took (seconds) :  23.40842
+# Cosmosis pipeline took (seconds) :  23.429946
+# Cosmosis pipeline took (seconds) :  23.431635
+# Cosmosis pipeline took (seconds) :  24.057318
+# Cosmosis pipeline took (seconds) :  23.521305
+# Cosmosis pipeline took (seconds) :  23.615195
+# Cosmosis pipeline took (seconds) :  23.454916
+# Cosmosis pipeline took (seconds) :  23.52813
+# Cosmosis pipeline took (seconds) :  23.456701
+# Cosmosis pipeline took (seconds) :  23.242761
+# Cosmosis pipeline took (seconds) :  23.353347
+# Cosmosis pipeline took (seconds) :  23.667207
+# Cosmosis pipeline took (seconds) :  23.610743
+# Cosmosis pipeline took (seconds) :  23.591288
+# Cosmosis pipeline took (seconds) :  23.508292
+# Cosmosis pipeline took (seconds) :  23.803528
+# Cosmosis pipeline took (seconds) :  23.924142
+# Cosmosis pipeline took (seconds) :  23.273413
+# Cosmosis pipeline took (seconds) :  23.663558
+# Cosmosis pipeline took (seconds) :  23.450076
+# Cosmosis pipeline took (seconds) :  23.435255
+# Cosmosis pipeline took (seconds) :  23.342339
+# Cosmosis pipeline took (seconds) :  23.193079
+# Cosmosis pipeline took (seconds) :  23.555638
+# Cosmosis pipeline took (seconds) :  23.100488
+# Cosmosis pipeline took (seconds) :  23.544125
+# Cosmosis pipeline took (seconds) :  23.673126
+# Cosmosis pipeline took (seconds) :  23.610014
+# Cosmosis pipeline took (seconds) :  23.263423
+# Cosmosis pipeline took (seconds) :  23.509952
+# Cosmosis pipeline took (seconds) :  23.476114
+# Cosmosis pipeline took (seconds) :  19.215381
+# Cosmosis pipeline took (seconds) :  23.576449
+# Cosmosis pipeline took (seconds) :  23.476748
+# Cosmosis pipeline took (seconds) :  23.388735
+# Cosmosis pipeline took (seconds) :  23.403259
+# Cosmosis pipeline took (seconds) :  23.657226
+# Cosmosis pipeline took (seconds) :  23.536756
+# Cosmosis pipeline took (seconds) :  23.326708
+# Cosmosis pipeline took (seconds) :  23.573356
+# Cosmosis pipeline took (seconds) :  23.58826
+# Cosmosis pipeline took (seconds) :  23.627092
+# Cosmosis pipeline took (seconds) :  23.447326
+# Cosmosis pipeline took (seconds) :  23.196285
+# Cosmosis pipeline took (seconds) :  23.59538
+# Cosmosis pipeline took (seconds) :  23.599462
+# Cosmosis pipeline took (seconds) :  23.608194
+# Cosmosis pipeline took (seconds) :  23.448386
+# Cosmosis pipeline took (seconds) :  23.445671
+# Cosmosis pipeline took (seconds) :  23.630286
+# Cosmosis pipeline took (seconds) :  23.508725
+# Cosmosis pipeline took (seconds) :  23.525513
+# Cosmosis pipeline took (seconds) :  23.485133
+# Cosmosis pipeline took (seconds) :  23.568209
+# Cosmosis pipeline took (seconds) :  23.440328
+# Cosmosis pipeline took (seconds) :  23.310713
+# Cosmosis pipeline took (seconds) :  23.426393
+# Cosmosis pipeline took (seconds) :  23.284391
+# Cosmosis pipeline took (seconds) :  23.385713
+# Cosmosis pipeline took (seconds) :  23.244871
+# Cosmosis pipeline took (seconds) :  23.31327
+# Cosmosis pipeline took (seconds) :  23.564478
+# Cosmosis pipeline took (seconds) :  23.300825
+# Cosmosis pipeline took (seconds) :  23.216863
+# Cosmosis pipeline took (seconds) :  23.488417
+# Cosmosis pipeline took (seconds) :  23.416369
+# Cosmosis pipeline took (seconds) :  23.683722
+# Cosmosis pipeline took (seconds) :  23.578597
+# Cosmosis pipeline took (seconds) :  23.311203
+# Cosmosis pipeline took (seconds) :  23.38576
+# Cosmosis pipeline took (seconds) :  23.435647
+ CHAIN #0 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 494.48 seconds.
+ CHAIN #0 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 438.94 seconds.
+ CHAIN #0 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 433.73 seconds.
+ CHAIN #0 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 440.55 seconds.
+ CHAIN #0 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2260.72 seconds.
+# Cosmosis pipeline took (seconds) :  23.610748
+# Cosmosis pipeline took (seconds) :  23.498203
+# Cosmosis pipeline took (seconds) :  23.72947
+# Cosmosis pipeline took (seconds) :  23.595803
+# Cosmosis pipeline took (seconds) :  23.399062
+# Cosmosis pipeline took (seconds) :  23.710697
+# Cosmosis pipeline took (seconds) :  23.594411
+# Cosmosis pipeline took (seconds) :  23.781482
+# Cosmosis pipeline took (seconds) :  23.620542
+# Cosmosis pipeline took (seconds) :  23.320409
+# Cosmosis pipeline took (seconds) :  23.651826
+# Cosmosis pipeline took (seconds) :  23.666561
+# Cosmosis pipeline took (seconds) :  24.055354
+# Cosmosis pipeline took (seconds) :  23.530338
+# Cosmosis pipeline took (seconds) :  23.433826
+# Cosmosis pipeline took (seconds) :  23.409673
+# Cosmosis pipeline took (seconds) :  23.403598
+# Cosmosis pipeline took (seconds) :  23.496943
+# Cosmosis pipeline took (seconds) :  23.673444
+# Cosmosis pipeline took (seconds) :  23.564898
+# Cosmosis pipeline took (seconds) :  23.628376
+# Cosmosis pipeline took (seconds) :  23.45898
+# Cosmosis pipeline took (seconds) :  23.79345
+# Cosmosis pipeline took (seconds) :  23.457924
+# Cosmosis pipeline took (seconds) :  23.861846
+# Cosmosis pipeline took (seconds) :  23.449851
+# Cosmosis pipeline took (seconds) :  23.506885
+# Cosmosis pipeline took (seconds) :  24.014716
+# Cosmosis pipeline took (seconds) :  23.759932
+# Cosmosis pipeline took (seconds) :  23.617571
+# Cosmosis pipeline took (seconds) :  23.404782
+# Cosmosis pipeline took (seconds) :  23.548814
+# Cosmosis pipeline took (seconds) :  23.828538
+# Cosmosis pipeline took (seconds) :  23.551672
+# Cosmosis pipeline took (seconds) :  23.545906
+# Cosmosis pipeline took (seconds) :  23.493271
+# Cosmosis pipeline took (seconds) :  23.473797
+# Cosmosis pipeline took (seconds) :  23.520943
+# Cosmosis pipeline took (seconds) :  23.769334
+# Cosmosis pipeline took (seconds) :  19.165891
+# Cosmosis pipeline took (seconds) :  23.43063
+# Cosmosis pipeline took (seconds) :  24.008847
+# Cosmosis pipeline took (seconds) :  23.318606
+# Cosmosis pipeline took (seconds) :  23.563647
+# Cosmosis pipeline took (seconds) :  23.780628
+# Cosmosis pipeline took (seconds) :  23.900259
+# Cosmosis pipeline took (seconds) :  23.502195
+# Cosmosis pipeline took (seconds) :  23.874127
+# Cosmosis pipeline took (seconds) :  23.811877
+# Cosmosis pipeline took (seconds) :  23.588458
+# Cosmosis pipeline took (seconds) :  23.46989
+# Cosmosis pipeline took (seconds) :  23.551702
+# Cosmosis pipeline took (seconds) :  23.39671
+# Cosmosis pipeline took (seconds) :  23.521746
+# Cosmosis pipeline took (seconds) :  24.3055
+# Cosmosis pipeline took (seconds) :  23.299764
+# Cosmosis pipeline took (seconds) :  23.607559
+# Cosmosis pipeline took (seconds) :  23.636582
+# Cosmosis pipeline took (seconds) :  23.488447
+# Cosmosis pipeline took (seconds) :  23.271576
+# Cosmosis pipeline took (seconds) :  23.538268
+# Cosmosis pipeline took (seconds) :  23.773212
+# Cosmosis pipeline took (seconds) :  23.587027
+# Cosmosis pipeline took (seconds) :  23.705327
+# Cosmosis pipeline took (seconds) :  23.532202
+# Cosmosis pipeline took (seconds) :  23.390347
+# Cosmosis pipeline took (seconds) :  23.50914
+# Cosmosis pipeline took (seconds) :  23.420055
+# Cosmosis pipeline took (seconds) :  23.699372
+# Cosmosis pipeline took (seconds) :  23.579496
+# Cosmosis pipeline took (seconds) :  23.571984
+# Cosmosis pipeline took (seconds) :  24.043833
+# Cosmosis pipeline took (seconds) :  23.855386
+# Cosmosis pipeline took (seconds) :  23.149409
+# Cosmosis pipeline took (seconds) :  23.341852
+# Cosmosis pipeline took (seconds) :  23.211455
+# Cosmosis pipeline took (seconds) :  23.478815
+# Cosmosis pipeline took (seconds) :  23.494366
+# Cosmosis pipeline took (seconds) :  23.53652
+# Cosmosis pipeline took (seconds) :  23.527488
+# Cosmosis pipeline took (seconds) :  22.345412
+# Cosmosis pipeline took (seconds) :  23.555754
+# Cosmosis pipeline took (seconds) :  23.53095
+# Cosmosis pipeline took (seconds) :  24.015834
+# Cosmosis pipeline took (seconds) :  23.661608
+# Cosmosis pipeline took (seconds) :  23.673902
+# Cosmosis pipeline took (seconds) :  23.66644
+# Cosmosis pipeline took (seconds) :  23.561222
+ CHAIN #8 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 590.72 seconds, while divergence encountered in 169 sample(s).
+ CHAIN #8 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 570.14 seconds.
+ CHAIN #8 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 565.77 seconds.
+ CHAIN #8 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 568.32 seconds.
+ CHAIN #8 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2845.03 seconds.
+# Cosmosis pipeline took (seconds) :  23.798939
+# Cosmosis pipeline took (seconds) :  23.692077
+# Cosmosis pipeline took (seconds) :  23.434355
+# Cosmosis pipeline took (seconds) :  19.130755
+# Cosmosis pipeline took (seconds) :  23.390374
+# Cosmosis pipeline took (seconds) :  23.426061
+# Cosmosis pipeline took (seconds) :  23.759178
+# Cosmosis pipeline took (seconds) :  23.728389
+# Cosmosis pipeline took (seconds) :  23.253865
+# Cosmosis pipeline took (seconds) :  23.419503
+# Cosmosis pipeline took (seconds) :  23.527744
+# Cosmosis pipeline took (seconds) :  23.849964
+# Cosmosis pipeline took (seconds) :  23.557269
+# Cosmosis pipeline took (seconds) :  23.534655
+# Cosmosis pipeline took (seconds) :  23.662427
+# Cosmosis pipeline took (seconds) :  23.501995
+# Cosmosis pipeline took (seconds) :  23.340628
+# Cosmosis pipeline took (seconds) :  23.46354
+# Cosmosis pipeline took (seconds) :  20.936276
+# Cosmosis pipeline took (seconds) :  18.993209
+# Cosmosis pipeline took (seconds) :  23.562139
+# Cosmosis pipeline took (seconds) :  23.885664
+# Cosmosis pipeline took (seconds) :  23.797268
+# Cosmosis pipeline took (seconds) :  23.604181
+# Cosmosis pipeline took (seconds) :  23.625412
+# Cosmosis pipeline took (seconds) :  23.681166
+# Cosmosis pipeline took (seconds) :  23.567552
+# Cosmosis pipeline took (seconds) :  23.369786
+# Cosmosis pipeline took (seconds) :  23.442601
+# Cosmosis pipeline took (seconds) :  24.109596
+# Cosmosis pipeline took (seconds) :  23.333401
+# Cosmosis pipeline took (seconds) :  24.152673
+# Cosmosis pipeline took (seconds) :  23.996734
+# Cosmosis pipeline took (seconds) :  23.327179
+# Cosmosis pipeline took (seconds) :  23.628094
+# Cosmosis pipeline took (seconds) :  22.277085
+# Cosmosis pipeline took (seconds) :  23.611791
+# Cosmosis pipeline took (seconds) :  23.424738
+# Cosmosis pipeline took (seconds) :  23.574711
+# Cosmosis pipeline took (seconds) :  23.730109
+# Cosmosis pipeline took (seconds) :  23.58445
+# Cosmosis pipeline took (seconds) :  23.526988
+# Cosmosis pipeline took (seconds) :  23.458939
+# Cosmosis pipeline took (seconds) :  23.348329
+# Cosmosis pipeline took (seconds) :  23.487801
+# Cosmosis pipeline took (seconds) :  23.36587
+# Cosmosis pipeline took (seconds) :  23.508701
+# Cosmosis pipeline took (seconds) :  24.442928
+# Cosmosis pipeline took (seconds) :  23.689449
+# Cosmosis pipeline took (seconds) :  23.585879
+# Cosmosis pipeline took (seconds) :  23.486399
+# Cosmosis pipeline took (seconds) :  23.302031
+# Cosmosis pipeline took (seconds) :  23.417009
+# Cosmosis pipeline took (seconds) :  23.491433
+# Cosmosis pipeline took (seconds) :  23.638606
+# Cosmosis pipeline took (seconds) :  23.59537
+# Cosmosis pipeline took (seconds) :  23.36827
+# Cosmosis pipeline took (seconds) :  23.613551
+# Cosmosis pipeline took (seconds) :  23.56802
+# Cosmosis pipeline took (seconds) :  23.691085
+# Cosmosis pipeline took (seconds) :  23.902511
+# Cosmosis pipeline took (seconds) :  23.563311
+# Cosmosis pipeline took (seconds) :  23.568093
+# Cosmosis pipeline took (seconds) :  23.677614
+# Cosmosis pipeline took (seconds) :  23.549083
+# Cosmosis pipeline took (seconds) :  23.712583
+# Cosmosis pipeline took (seconds) :  23.284679
+# Cosmosis pipeline took (seconds) :  23.575293
+# Cosmosis pipeline took (seconds) :  23.482729
+# Cosmosis pipeline took (seconds) :  23.655494
+# Cosmosis pipeline took (seconds) :  23.624732
+# Cosmosis pipeline took (seconds) :  23.528594
+# Cosmosis pipeline took (seconds) :  23.457813
+# Cosmosis pipeline took (seconds) :  24.561088
+# Cosmosis pipeline took (seconds) :  23.548006
+# Cosmosis pipeline took (seconds) :  23.327897
+# Cosmosis pipeline took (seconds) :  23.652182
+# Cosmosis pipeline took (seconds) :  23.506459
+# Cosmosis pipeline took (seconds) :  23.472578
+# Cosmosis pipeline took (seconds) :  23.552551
+# Cosmosis pipeline took (seconds) :  23.499169
+# Cosmosis pipeline took (seconds) :  23.651704
+# Cosmosis pipeline took (seconds) :  23.582232
+# Cosmosis pipeline took (seconds) :  23.747838
+# Cosmosis pipeline took (seconds) :  23.492558
+# Cosmosis pipeline took (seconds) :  23.542198
+# Cosmosis pipeline took (seconds) :  23.361509
+# Cosmosis pipeline took (seconds) :  23.446068
+ CHAIN #5 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 532.10 seconds.
+ CHAIN #5 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 478.68 seconds.
+ CHAIN #5 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 469.56 seconds.
+ CHAIN #5 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 480.07 seconds.
+ CHAIN #5 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2429.84 seconds.
+# Cosmosis pipeline took (seconds) :  23.715398
+# Cosmosis pipeline took (seconds) :  23.568601
+# Cosmosis pipeline took (seconds) :  23.688988
+# Cosmosis pipeline took (seconds) :  23.379327
+# Cosmosis pipeline took (seconds) :  23.551521
+# Cosmosis pipeline took (seconds) :  23.399595
+# Cosmosis pipeline took (seconds) :  23.208287
+# Cosmosis pipeline took (seconds) :  23.274393
+# Cosmosis pipeline took (seconds) :  23.353789
+# Cosmosis pipeline took (seconds) :  23.787396
+# Cosmosis pipeline took (seconds) :  23.815798
+# Cosmosis pipeline took (seconds) :  23.593752
+# Cosmosis pipeline took (seconds) :  23.531671
+# Cosmosis pipeline took (seconds) :  23.337318
+# Cosmosis pipeline took (seconds) :  23.643424
+# Cosmosis pipeline took (seconds) :  23.231838
+# Cosmosis pipeline took (seconds) :  23.687528
+# Cosmosis pipeline took (seconds) :  23.255749
+# Cosmosis pipeline took (seconds) :  23.823882
+# Cosmosis pipeline took (seconds) :  23.415434
+# Cosmosis pipeline took (seconds) :  23.717215
+# Cosmosis pipeline took (seconds) :  23.542978
+# Cosmosis pipeline took (seconds) :  23.385856
+# Cosmosis pipeline took (seconds) :  23.509843
+# Cosmosis pipeline took (seconds) :  23.597672
+# Cosmosis pipeline took (seconds) :  23.385989
+# Cosmosis pipeline took (seconds) :  23.616678
+# Cosmosis pipeline took (seconds) :  23.382358
+# Cosmosis pipeline took (seconds) :  23.774496
+# Cosmosis pipeline took (seconds) :  23.415888
+# Cosmosis pipeline took (seconds) :  23.628251
+# Cosmosis pipeline took (seconds) :  23.393182
+# Cosmosis pipeline took (seconds) :  23.400066
+# Cosmosis pipeline took (seconds) :  23.941696
+# Cosmosis pipeline took (seconds) :  23.436127
+# Cosmosis pipeline took (seconds) :  23.890339
+# Cosmosis pipeline took (seconds) :  23.412244
+# Cosmosis pipeline took (seconds) :  23.775341
+# Cosmosis pipeline took (seconds) :  23.329006
+# Cosmosis pipeline took (seconds) :  23.273669
+# Cosmosis pipeline took (seconds) :  23.607194
+# Cosmosis pipeline took (seconds) :  23.464578
+# Cosmosis pipeline took (seconds) :  23.498657
+# Cosmosis pipeline took (seconds) :  23.530767
+# Cosmosis pipeline took (seconds) :  23.502036
+# Cosmosis pipeline took (seconds) :  23.372906
+# Cosmosis pipeline took (seconds) :  23.364303
+# Cosmosis pipeline took (seconds) :  23.308866
+# Cosmosis pipeline took (seconds) :  23.998492
+# Cosmosis pipeline took (seconds) :  23.487779
+# Cosmosis pipeline took (seconds) :  23.580684
+# Cosmosis pipeline took (seconds) :  23.254172
+# Cosmosis pipeline took (seconds) :  23.48182
+# Cosmosis pipeline took (seconds) :  23.434376
+# Cosmosis pipeline took (seconds) :  23.498275
+# Cosmosis pipeline took (seconds) :  23.638141
+# Cosmosis pipeline took (seconds) :  23.274231
+# Cosmosis pipeline took (seconds) :  23.83433
+# Cosmosis pipeline took (seconds) :  23.203775
+# Cosmosis pipeline took (seconds) :  23.760453
+# Cosmosis pipeline took (seconds) :  23.326518
+# Cosmosis pipeline took (seconds) :  23.450076
+# Cosmosis pipeline took (seconds) :  23.67608
+# Cosmosis pipeline took (seconds) :  23.63511
+# Cosmosis pipeline took (seconds) :  23.526182
+# Cosmosis pipeline took (seconds) :  23.598005
+# Cosmosis pipeline took (seconds) :  23.517191
+# Cosmosis pipeline took (seconds) :  23.849791
+# Cosmosis pipeline took (seconds) :  23.33411
+# Cosmosis pipeline took (seconds) :  23.4692
+# Cosmosis pipeline took (seconds) :  23.423454
+# Cosmosis pipeline took (seconds) :  23.403594
+# Cosmosis pipeline took (seconds) :  23.934254
+# Cosmosis pipeline took (seconds) :  23.343793
+# Cosmosis pipeline took (seconds) :  23.833487
+# Cosmosis pipeline took (seconds) :  23.60339
+# Cosmosis pipeline took (seconds) :  23.411862
+# Cosmosis pipeline took (seconds) :  19.347592
+# Cosmosis pipeline took (seconds) :  23.432387
+# Cosmosis pipeline took (seconds) :  23.760864
+# Cosmosis pipeline took (seconds) :  23.936825
+# Cosmosis pipeline took (seconds) :  24.58027
+# Cosmosis pipeline took (seconds) :  23.35774
+# Cosmosis pipeline took (seconds) :  23.357353
+# Cosmosis pipeline took (seconds) :  23.558163
+# Cosmosis pipeline took (seconds) :  23.236964
+# Cosmosis pipeline took (seconds) :  23.309868
+# Cosmosis pipeline took (seconds) :  23.498435
+ CHAIN #2 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 696.43 seconds, while divergence encountered in 205 sample(s).
+ CHAIN #2 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 731.29 seconds.
+ CHAIN #2 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 745.65 seconds.
+ CHAIN #2 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 755.88 seconds.
+ CHAIN #2 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3671.24 seconds.
+# Cosmosis pipeline took (seconds) :  23.404989
+# Cosmosis pipeline took (seconds) :  23.570253
+# Cosmosis pipeline took (seconds) :  23.54796
+# Cosmosis pipeline took (seconds) :  23.877462
+# Cosmosis pipeline took (seconds) :  23.544671
+# Cosmosis pipeline took (seconds) :  23.398573
+# Cosmosis pipeline took (seconds) :  23.44149
+# Cosmosis pipeline took (seconds) :  23.481448
+# Cosmosis pipeline took (seconds) :  23.225661
+# Cosmosis pipeline took (seconds) :  23.657488
+# Cosmosis pipeline took (seconds) :  24.065373
+# Cosmosis pipeline took (seconds) :  23.378987
+# Cosmosis pipeline took (seconds) :  23.398922
+# Cosmosis pipeline took (seconds) :  23.767544
+# Cosmosis pipeline took (seconds) :  23.385406
+# Cosmosis pipeline took (seconds) :  23.567763
+# Cosmosis pipeline took (seconds) :  23.56439
+# Cosmosis pipeline took (seconds) :  23.507688
+# Cosmosis pipeline took (seconds) :  23.53307
+# Cosmosis pipeline took (seconds) :  24.080242
+# Cosmosis pipeline took (seconds) :  23.615531
+# Cosmosis pipeline took (seconds) :  23.638414
+# Cosmosis pipeline took (seconds) :  23.333369
+# Cosmosis pipeline took (seconds) :  23.574821
+# Cosmosis pipeline took (seconds) :  24.063367
+# Cosmosis pipeline took (seconds) :  23.682027
+# Cosmosis pipeline took (seconds) :  23.675288
+# Cosmosis pipeline took (seconds) :  23.230498
+# Cosmosis pipeline took (seconds) :  23.292504
+# Cosmosis pipeline took (seconds) :  23.357835
+# Cosmosis pipeline took (seconds) :  23.508908
+# Cosmosis pipeline took (seconds) :  23.267473
+# Cosmosis pipeline took (seconds) :  23.479049
+# Cosmosis pipeline took (seconds) :  23.324472
+# Cosmosis pipeline took (seconds) :  24.538231
+# Cosmosis pipeline took (seconds) :  23.565945
+# Cosmosis pipeline took (seconds) :  23.56022
+# Cosmosis pipeline took (seconds) :  23.607299
+# Cosmosis pipeline took (seconds) :  23.636459
+# Cosmosis pipeline took (seconds) :  23.644064
+# Cosmosis pipeline took (seconds) :  23.713352
+# Cosmosis pipeline took (seconds) :  23.600655
+# Cosmosis pipeline took (seconds) :  23.768605
+# Cosmosis pipeline took (seconds) :  23.741527
+# Cosmosis pipeline took (seconds) :  23.361801
+# Cosmosis pipeline took (seconds) :  23.526199
+# Cosmosis pipeline took (seconds) :  23.647594
+# Cosmosis pipeline took (seconds) :  23.519056
+# Cosmosis pipeline took (seconds) :  23.744052
+# Cosmosis pipeline took (seconds) :  23.502153
+# Cosmosis pipeline took (seconds) :  23.320124
+# Cosmosis pipeline took (seconds) :  23.634098
+# Cosmosis pipeline took (seconds) :  23.517669
+# Cosmosis pipeline took (seconds) :  23.520253
+# Cosmosis pipeline took (seconds) :  23.276798
+# Cosmosis pipeline took (seconds) :  23.301496
+# Cosmosis pipeline took (seconds) :  23.379205
+# Cosmosis pipeline took (seconds) :  23.405108
+# Cosmosis pipeline took (seconds) :  23.306526
+# Cosmosis pipeline took (seconds) :  23.544356
+# Cosmosis pipeline took (seconds) :  23.038359
+# Cosmosis pipeline took (seconds) :  23.564001
+# Cosmosis pipeline took (seconds) :  23.551213
+# Cosmosis pipeline took (seconds) :  23.488344
+# Cosmosis pipeline took (seconds) :  23.513358
+# Cosmosis pipeline took (seconds) :  23.346958
+# Cosmosis pipeline took (seconds) :  23.339475
+# Cosmosis pipeline took (seconds) :  23.513403
+# Cosmosis pipeline took (seconds) :  23.273892
+# Cosmosis pipeline took (seconds) :  23.436389
+# Cosmosis pipeline took (seconds) :  23.350842
+# Cosmosis pipeline took (seconds) :  23.415077
+# Cosmosis pipeline took (seconds) :  23.420409
+# Cosmosis pipeline took (seconds) :  23.509166
+# Cosmosis pipeline took (seconds) :  23.372094
+# Cosmosis pipeline took (seconds) :  23.353954
+# Cosmosis pipeline took (seconds) :  23.339952
+# Cosmosis pipeline took (seconds) :  23.477604
+# Cosmosis pipeline took (seconds) :  23.554589
+# Cosmosis pipeline took (seconds) :  23.48491
+# Cosmosis pipeline took (seconds) :  23.374895
+# Cosmosis pipeline took (seconds) :  23.345631
+# Cosmosis pipeline took (seconds) :  23.28779
+# Cosmosis pipeline took (seconds) :  23.500655
+# Cosmosis pipeline took (seconds) :  23.402757
+# Cosmosis pipeline took (seconds) :  23.54951
+# Cosmosis pipeline took (seconds) :  23.386719
+# Cosmosis pipeline took (seconds) :  23.428291
+ CHAIN #12 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 551.71 seconds.
+ CHAIN #12 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 521.05 seconds.
+ CHAIN #12 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 523.30 seconds.
+ CHAIN #12 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 521.35 seconds.
+ CHAIN #12 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2640.90 seconds.
+# Cosmosis pipeline took (seconds) :  23.487525
+# Cosmosis pipeline took (seconds) :  23.348125
+# Cosmosis pipeline took (seconds) :  23.477004
+# Cosmosis pipeline took (seconds) :  23.572213
+# Cosmosis pipeline took (seconds) :  23.528506
+# Cosmosis pipeline took (seconds) :  23.365749
+# Cosmosis pipeline took (seconds) :  23.604163
+# Cosmosis pipeline took (seconds) :  23.154839
+# Cosmosis pipeline took (seconds) :  23.727296
+# Cosmosis pipeline took (seconds) :  23.265314
+# Cosmosis pipeline took (seconds) :  23.639532
+# Cosmosis pipeline took (seconds) :  23.172703
+# Cosmosis pipeline took (seconds) :  23.557149
+# Cosmosis pipeline took (seconds) :  23.863481
+# Cosmosis pipeline took (seconds) :  23.393129
+# Cosmosis pipeline took (seconds) :  23.853372
+# Cosmosis pipeline took (seconds) :  23.347818
+# Cosmosis pipeline took (seconds) :  23.542697
+# Cosmosis pipeline took (seconds) :  23.419098
+# Cosmosis pipeline took (seconds) :  23.532886
+# Cosmosis pipeline took (seconds) :  23.455837
+# Cosmosis pipeline took (seconds) :  23.515496
+# Cosmosis pipeline took (seconds) :  23.335886
+# Cosmosis pipeline took (seconds) :  23.295877
+# Cosmosis pipeline took (seconds) :  23.405999
+# Cosmosis pipeline took (seconds) :  23.914455
+# Cosmosis pipeline took (seconds) :  23.585519
+# Cosmosis pipeline took (seconds) :  23.496568
+# Cosmosis pipeline took (seconds) :  23.501054
+# Cosmosis pipeline took (seconds) :  23.339421
+# Cosmosis pipeline took (seconds) :  23.593596
+# Cosmosis pipeline took (seconds) :  23.27428
+# Cosmosis pipeline took (seconds) :  23.541914
+# Cosmosis pipeline took (seconds) :  23.316514
+# Cosmosis pipeline took (seconds) :  23.995405
+# Cosmosis pipeline took (seconds) :  23.418428
+# Cosmosis pipeline took (seconds) :  23.632511
+# Cosmosis pipeline took (seconds) :  23.734783
+# Cosmosis pipeline took (seconds) :  23.2741
+# Cosmosis pipeline took (seconds) :  23.623734
+# Cosmosis pipeline took (seconds) :  23.612104
+# Cosmosis pipeline took (seconds) :  23.490291
+# Cosmosis pipeline took (seconds) :  23.357028
+# Cosmosis pipeline took (seconds) :  23.558086
+# Cosmosis pipeline took (seconds) :  23.995125
+# Cosmosis pipeline took (seconds) :  23.515574
+# Cosmosis pipeline took (seconds) :  23.831656
+# Cosmosis pipeline took (seconds) :  23.604336
+# Cosmosis pipeline took (seconds) :  23.636757
+# Cosmosis pipeline took (seconds) :  23.5009
+# Cosmosis pipeline took (seconds) :  24.126772
+# Cosmosis pipeline took (seconds) :  23.551522
+# Cosmosis pipeline took (seconds) :  23.473001
+# Cosmosis pipeline took (seconds) :  23.666429
+# Cosmosis pipeline took (seconds) :  23.548983
+# Cosmosis pipeline took (seconds) :  23.270287
+# Cosmosis pipeline took (seconds) :  23.766338
+# Cosmosis pipeline took (seconds) :  23.389738
+# Cosmosis pipeline took (seconds) :  23.466607
+# Cosmosis pipeline took (seconds) :  23.816224
+# Cosmosis pipeline took (seconds) :  23.399159
+# Cosmosis pipeline took (seconds) :  23.303992
+# Cosmosis pipeline took (seconds) :  23.719677
+# Cosmosis pipeline took (seconds) :  23.346923
+# Cosmosis pipeline took (seconds) :  23.517453
+# Cosmosis pipeline took (seconds) :  23.522966
+# Cosmosis pipeline took (seconds) :  23.543292
+# Cosmosis pipeline took (seconds) :  23.292501
+# Cosmosis pipeline took (seconds) :  23.801209
+# Cosmosis pipeline took (seconds) :  23.315102
+# Cosmosis pipeline took (seconds) :  24.041659
+# Cosmosis pipeline took (seconds) :  23.297382
+# Cosmosis pipeline took (seconds) :  23.312103
+# Cosmosis pipeline took (seconds) :  23.470922
+# Cosmosis pipeline took (seconds) :  23.12788
+# Cosmosis pipeline took (seconds) :  23.755177
+# Cosmosis pipeline took (seconds) :  23.477253
+# Cosmosis pipeline took (seconds) :  23.579833
+# Cosmosis pipeline took (seconds) :  23.51211
+# Cosmosis pipeline took (seconds) :  23.782391
+# Cosmosis pipeline took (seconds) :  23.580068
+# Cosmosis pipeline took (seconds) :  23.98141
+# Cosmosis pipeline took (seconds) :  23.786686
+# Cosmosis pipeline took (seconds) :  23.429164
+# Cosmosis pipeline took (seconds) :  23.71868
+# Cosmosis pipeline took (seconds) :  23.404141
+# Cosmosis pipeline took (seconds) :  23.320119
+# Cosmosis pipeline took (seconds) :  23.295489
+ CHAIN #7 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 595.74 seconds, while divergence encountered in 275 sample(s).
+ CHAIN #7 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 591.16 seconds, while divergence encountered in 211 sample(s).
+ CHAIN #7 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 588.19 seconds, while divergence encountered in 182 sample(s).
+ CHAIN #7 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 578.31 seconds, while divergence encountered in 177 sample(s).
+ CHAIN #7 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2938.39 seconds.
+# Cosmosis pipeline took (seconds) :  23.439832
+# Cosmosis pipeline took (seconds) :  23.396186
+# Cosmosis pipeline took (seconds) :  23.672143
+# Cosmosis pipeline took (seconds) :  23.603892
+# Cosmosis pipeline took (seconds) :  23.547687
+# Cosmosis pipeline took (seconds) :  23.546763
+# Cosmosis pipeline took (seconds) :  23.388124
+# Cosmosis pipeline took (seconds) :  23.433354
+# Cosmosis pipeline took (seconds) :  23.915245
+# Cosmosis pipeline took (seconds) :  23.646112
+# Cosmosis pipeline took (seconds) :  23.44239
+# Cosmosis pipeline took (seconds) :  23.401471
+# Cosmosis pipeline took (seconds) :  23.570807
+# Cosmosis pipeline took (seconds) :  23.510941
+# Cosmosis pipeline took (seconds) :  23.738743
+# Cosmosis pipeline took (seconds) :  23.524705
+# Cosmosis pipeline took (seconds) :  19.035994
+# Cosmosis pipeline took (seconds) :  23.599116
+# Cosmosis pipeline took (seconds) :  23.326343
+# Cosmosis pipeline took (seconds) :  24.543651
+# Cosmosis pipeline took (seconds) :  23.509373
+# Cosmosis pipeline took (seconds) :  23.361555
+# Cosmosis pipeline took (seconds) :  23.596408
+# Cosmosis pipeline took (seconds) :  23.321709
+# Cosmosis pipeline took (seconds) :  23.54984
+# Cosmosis pipeline took (seconds) :  23.476219
+# Cosmosis pipeline took (seconds) :  23.497748
+# Cosmosis pipeline took (seconds) :  23.290891
+# Cosmosis pipeline took (seconds) :  23.628092
+# Cosmosis pipeline took (seconds) :  23.469786
+# Cosmosis pipeline took (seconds) :  23.47054
+# Cosmosis pipeline took (seconds) :  23.375476
+# Cosmosis pipeline took (seconds) :  23.830747
+# Cosmosis pipeline took (seconds) :  23.589561
+# Cosmosis pipeline took (seconds) :  23.514862
+# Cosmosis pipeline took (seconds) :  23.450214
+# Cosmosis pipeline took (seconds) :  23.447427
+# Cosmosis pipeline took (seconds) :  23.485698
+# Cosmosis pipeline took (seconds) :  23.322098
+# Cosmosis pipeline took (seconds) :  23.428031
+# Cosmosis pipeline took (seconds) :  23.525843
+# Cosmosis pipeline took (seconds) :  23.419663
+# Cosmosis pipeline took (seconds) :  23.439655
+# Cosmosis pipeline took (seconds) :  23.235785
+# Cosmosis pipeline took (seconds) :  21.537925
+# Cosmosis pipeline took (seconds) :  23.343651
+# Cosmosis pipeline took (seconds) :  23.433719
+# Cosmosis pipeline took (seconds) :  23.626677
+# Cosmosis pipeline took (seconds) :  23.682177
+# Cosmosis pipeline took (seconds) :  23.254744
+# Cosmosis pipeline took (seconds) :  20.55893
+# Cosmosis pipeline took (seconds) :  23.732108
+# Cosmosis pipeline took (seconds) :  23.428774
+# Cosmosis pipeline took (seconds) :  23.524587
+# Cosmosis pipeline took (seconds) :  23.531641
+# Cosmosis pipeline took (seconds) :  23.424513
+# Cosmosis pipeline took (seconds) :  23.597071
+# Cosmosis pipeline took (seconds) :  23.519303
+# Cosmosis pipeline took (seconds) :  23.527611
+# Cosmosis pipeline took (seconds) :  23.348758
+# Cosmosis pipeline took (seconds) :  23.57642
+# Cosmosis pipeline took (seconds) :  23.24205
+# Cosmosis pipeline took (seconds) :  23.663159
+# Cosmosis pipeline took (seconds) :  23.408874
+# Cosmosis pipeline took (seconds) :  23.281363
+# Cosmosis pipeline took (seconds) :  23.401458
+# Cosmosis pipeline took (seconds) :  23.624056
+# Cosmosis pipeline took (seconds) :  23.626243
+# Cosmosis pipeline took (seconds) :  23.45432
+# Cosmosis pipeline took (seconds) :  23.55769
+# Cosmosis pipeline took (seconds) :  23.348796
+# Cosmosis pipeline took (seconds) :  23.357803
+# Cosmosis pipeline took (seconds) :  23.596553
+# Cosmosis pipeline took (seconds) :  23.491236
+# Cosmosis pipeline took (seconds) :  23.506245
+# Cosmosis pipeline took (seconds) :  23.421018
+# Cosmosis pipeline took (seconds) :  23.359962
+# Cosmosis pipeline took (seconds) :  23.602402
+# Cosmosis pipeline took (seconds) :  23.145972
+# Cosmosis pipeline took (seconds) :  23.272958
+# Cosmosis pipeline took (seconds) :  23.563877
+# Cosmosis pipeline took (seconds) :  23.643579
+# Cosmosis pipeline took (seconds) :  23.598915
+# Cosmosis pipeline took (seconds) :  23.45754
+# Cosmosis pipeline took (seconds) :  23.662356
+# Cosmosis pipeline took (seconds) :  23.343024
+# Cosmosis pipeline took (seconds) :  23.590896
+# Cosmosis pipeline took (seconds) :  23.486508
+ CHAIN #1 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 554.66 seconds.
+ CHAIN #1 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 514.89 seconds.
+ CHAIN #1 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 520.25 seconds.
+ CHAIN #1 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 513.77 seconds.
+ CHAIN #1 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2624.86 seconds.
+# Cosmosis pipeline took (seconds) :  23.037008
+# Cosmosis pipeline took (seconds) :  23.702037
+# Cosmosis pipeline took (seconds) :  23.459697
+# Cosmosis pipeline took (seconds) :  23.874146
+# Cosmosis pipeline took (seconds) :  23.4619
+# Cosmosis pipeline took (seconds) :  23.558613
+# Cosmosis pipeline took (seconds) :  23.442829
+# Cosmosis pipeline took (seconds) :  23.512419
+# Cosmosis pipeline took (seconds) :  23.564531
+# Cosmosis pipeline took (seconds) :  23.599783
+# Cosmosis pipeline took (seconds) :  23.674493
+# Cosmosis pipeline took (seconds) :  23.48219
+# Cosmosis pipeline took (seconds) :  23.496181
+# Cosmosis pipeline took (seconds) :  23.784505
+# Cosmosis pipeline took (seconds) :  23.603234
+# Cosmosis pipeline took (seconds) :  23.502779
+# Cosmosis pipeline took (seconds) :  23.888721
+# Cosmosis pipeline took (seconds) :  23.964804
+# Cosmosis pipeline took (seconds) :  24.134751
+# Cosmosis pipeline took (seconds) :  23.549924
+# Cosmosis pipeline took (seconds) :  23.640506
+# Cosmosis pipeline took (seconds) :  23.890142
+# Cosmosis pipeline took (seconds) :  23.616367
+# Cosmosis pipeline took (seconds) :  23.284429
+# Cosmosis pipeline took (seconds) :  23.811962
+# Cosmosis pipeline took (seconds) :  23.589446
+# Cosmosis pipeline took (seconds) :  23.623335
+# Cosmosis pipeline took (seconds) :  23.658077
+# Cosmosis pipeline took (seconds) :  23.640787
+# Cosmosis pipeline took (seconds) :  23.655272
+# Cosmosis pipeline took (seconds) :  23.713814
+# Cosmosis pipeline took (seconds) :  23.92408
+# Cosmosis pipeline took (seconds) :  23.668615
+# Cosmosis pipeline took (seconds) :  23.359227
+# Cosmosis pipeline took (seconds) :  23.66328
+# Cosmosis pipeline took (seconds) :  23.497337
+# Cosmosis pipeline took (seconds) :  23.533923
+# Cosmosis pipeline took (seconds) :  23.462593
+# Cosmosis pipeline took (seconds) :  23.551208
+# Cosmosis pipeline took (seconds) :  23.390576
+# Cosmosis pipeline took (seconds) :  23.897506
+# Cosmosis pipeline took (seconds) :  23.705767
+# Cosmosis pipeline took (seconds) :  23.510356
+# Cosmosis pipeline took (seconds) :  23.453298
+# Cosmosis pipeline took (seconds) :  23.427886
+# Cosmosis pipeline took (seconds) :  23.465716
+# Cosmosis pipeline took (seconds) :  23.481811
+# Cosmosis pipeline took (seconds) :  23.741316
+# Cosmosis pipeline took (seconds) :  23.492537
+# Cosmosis pipeline took (seconds) :  23.559907
+# Cosmosis pipeline took (seconds) :  23.860839
+# Cosmosis pipeline took (seconds) :  23.617716
+# Cosmosis pipeline took (seconds) :  23.272234
+# Cosmosis pipeline took (seconds) :  23.644512
+# Cosmosis pipeline took (seconds) :  23.543754
+# Cosmosis pipeline took (seconds) :  23.582907
+# Cosmosis pipeline took (seconds) :  23.78591
+# Cosmosis pipeline took (seconds) :  23.753639
+# Cosmosis pipeline took (seconds) :  23.596577
+# Cosmosis pipeline took (seconds) :  23.29133
+# Cosmosis pipeline took (seconds) :  23.499146
+# Cosmosis pipeline took (seconds) :  23.645921
+# Cosmosis pipeline took (seconds) :  23.517982
+# Cosmosis pipeline took (seconds) :  24.030059
+# Cosmosis pipeline took (seconds) :  23.451943
+# Cosmosis pipeline took (seconds) :  23.658275
+# Cosmosis pipeline took (seconds) :  23.444128
+# Cosmosis pipeline took (seconds) :  23.491825
+# Cosmosis pipeline took (seconds) :  23.54647
+# Cosmosis pipeline took (seconds) :  23.403172
+# Cosmosis pipeline took (seconds) :  23.556846
+# Cosmosis pipeline took (seconds) :  23.394381
+# Cosmosis pipeline took (seconds) :  23.681074
+# Cosmosis pipeline took (seconds) :  23.397292
+# Cosmosis pipeline took (seconds) :  23.720295
+# Cosmosis pipeline took (seconds) :  23.237269
+# Cosmosis pipeline took (seconds) :  23.449594
+# Cosmosis pipeline took (seconds) :  23.520113
+# Cosmosis pipeline took (seconds) :  24.021779
+# Cosmosis pipeline took (seconds) :  23.516986
+# Cosmosis pipeline took (seconds) :  23.385259
+# Cosmosis pipeline took (seconds) :  23.923872
+# Cosmosis pipeline took (seconds) :  23.482524
+# Cosmosis pipeline took (seconds) :  23.66281
+# Cosmosis pipeline took (seconds) :  23.982739
+# Cosmosis pipeline took (seconds) :  23.620992
+# Cosmosis pipeline took (seconds) :  23.241991
+# Cosmosis pipeline took (seconds) :  23.65241
+ CHAIN #12 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 682.85 seconds, while divergence encountered in 240 sample(s).
+ CHAIN #12 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 729.28 seconds, while divergence encountered in 109 sample(s).
+ CHAIN #12 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 742.53 seconds, while divergence encountered in 112 sample(s).
+ CHAIN #12 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 734.65 seconds, while divergence encountered in 102 sample(s).
+ CHAIN #12 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3626.22 seconds.
+# Cosmosis pipeline took (seconds) :  23.559043
+# Cosmosis pipeline took (seconds) :  23.538483
+# Cosmosis pipeline took (seconds) :  23.693943
+# Cosmosis pipeline took (seconds) :  23.416404
+# Cosmosis pipeline took (seconds) :  23.737153
+# Cosmosis pipeline took (seconds) :  23.406239
+# Cosmosis pipeline took (seconds) :  23.54149
+# Cosmosis pipeline took (seconds) :  23.399223
+# Cosmosis pipeline took (seconds) :  23.466266
+# Cosmosis pipeline took (seconds) :  23.420427
+# Cosmosis pipeline took (seconds) :  23.533151
+# Cosmosis pipeline took (seconds) :  18.866381
+# Cosmosis pipeline took (seconds) :  23.460728
+# Cosmosis pipeline took (seconds) :  23.549861
+# Cosmosis pipeline took (seconds) :  23.75981
+# Cosmosis pipeline took (seconds) :  23.584095
+# Cosmosis pipeline took (seconds) :  23.882109
+# Cosmosis pipeline took (seconds) :  23.517121
+# Cosmosis pipeline took (seconds) :  23.51089
+# Cosmosis pipeline took (seconds) :  23.904261
+# Cosmosis pipeline took (seconds) :  23.603451
+# Cosmosis pipeline took (seconds) :  23.456669
+# Cosmosis pipeline took (seconds) :  23.28754
+# Cosmosis pipeline took (seconds) :  23.419252
+# Cosmosis pipeline took (seconds) :  23.322408
+# Cosmosis pipeline took (seconds) :  23.521641
+# Cosmosis pipeline took (seconds) :  23.322715
+# Cosmosis pipeline took (seconds) :  23.255896
+# Cosmosis pipeline took (seconds) :  23.59374
+# Cosmosis pipeline took (seconds) :  23.809346
+# Cosmosis pipeline took (seconds) :  23.484605
+# Cosmosis pipeline took (seconds) :  23.744082
+# Cosmosis pipeline took (seconds) :  23.26812
+# Cosmosis pipeline took (seconds) :  19.230437
+# Cosmosis pipeline took (seconds) :  23.503863
+# Cosmosis pipeline took (seconds) :  23.616756
+# Cosmosis pipeline took (seconds) :  23.331122
+# Cosmosis pipeline took (seconds) :  23.53026
+# Cosmosis pipeline took (seconds) :  23.704619
+# Cosmosis pipeline took (seconds) :  23.716516
+# Cosmosis pipeline took (seconds) :  23.533475
+# Cosmosis pipeline took (seconds) :  23.295319
+# Cosmosis pipeline took (seconds) :  23.768748
+# Cosmosis pipeline took (seconds) :  23.170732
+# Cosmosis pipeline took (seconds) :  23.638606
+# Cosmosis pipeline took (seconds) :  23.296514
+# Cosmosis pipeline took (seconds) :  23.424981
+# Cosmosis pipeline took (seconds) :  23.567965
+# Cosmosis pipeline took (seconds) :  23.612013
+# Cosmosis pipeline took (seconds) :  23.220238
+# Cosmosis pipeline took (seconds) :  23.716376
+# Cosmosis pipeline took (seconds) :  23.447211
+# Cosmosis pipeline took (seconds) :  23.5241
+# Cosmosis pipeline took (seconds) :  23.575701
+# Cosmosis pipeline took (seconds) :  23.635064
+# Cosmosis pipeline took (seconds) :  23.493756
+# Cosmosis pipeline took (seconds) :  23.404387
+# Cosmosis pipeline took (seconds) :  23.352366
+# Cosmosis pipeline took (seconds) :  23.430863
+# Cosmosis pipeline took (seconds) :  23.47686
+# Cosmosis pipeline took (seconds) :  23.574446
+# Cosmosis pipeline took (seconds) :  23.394558
+# Cosmosis pipeline took (seconds) :  23.399165
+# Cosmosis pipeline took (seconds) :  23.281258
+# Cosmosis pipeline took (seconds) :  23.590011
+# Cosmosis pipeline took (seconds) :  23.489818
+# Cosmosis pipeline took (seconds) :  23.27856
+# Cosmosis pipeline took (seconds) :  23.452388
+# Cosmosis pipeline took (seconds) :  23.472987
+# Cosmosis pipeline took (seconds) :  23.483738
+# Cosmosis pipeline took (seconds) :  23.283807
+# Cosmosis pipeline took (seconds) :  23.505888
+# Cosmosis pipeline took (seconds) :  23.373681
+# Cosmosis pipeline took (seconds) :  23.434386
+# Cosmosis pipeline took (seconds) :  23.455471
+# Cosmosis pipeline took (seconds) :  23.604521
+# Cosmosis pipeline took (seconds) :  23.343574
+# Cosmosis pipeline took (seconds) :  23.574333
+# Cosmosis pipeline took (seconds) :  23.445136
+# Cosmosis pipeline took (seconds) :  23.270506
+# Cosmosis pipeline took (seconds) :  23.596498
+# Cosmosis pipeline took (seconds) :  23.623543
+# Cosmosis pipeline took (seconds) :  23.452527
+# Cosmosis pipeline took (seconds) :  23.407459
+# Cosmosis pipeline took (seconds) :  23.410749
+# Cosmosis pipeline took (seconds) :  23.522236
+# Cosmosis pipeline took (seconds) :  23.772703
+# Cosmosis pipeline took (seconds) :  23.28211
+ CHAIN #3 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 552.67 seconds.
+ CHAIN #3 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 528.58 seconds.
+ CHAIN #3 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 527.10 seconds.
+ CHAIN #3 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 519.87 seconds.
+ CHAIN #3 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2651.99 seconds.
+# Cosmosis pipeline took (seconds) :  24.416218
+# Cosmosis pipeline took (seconds) :  23.517939
+# Cosmosis pipeline took (seconds) :  23.498395
+# Cosmosis pipeline took (seconds) :  24.206722
+# Cosmosis pipeline took (seconds) :  23.24881
+# Cosmosis pipeline took (seconds) :  23.71625
+# Cosmosis pipeline took (seconds) :  23.567273
+# Cosmosis pipeline took (seconds) :  23.74538
+# Cosmosis pipeline took (seconds) :  23.4755
+# Cosmosis pipeline took (seconds) :  23.472309
+# Cosmosis pipeline took (seconds) :  23.567848
+# Cosmosis pipeline took (seconds) :  23.50351
+# Cosmosis pipeline took (seconds) :  23.604682
+# Cosmosis pipeline took (seconds) :  23.751807
+# Cosmosis pipeline took (seconds) :  23.569971
+# Cosmosis pipeline took (seconds) :  23.510079
+# Cosmosis pipeline took (seconds) :  23.466133
+# Cosmosis pipeline took (seconds) :  23.798337
+# Cosmosis pipeline took (seconds) :  23.559017
+# Cosmosis pipeline took (seconds) :  23.400411
+# Cosmosis pipeline took (seconds) :  23.47635
+# Cosmosis pipeline took (seconds) :  23.522101
+# Cosmosis pipeline took (seconds) :  23.634672
+# Cosmosis pipeline took (seconds) :  23.801791
+# Cosmosis pipeline took (seconds) :  23.464406
+# Cosmosis pipeline took (seconds) :  23.857447
+# Cosmosis pipeline took (seconds) :  23.304165
+# Cosmosis pipeline took (seconds) :  23.632566
+# Cosmosis pipeline took (seconds) :  23.520874
+# Cosmosis pipeline took (seconds) :  23.663935
+# Cosmosis pipeline took (seconds) :  23.727444
+# Cosmosis pipeline took (seconds) :  23.502382
+# Cosmosis pipeline took (seconds) :  23.639368
+# Cosmosis pipeline took (seconds) :  23.758977
+# Cosmosis pipeline took (seconds) :  23.512647
+# Cosmosis pipeline took (seconds) :  23.670821
+# Cosmosis pipeline took (seconds) :  23.603307
+# Cosmosis pipeline took (seconds) :  23.418753
+# Cosmosis pipeline took (seconds) :  23.422304
+# Cosmosis pipeline took (seconds) :  23.47117
+# Cosmosis pipeline took (seconds) :  23.647864
+# Cosmosis pipeline took (seconds) :  19.019734
+# Cosmosis pipeline took (seconds) :  23.371797
+# Cosmosis pipeline took (seconds) :  23.470674
+# Cosmosis pipeline took (seconds) :  23.392584
+# Cosmosis pipeline took (seconds) :  23.571456
+# Cosmosis pipeline took (seconds) :  23.551233
+# Cosmosis pipeline took (seconds) :  21.832074
+# Cosmosis pipeline took (seconds) :  23.967675
+# Cosmosis pipeline took (seconds) :  23.577675
+# Cosmosis pipeline took (seconds) :  23.487068
+# Cosmosis pipeline took (seconds) :  23.546612
+# Cosmosis pipeline took (seconds) :  24.228433
+# Cosmosis pipeline took (seconds) :  23.894575
+# Cosmosis pipeline took (seconds) :  23.332744
+# Cosmosis pipeline took (seconds) :  23.35184
+# Cosmosis pipeline took (seconds) :  23.727503
+# Cosmosis pipeline took (seconds) :  23.339902
+# Cosmosis pipeline took (seconds) :  23.587999
+# Cosmosis pipeline took (seconds) :  23.333775
+# Cosmosis pipeline took (seconds) :  23.603204
+# Cosmosis pipeline took (seconds) :  23.473987
+# Cosmosis pipeline took (seconds) :  23.351392
+# Cosmosis pipeline took (seconds) :  23.606994
+# Cosmosis pipeline took (seconds) :  23.620901
+# Cosmosis pipeline took (seconds) :  23.705282
+# Cosmosis pipeline took (seconds) :  23.409412
+# Cosmosis pipeline took (seconds) :  23.413025
+# Cosmosis pipeline took (seconds) :  23.55817
+# Cosmosis pipeline took (seconds) :  23.723589
+# Cosmosis pipeline took (seconds) :  23.434052
+# Cosmosis pipeline took (seconds) :  23.273282
+# Cosmosis pipeline took (seconds) :  23.246274
+# Cosmosis pipeline took (seconds) :  23.360585
+# Cosmosis pipeline took (seconds) :  23.539433
+# Cosmosis pipeline took (seconds) :  23.377099
+# Cosmosis pipeline took (seconds) :  23.491433
+# Cosmosis pipeline took (seconds) :  23.325981
+# Cosmosis pipeline took (seconds) :  23.735606
+# Cosmosis pipeline took (seconds) :  23.510402
+# Cosmosis pipeline took (seconds) :  23.94565
+# Cosmosis pipeline took (seconds) :  23.291622
+# Cosmosis pipeline took (seconds) :  23.369481
+# Cosmosis pipeline took (seconds) :  23.403955
+# Cosmosis pipeline took (seconds) :  23.516956
+# Cosmosis pipeline took (seconds) :  23.714682
+# Cosmosis pipeline took (seconds) :  23.49569
+# Cosmosis pipeline took (seconds) :  23.563731
+ CHAIN #3 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 581.74 seconds, while divergence encountered in 192 sample(s).
+ CHAIN #3 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 553.04 seconds.
+ CHAIN #3 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 550.74 seconds.
+ CHAIN #3 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 531.59 seconds.
+ CHAIN #3 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2769.37 seconds.
+# Cosmosis pipeline took (seconds) :  23.819461
+# Cosmosis pipeline took (seconds) :  23.831042
+# Cosmosis pipeline took (seconds) :  23.547453
+# Cosmosis pipeline took (seconds) :  23.50235
+# Cosmosis pipeline took (seconds) :  23.306754
+# Cosmosis pipeline took (seconds) :  23.55412
+# Cosmosis pipeline took (seconds) :  23.568732
+# Cosmosis pipeline took (seconds) :  23.564318
+# Cosmosis pipeline took (seconds) :  23.455923
+# Cosmosis pipeline took (seconds) :  23.553913
+# Cosmosis pipeline took (seconds) :  23.507624
+# Cosmosis pipeline took (seconds) :  23.368464
+# Cosmosis pipeline took (seconds) :  23.438221
+# Cosmosis pipeline took (seconds) :  23.428033
+# Cosmosis pipeline took (seconds) :  22.595902
+# Cosmosis pipeline took (seconds) :  23.637304
+# Cosmosis pipeline took (seconds) :  23.414989
+# Cosmosis pipeline took (seconds) :  23.465588
+# Cosmosis pipeline took (seconds) :  23.378164
+# Cosmosis pipeline took (seconds) :  23.561414
+# Cosmosis pipeline took (seconds) :  23.29692
+# Cosmosis pipeline took (seconds) :  23.529398
+# Cosmosis pipeline took (seconds) :  23.473266
+# Cosmosis pipeline took (seconds) :  23.773795
+# Cosmosis pipeline took (seconds) :  23.294483
+# Cosmosis pipeline took (seconds) :  23.486062
+# Cosmosis pipeline took (seconds) :  23.450926
+# Cosmosis pipeline took (seconds) :  23.359464
+# Cosmosis pipeline took (seconds) :  23.494126
+# Cosmosis pipeline took (seconds) :  23.759237
+# Cosmosis pipeline took (seconds) :  23.411255
+# Cosmosis pipeline took (seconds) :  23.489261
+# Cosmosis pipeline took (seconds) :  23.86119
+# Cosmosis pipeline took (seconds) :  23.451438
+# Cosmosis pipeline took (seconds) :  23.190039
+# Cosmosis pipeline took (seconds) :  24.554378
+# Cosmosis pipeline took (seconds) :  23.334425
+# Cosmosis pipeline took (seconds) :  18.985138
+# Cosmosis pipeline took (seconds) :  23.59702
+# Cosmosis pipeline took (seconds) :  23.539394
+# Cosmosis pipeline took (seconds) :  24.522792
+# Cosmosis pipeline took (seconds) :  23.563638
+# Cosmosis pipeline took (seconds) :  23.673818
+# Cosmosis pipeline took (seconds) :  23.714995
+# Cosmosis pipeline took (seconds) :  23.436206
+# Cosmosis pipeline took (seconds) :  23.301318
+# Cosmosis pipeline took (seconds) :  23.530145
+# Cosmosis pipeline took (seconds) :  23.494917
+# Cosmosis pipeline took (seconds) :  23.660741
+# Cosmosis pipeline took (seconds) :  23.618183
+# Cosmosis pipeline took (seconds) :  23.814817
+# Cosmosis pipeline took (seconds) :  23.529789
+# Cosmosis pipeline took (seconds) :  23.392092
+# Cosmosis pipeline took (seconds) :  23.712221
+# Cosmosis pipeline took (seconds) :  23.262177
+# Cosmosis pipeline took (seconds) :  23.497649
+# Cosmosis pipeline took (seconds) :  23.394972
+# Cosmosis pipeline took (seconds) :  23.464018
+# Cosmosis pipeline took (seconds) :  23.502945
+# Cosmosis pipeline took (seconds) :  23.425217
+# Cosmosis pipeline took (seconds) :  23.504631
+# Cosmosis pipeline took (seconds) :  23.515716
+# Cosmosis pipeline took (seconds) :  23.635456
+# Cosmosis pipeline took (seconds) :  23.687701
+# Cosmosis pipeline took (seconds) :  23.53151
+# Cosmosis pipeline took (seconds) :  23.593982
+# Cosmosis pipeline took (seconds) :  23.524356
+# Cosmosis pipeline took (seconds) :  23.530587
+# Cosmosis pipeline took (seconds) :  23.527434
+# Cosmosis pipeline took (seconds) :  23.512085
+# Cosmosis pipeline took (seconds) :  23.558549
+# Cosmosis pipeline took (seconds) :  23.330632
+# Cosmosis pipeline took (seconds) :  23.481409
+# Cosmosis pipeline took (seconds) :  23.476549
+# Cosmosis pipeline took (seconds) :  23.331491
+# Cosmosis pipeline took (seconds) :  23.444147
+# Cosmosis pipeline took (seconds) :  23.435824
+# Cosmosis pipeline took (seconds) :  23.443143
+# Cosmosis pipeline took (seconds) :  23.935534
+# Cosmosis pipeline took (seconds) :  23.518117
+# Cosmosis pipeline took (seconds) :  23.443788
+# Cosmosis pipeline took (seconds) :  23.667573
+# Cosmosis pipeline took (seconds) :  23.256451
+# Cosmosis pipeline took (seconds) :  23.481567
+# Cosmosis pipeline took (seconds) :  23.520903
+# Cosmosis pipeline took (seconds) :  23.634127
+# Cosmosis pipeline took (seconds) :  23.158648
+# Cosmosis pipeline took (seconds) :  23.394842
+ CHAIN #6 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 587.05 seconds.
+ CHAIN #6 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 521.90 seconds.
+ CHAIN #6 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 521.82 seconds.
+ CHAIN #6 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 538.94 seconds.
+ CHAIN #6 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2695.45 seconds.
+# Cosmosis pipeline took (seconds) :  23.869865
+# Cosmosis pipeline took (seconds) :  23.877287
+# Cosmosis pipeline took (seconds) :  23.824163
+# Cosmosis pipeline took (seconds) :  23.486116
+# Cosmosis pipeline took (seconds) :  23.423486
+# Cosmosis pipeline took (seconds) :  24.080846
+# Cosmosis pipeline took (seconds) :  23.339544
+# Cosmosis pipeline took (seconds) :  23.608066
+# Cosmosis pipeline took (seconds) :  23.385103
+# Cosmosis pipeline took (seconds) :  23.290127
+# Cosmosis pipeline took (seconds) :  23.619383
+# Cosmosis pipeline took (seconds) :  23.603567
+# Cosmosis pipeline took (seconds) :  23.56151
+# Cosmosis pipeline took (seconds) :  23.486423
+# Cosmosis pipeline took (seconds) :  23.515272
+# Cosmosis pipeline took (seconds) :  23.373857
+# Cosmosis pipeline took (seconds) :  23.389319
+# Cosmosis pipeline took (seconds) :  23.896001
+# Cosmosis pipeline took (seconds) :  23.590808
+# Cosmosis pipeline took (seconds) :  23.781572
+# Cosmosis pipeline took (seconds) :  23.51394
+# Cosmosis pipeline took (seconds) :  23.245271
+# Cosmosis pipeline took (seconds) :  23.31214
+# Cosmosis pipeline took (seconds) :  23.218956
+# Cosmosis pipeline took (seconds) :  23.64162
+# Cosmosis pipeline took (seconds) :  23.443884
+# Cosmosis pipeline took (seconds) :  23.685282
+# Cosmosis pipeline took (seconds) :  23.320708
+# Cosmosis pipeline took (seconds) :  23.228177
+# Cosmosis pipeline took (seconds) :  23.361248
+# Cosmosis pipeline took (seconds) :  23.424019
+# Cosmosis pipeline took (seconds) :  24.066064
+# Cosmosis pipeline took (seconds) :  23.463213
+# Cosmosis pipeline took (seconds) :  23.500206
+# Cosmosis pipeline took (seconds) :  23.577932
+# Cosmosis pipeline took (seconds) :  23.387814
+# Cosmosis pipeline took (seconds) :  23.786598
+# Cosmosis pipeline took (seconds) :  23.366702
+# Cosmosis pipeline took (seconds) :  23.449089
+# Cosmosis pipeline took (seconds) :  23.291933
+# Cosmosis pipeline took (seconds) :  23.444649
+# Cosmosis pipeline took (seconds) :  23.607771
+# Cosmosis pipeline took (seconds) :  23.427992
+# Cosmosis pipeline took (seconds) :  23.453526
+# Cosmosis pipeline took (seconds) :  23.387394
+# Cosmosis pipeline took (seconds) :  23.661132
+# Cosmosis pipeline took (seconds) :  23.549143
+# Cosmosis pipeline took (seconds) :  23.857237
+# Cosmosis pipeline took (seconds) :  23.296401
+# Cosmosis pipeline took (seconds) :  23.202657
+# Cosmosis pipeline took (seconds) :  23.734747
+# Cosmosis pipeline took (seconds) :  23.457032
+# Cosmosis pipeline took (seconds) :  21.88508
+# Cosmosis pipeline took (seconds) :  23.395301
+# Cosmosis pipeline took (seconds) :  23.555187
+# Cosmosis pipeline took (seconds) :  23.41448
+# Cosmosis pipeline took (seconds) :  23.629194
+# Cosmosis pipeline took (seconds) :  23.347946
+# Cosmosis pipeline took (seconds) :  23.421648
+# Cosmosis pipeline took (seconds) :  23.385169
+# Cosmosis pipeline took (seconds) :  23.8609
+# Cosmosis pipeline took (seconds) :  23.667829
+# Cosmosis pipeline took (seconds) :  23.809152
+# Cosmosis pipeline took (seconds) :  23.693491
+# Cosmosis pipeline took (seconds) :  23.358903
+# Cosmosis pipeline took (seconds) :  23.39834
+# Cosmosis pipeline took (seconds) :  23.527725
+# Cosmosis pipeline took (seconds) :  23.337567
+# Cosmosis pipeline took (seconds) :  23.477957
+# Cosmosis pipeline took (seconds) :  23.421308
+# Cosmosis pipeline took (seconds) :  23.741703
+# Cosmosis pipeline took (seconds) :  23.605342
+# Cosmosis pipeline took (seconds) :  23.679236
+# Cosmosis pipeline took (seconds) :  23.403976
+# Cosmosis pipeline took (seconds) :  23.5862
+# Cosmosis pipeline took (seconds) :  23.531202
+# Cosmosis pipeline took (seconds) :  23.429448
+# Cosmosis pipeline took (seconds) :  23.506456
+# Cosmosis pipeline took (seconds) :  23.555824
+# Cosmosis pipeline took (seconds) :  23.218017
+# Cosmosis pipeline took (seconds) :  23.535104
+# Cosmosis pipeline took (seconds) :  23.381067
+# Cosmosis pipeline took (seconds) :  23.339861
+# Cosmosis pipeline took (seconds) :  23.604619
+# Cosmosis pipeline took (seconds) :  23.518845
+# Cosmosis pipeline took (seconds) :  23.58412
+# Cosmosis pipeline took (seconds) :  23.581932
+# Cosmosis pipeline took (seconds) :  23.445562
+ CHAIN #4 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 614.71 seconds, while divergence encountered in 287 sample(s).
+ CHAIN #4 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 614.89 seconds, while divergence encountered in 189 sample(s).
+ CHAIN #4 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 631.46 seconds, while divergence encountered in 183 sample(s).
+ CHAIN #4 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 622.65 seconds, while divergence encountered in 213 sample(s).
+ CHAIN #4 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3098.84 seconds.
+# Cosmosis pipeline took (seconds) :  23.666937
+# Cosmosis pipeline took (seconds) :  23.510518
+# Cosmosis pipeline took (seconds) :  23.726562
+# Cosmosis pipeline took (seconds) :  23.388633
+# Cosmosis pipeline took (seconds) :  23.638189
+# Cosmosis pipeline took (seconds) :  23.530875
+# Cosmosis pipeline took (seconds) :  23.580366
+# Cosmosis pipeline took (seconds) :  23.553698
+# Cosmosis pipeline took (seconds) :  23.645216
+# Cosmosis pipeline took (seconds) :  23.367562
+# Cosmosis pipeline took (seconds) :  23.731004
+# Cosmosis pipeline took (seconds) :  23.467347
+# Cosmosis pipeline took (seconds) :  23.619892
+# Cosmosis pipeline took (seconds) :  23.422407
+# Cosmosis pipeline took (seconds) :  23.413923
+# Cosmosis pipeline took (seconds) :  23.436007
+# Cosmosis pipeline took (seconds) :  23.458437
+# Cosmosis pipeline took (seconds) :  23.453207
+# Cosmosis pipeline took (seconds) :  23.561277
+# Cosmosis pipeline took (seconds) :  23.584624
+# Cosmosis pipeline took (seconds) :  23.347746
+# Cosmosis pipeline took (seconds) :  23.379162
+# Cosmosis pipeline took (seconds) :  23.346068
+# Cosmosis pipeline took (seconds) :  23.289774
+# Cosmosis pipeline took (seconds) :  23.25977
+# Cosmosis pipeline took (seconds) :  23.264176
+# Cosmosis pipeline took (seconds) :  23.630797
+# Cosmosis pipeline took (seconds) :  23.534651
+# Cosmosis pipeline took (seconds) :  23.622062
+# Cosmosis pipeline took (seconds) :  23.658212
+# Cosmosis pipeline took (seconds) :  23.553034
+# Cosmosis pipeline took (seconds) :  23.477081
+# Cosmosis pipeline took (seconds) :  23.742076
+# Cosmosis pipeline took (seconds) :  23.779592
+# Cosmosis pipeline took (seconds) :  23.548266
+# Cosmosis pipeline took (seconds) :  23.253117
+# Cosmosis pipeline took (seconds) :  23.503876
+# Cosmosis pipeline took (seconds) :  23.467515
+# Cosmosis pipeline took (seconds) :  23.457503
+# Cosmosis pipeline took (seconds) :  23.476988
+# Cosmosis pipeline took (seconds) :  23.575368
+# Cosmosis pipeline took (seconds) :  23.504632
+# Cosmosis pipeline took (seconds) :  23.376447
+# Cosmosis pipeline took (seconds) :  23.646452
+# Cosmosis pipeline took (seconds) :  23.498982
+# Cosmosis pipeline took (seconds) :  23.530988
+# Cosmosis pipeline took (seconds) :  23.58059
+# Cosmosis pipeline took (seconds) :  23.596322
+# Cosmosis pipeline took (seconds) :  23.876083
+# Cosmosis pipeline took (seconds) :  23.55523
+# Cosmosis pipeline took (seconds) :  23.80292
+# Cosmosis pipeline took (seconds) :  23.404142
+# Cosmosis pipeline took (seconds) :  23.389264
+# Cosmosis pipeline took (seconds) :  23.597127
+# Cosmosis pipeline took (seconds) :  23.515945
+# Cosmosis pipeline took (seconds) :  23.552714
+# Cosmosis pipeline took (seconds) :  23.659971
+# Cosmosis pipeline took (seconds) :  23.809589
+# Cosmosis pipeline took (seconds) :  23.57694
+# Cosmosis pipeline took (seconds) :  23.541867
+# Cosmosis pipeline took (seconds) :  23.585819
+# Cosmosis pipeline took (seconds) :  23.535387
+# Cosmosis pipeline took (seconds) :  23.35066
+# Cosmosis pipeline took (seconds) :  23.746634
+# Cosmosis pipeline took (seconds) :  21.396269
+# Cosmosis pipeline took (seconds) :  23.663511
+# Cosmosis pipeline took (seconds) :  23.559796
+# Cosmosis pipeline took (seconds) :  23.472885
+# Cosmosis pipeline took (seconds) :  23.52372
+# Cosmosis pipeline took (seconds) :  23.524389
+# Cosmosis pipeline took (seconds) :  23.47155
+# Cosmosis pipeline took (seconds) :  23.493635
+# Cosmosis pipeline took (seconds) :  23.19391
+# Cosmosis pipeline took (seconds) :  23.527704
+# Cosmosis pipeline took (seconds) :  23.574472
+# Cosmosis pipeline took (seconds) :  23.564604
+# Cosmosis pipeline took (seconds) :  23.513946
+# Cosmosis pipeline took (seconds) :  23.631758
+# Cosmosis pipeline took (seconds) :  23.475425
+# Cosmosis pipeline took (seconds) :  23.581857
+# Cosmosis pipeline took (seconds) :  23.547623
+# Cosmosis pipeline took (seconds) :  23.398233
+# Cosmosis pipeline took (seconds) :  23.558785
+# Cosmosis pipeline took (seconds) :  23.515434
+# Cosmosis pipeline took (seconds) :  23.364252
+# Cosmosis pipeline took (seconds) :  23.366807
+# Cosmosis pipeline took (seconds) :  23.50697
+# Cosmosis pipeline took (seconds) :  23.651579
+ CHAIN #11 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 564.45 seconds.
+ CHAIN #11 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 556.22 seconds.
+ CHAIN #11 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 569.70 seconds.
+ CHAIN #11 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 549.51 seconds.
+ CHAIN #11 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2792.29 seconds.
+# Cosmosis pipeline took (seconds) :  23.393394
+# Cosmosis pipeline took (seconds) :  23.630859
+# Cosmosis pipeline took (seconds) :  23.649502
+# Cosmosis pipeline took (seconds) :  23.453607
+# Cosmosis pipeline took (seconds) :  23.273395
+# Cosmosis pipeline took (seconds) :  23.716319
+# Cosmosis pipeline took (seconds) :  23.505842
+# Cosmosis pipeline took (seconds) :  23.581042
+# Cosmosis pipeline took (seconds) :  23.487381
+# Cosmosis pipeline took (seconds) :  23.523675
+# Cosmosis pipeline took (seconds) :  23.768255
+# Cosmosis pipeline took (seconds) :  23.657954
+# Cosmosis pipeline took (seconds) :  19.395313
+# Cosmosis pipeline took (seconds) :  23.763553
+# Cosmosis pipeline took (seconds) :  23.423422
+# Cosmosis pipeline took (seconds) :  23.533318
+# Cosmosis pipeline took (seconds) :  23.510524
+# Cosmosis pipeline took (seconds) :  23.441054
+# Cosmosis pipeline took (seconds) :  23.766794
+# Cosmosis pipeline took (seconds) :  23.49593
+# Cosmosis pipeline took (seconds) :  23.448286
+# Cosmosis pipeline took (seconds) :  23.338194
+# Cosmosis pipeline took (seconds) :  23.551578
+# Cosmosis pipeline took (seconds) :  23.287722
+# Cosmosis pipeline took (seconds) :  23.396241
+# Cosmosis pipeline took (seconds) :  23.575692
+# Cosmosis pipeline took (seconds) :  23.524203
+# Cosmosis pipeline took (seconds) :  23.548494
+# Cosmosis pipeline took (seconds) :  23.385402
+# Cosmosis pipeline took (seconds) :  23.21472
+# Cosmosis pipeline took (seconds) :  23.463139
+# Cosmosis pipeline took (seconds) :  23.340457
+# Cosmosis pipeline took (seconds) :  23.72142
+# Cosmosis pipeline took (seconds) :  23.4926
+# Cosmosis pipeline took (seconds) :  23.748447
+# Cosmosis pipeline took (seconds) :  19.521325
+# Cosmosis pipeline took (seconds) :  23.601517
+# Cosmosis pipeline took (seconds) :  23.340809
+# Cosmosis pipeline took (seconds) :  23.577714
+# Cosmosis pipeline took (seconds) :  23.330472
+# Cosmosis pipeline took (seconds) :  23.394756
+# Cosmosis pipeline took (seconds) :  23.40407
+# Cosmosis pipeline took (seconds) :  23.309286
+# Cosmosis pipeline took (seconds) :  23.599574
+# Cosmosis pipeline took (seconds) :  23.739545
+# Cosmosis pipeline took (seconds) :  23.532141
+# Cosmosis pipeline took (seconds) :  23.468259
+# Cosmosis pipeline took (seconds) :  23.755862
+# Cosmosis pipeline took (seconds) :  23.164851
+# Cosmosis pipeline took (seconds) :  24.02654
+# Cosmosis pipeline took (seconds) :  23.462939
+# Cosmosis pipeline took (seconds) :  23.346736
+# Cosmosis pipeline took (seconds) :  23.398848
+# Cosmosis pipeline took (seconds) :  23.389116
+# Cosmosis pipeline took (seconds) :  23.642934
+# Cosmosis pipeline took (seconds) :  21.085417
+# Cosmosis pipeline took (seconds) :  23.615564
+# Cosmosis pipeline took (seconds) :  23.419618
+# Cosmosis pipeline took (seconds) :  23.489658
+# Cosmosis pipeline took (seconds) :  23.463538
+# Cosmosis pipeline took (seconds) :  23.517573
+# Cosmosis pipeline took (seconds) :  23.59314
+# Cosmosis pipeline took (seconds) :  23.41576
+# Cosmosis pipeline took (seconds) :  23.37525
+# Cosmosis pipeline took (seconds) :  23.425604
+# Cosmosis pipeline took (seconds) :  23.504922
+# Cosmosis pipeline took (seconds) :  23.975307
+# Cosmosis pipeline took (seconds) :  23.248833
+# Cosmosis pipeline took (seconds) :  23.360154
+# Cosmosis pipeline took (seconds) :  23.630104
+# Cosmosis pipeline took (seconds) :  23.433602
+# Cosmosis pipeline took (seconds) :  23.585608
+# Cosmosis pipeline took (seconds) :  23.402664
+# Cosmosis pipeline took (seconds) :  23.511853
+# Cosmosis pipeline took (seconds) :  23.435394
+# Cosmosis pipeline took (seconds) :  23.540575
+# Cosmosis pipeline took (seconds) :  23.609049
+# Cosmosis pipeline took (seconds) :  23.283826
+# Cosmosis pipeline took (seconds) :  23.493704
+# Cosmosis pipeline took (seconds) :  23.859319
+# Cosmosis pipeline took (seconds) :  23.537622
+# Cosmosis pipeline took (seconds) :  23.540515
+# Cosmosis pipeline took (seconds) :  23.532894
+# Cosmosis pipeline took (seconds) :  23.748873
+# Cosmosis pipeline took (seconds) :  23.967854
+# Cosmosis pipeline took (seconds) :  23.544909
+# Cosmosis pipeline took (seconds) :  23.612974
+# Cosmosis pipeline took (seconds) :  23.224554
+ CHAIN #0 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 644.88 seconds, while divergence encountered in 191 sample(s).
+ CHAIN #0 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 679.92 seconds.
+ CHAIN #0 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 687.72 seconds.
+ CHAIN #0 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 686.01 seconds.
+ CHAIN #0 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3382.58 seconds.
+# Cosmosis pipeline took (seconds) :  23.815318
+# Cosmosis pipeline took (seconds) :  23.383495
+# Cosmosis pipeline took (seconds) :  23.533768
+# Cosmosis pipeline took (seconds) :  23.513005
+# Cosmosis pipeline took (seconds) :  23.488235
+# Cosmosis pipeline took (seconds) :  23.633653
+# Cosmosis pipeline took (seconds) :  23.619396
+# Cosmosis pipeline took (seconds) :  23.212805
+# Cosmosis pipeline took (seconds) :  23.843967
+# Cosmosis pipeline took (seconds) :  23.573057
+# Cosmosis pipeline took (seconds) :  23.407955
+# Cosmosis pipeline took (seconds) :  23.369301
+# Cosmosis pipeline took (seconds) :  23.551572
+# Cosmosis pipeline took (seconds) :  23.140529
+# Cosmosis pipeline took (seconds) :  23.558599
+# Cosmosis pipeline took (seconds) :  23.408068
+# Cosmosis pipeline took (seconds) :  23.417113
+# Cosmosis pipeline took (seconds) :  23.339662
+# Cosmosis pipeline took (seconds) :  23.58102
+# Cosmosis pipeline took (seconds) :  23.411429
+# Cosmosis pipeline took (seconds) :  23.424563
+# Cosmosis pipeline took (seconds) :  23.406924
+# Cosmosis pipeline took (seconds) :  23.539563
+# Cosmosis pipeline took (seconds) :  23.484376
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.715129
+# Cosmosis pipeline took (seconds) :  23.572426
+# Cosmosis pipeline took (seconds) :  23.2068
+# Cosmosis pipeline took (seconds) :  23.405886
+# Cosmosis pipeline took (seconds) :  23.817606
+# Cosmosis pipeline took (seconds) :  23.439622
+# Cosmosis pipeline took (seconds) :  23.60006
+# Cosmosis pipeline took (seconds) :  23.110942
+# Cosmosis pipeline took (seconds) :  23.556329
+# Cosmosis pipeline took (seconds) :  23.756883
+# Cosmosis pipeline took (seconds) :  23.419826
+# Cosmosis pipeline took (seconds) :  22.985824
+# Cosmosis pipeline took (seconds) :  23.502362
+# Cosmosis pipeline took (seconds) :  19.105166
+# Cosmosis pipeline took (seconds) :  23.473213
+# Cosmosis pipeline took (seconds) :  23.483954
+# Cosmosis pipeline took (seconds) :  23.569978
+# Cosmosis pipeline took (seconds) :  23.376908
+# Cosmosis pipeline took (seconds) :  23.51537
+# Cosmosis pipeline took (seconds) :  23.740242
+# Cosmosis pipeline took (seconds) :  23.426251
+# Cosmosis pipeline took (seconds) :  24.604515
+# Cosmosis pipeline took (seconds) :  23.443872
+# Cosmosis pipeline took (seconds) :  23.540142
+# Cosmosis pipeline took (seconds) :  23.308127
+# Cosmosis pipeline took (seconds) :  23.322834
+# Cosmosis pipeline took (seconds) :  23.278812
+# Cosmosis pipeline took (seconds) :  23.04979
+# Cosmosis pipeline took (seconds) :  23.365942
+# Cosmosis pipeline took (seconds) :  23.657177
+# Cosmosis pipeline took (seconds) :  23.479671
+# Cosmosis pipeline took (seconds) :  23.478064
+# Cosmosis pipeline took (seconds) :  23.378753
+# Cosmosis pipeline took (seconds) :  23.421069
+# Cosmosis pipeline took (seconds) :  23.480307
+# Cosmosis pipeline took (seconds) :  24.582241
+# Cosmosis pipeline took (seconds) :  22.126923
+# Cosmosis pipeline took (seconds) :  19.40783
+# Cosmosis pipeline took (seconds) :  23.284351
+# Cosmosis pipeline took (seconds) :  23.394476
+# Cosmosis pipeline took (seconds) :  23.336906
+# Cosmosis pipeline took (seconds) :  23.484829
+# Cosmosis pipeline took (seconds) :  23.493893
+# Cosmosis pipeline took (seconds) :  23.619139
+# Cosmosis pipeline took (seconds) :  23.529217
+# Cosmosis pipeline took (seconds) :  23.729595
+# Cosmosis pipeline took (seconds) :  23.395686
+# Cosmosis pipeline took (seconds) :  23.418687
+# Cosmosis pipeline took (seconds) :  23.57895
+# Cosmosis pipeline took (seconds) :  23.475618
+# Cosmosis pipeline took (seconds) :  23.578525
+# Cosmosis pipeline took (seconds) :  23.514599
+# Cosmosis pipeline took (seconds) :  23.650863
+# Cosmosis pipeline took (seconds) :  23.497124
+# Cosmosis pipeline took (seconds) :  23.541312
+# Cosmosis pipeline took (seconds) :  23.454048
+# Cosmosis pipeline took (seconds) :  23.443579
+# Cosmosis pipeline took (seconds) :  23.437091
+# Cosmosis pipeline took (seconds) :  23.317746
+# Cosmosis pipeline took (seconds) :  23.41855
+# Cosmosis pipeline took (seconds) :  23.493421
+# Cosmosis pipeline took (seconds) :  23.403933
+# Cosmosis pipeline took (seconds) :  23.481742
+# Cosmosis pipeline took (seconds) :  23.32694
+ CHAIN #2 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 572.24 seconds.
+ CHAIN #2 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 576.56 seconds.
+ CHAIN #2 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 573.68 seconds.
+ CHAIN #2 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 571.23 seconds.
+ CHAIN #2 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2865.79 seconds.
+# Cosmosis pipeline took (seconds) :  23.65337
+# Cosmosis pipeline took (seconds) :  23.238969
+# Cosmosis pipeline took (seconds) :  23.854445
+# Cosmosis pipeline took (seconds) :  18.878486
+# Cosmosis pipeline took (seconds) :  23.619336
+# Cosmosis pipeline took (seconds) :  23.561442
+# Cosmosis pipeline took (seconds) :  23.791608
+# Cosmosis pipeline took (seconds) :  23.992121
+# Cosmosis pipeline took (seconds) :  23.902614
+# Cosmosis pipeline took (seconds) :  23.702005
+# Cosmosis pipeline took (seconds) :  23.862741
+# Cosmosis pipeline took (seconds) :  23.886536
+# Cosmosis pipeline took (seconds) :  23.644744
+# Cosmosis pipeline took (seconds) :  23.39181
+# Cosmosis pipeline took (seconds) :  23.675367
+# Cosmosis pipeline took (seconds) :  23.43071
+# Cosmosis pipeline took (seconds) :  19.040151
+# Cosmosis pipeline took (seconds) :  23.487269
+# Cosmosis pipeline took (seconds) :  23.705758
+# Cosmosis pipeline took (seconds) :  23.553738
+# Cosmosis pipeline took (seconds) :  24.025156
+# Cosmosis pipeline took (seconds) :  23.280523
+# Cosmosis pipeline took (seconds) :  23.472861
+# Cosmosis pipeline took (seconds) :  23.493412
+# Cosmosis pipeline took (seconds) :  23.632795
+# Cosmosis pipeline took (seconds) :  23.278026
+# Cosmosis pipeline took (seconds) :  23.476055
+# Cosmosis pipeline took (seconds) :  23.487247
+# Cosmosis pipeline took (seconds) :  23.567102
+# Cosmosis pipeline took (seconds) :  23.485253
+# Cosmosis pipeline took (seconds) :  23.527557
+# Cosmosis pipeline took (seconds) :  23.875693
+# Cosmosis pipeline took (seconds) :  23.502808
+# Cosmosis pipeline took (seconds) :  23.434668
+# Cosmosis pipeline took (seconds) :  23.780435
+# Cosmosis pipeline took (seconds) :  23.716693
+# Cosmosis pipeline took (seconds) :  23.2991
+# Cosmosis pipeline took (seconds) :  23.389587
+# Cosmosis pipeline took (seconds) :  23.40457
+# Cosmosis pipeline took (seconds) :  23.773597
+# Cosmosis pipeline took (seconds) :  23.616523
+# Cosmosis pipeline took (seconds) :  23.511232
+# Cosmosis pipeline took (seconds) :  23.179113
+# Cosmosis pipeline took (seconds) :  23.787774
+# Cosmosis pipeline took (seconds) :  23.477491
+# Cosmosis pipeline took (seconds) :  23.609603
+# Cosmosis pipeline took (seconds) :  23.399231
+# Cosmosis pipeline took (seconds) :  23.773463
+# Cosmosis pipeline took (seconds) :  23.413086
+# Cosmosis pipeline took (seconds) :  23.717508
+# Cosmosis pipeline took (seconds) :  23.650253
+# Cosmosis pipeline took (seconds) :  23.411495
+# Cosmosis pipeline took (seconds) :  23.430378
+# Cosmosis pipeline took (seconds) :  23.469396
+# Cosmosis pipeline took (seconds) :  23.444677
+# Cosmosis pipeline took (seconds) :  23.647675
+# Cosmosis pipeline took (seconds) :  23.908004
+# Cosmosis pipeline took (seconds) :  23.110564
+# Cosmosis pipeline took (seconds) :  23.419947
+# Cosmosis pipeline took (seconds) :  23.540146
+# Cosmosis pipeline took (seconds) :  23.455664
+# Cosmosis pipeline took (seconds) :  23.722935
+# Cosmosis pipeline took (seconds) :  23.584616
+# Cosmosis pipeline took (seconds) :  23.538462
+# Cosmosis pipeline took (seconds) :  23.441975
+# Cosmosis pipeline took (seconds) :  23.952022
+# Cosmosis pipeline took (seconds) :  23.301372
+# Cosmosis pipeline took (seconds) :  23.781446
+# Cosmosis pipeline took (seconds) :  23.528045
+# Cosmosis pipeline took (seconds) :  23.367604
+# Cosmosis pipeline took (seconds) :  23.820429
+# Cosmosis pipeline took (seconds) :  23.503793
+# Cosmosis pipeline took (seconds) :  23.76609
+# Cosmosis pipeline took (seconds) :  23.294232
+# Cosmosis pipeline took (seconds) :  23.503167
+# Cosmosis pipeline took (seconds) :  23.705796
+# Cosmosis pipeline took (seconds) :  23.487749
+# Cosmosis pipeline took (seconds) :  23.453164
+# Cosmosis pipeline took (seconds) :  23.68877
+# Cosmosis pipeline took (seconds) :  23.500797
+# Cosmosis pipeline took (seconds) :  23.429718
+# Cosmosis pipeline took (seconds) :  23.601079
+# Cosmosis pipeline took (seconds) :  23.502987
+# Cosmosis pipeline took (seconds) :  23.425548
+# Cosmosis pipeline took (seconds) :  23.379994
+# Cosmosis pipeline took (seconds) :  23.491171
+# Cosmosis pipeline took (seconds) :  23.558904
+# Cosmosis pipeline took (seconds) :  23.370163
+ CHAIN #1 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 620.04 seconds, while divergence encountered in 207 sample(s).
+ CHAIN #1 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 583.02 seconds, while divergence encountered in 105 sample(s).
+ CHAIN #1 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 609.37 seconds.
+ CHAIN #1 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 600.84 seconds.
+ CHAIN #1 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3012.52 seconds.
+# Cosmosis pipeline took (seconds) :  23.667146
+# Cosmosis pipeline took (seconds) :  23.964594
+# Cosmosis pipeline took (seconds) :  23.444084
+# Cosmosis pipeline took (seconds) :  23.864063
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.303755
+# Cosmosis pipeline took (seconds) :  23.36227
+# Cosmosis pipeline took (seconds) :  23.709621
+# Cosmosis pipeline took (seconds) :  23.648335
+# Cosmosis pipeline took (seconds) :  23.37494
+# Cosmosis pipeline took (seconds) :  23.246252
+# Cosmosis pipeline took (seconds) :  23.624863
+# Cosmosis pipeline took (seconds) :  23.513274
+# Cosmosis pipeline took (seconds) :  23.637775
+# Cosmosis pipeline took (seconds) :  23.41563
+# Cosmosis pipeline took (seconds) :  24.600808
+# Cosmosis pipeline took (seconds) :  23.573946
+# Cosmosis pipeline took (seconds) :  23.436057
+# Cosmosis pipeline took (seconds) :  23.532925
+# Cosmosis pipeline took (seconds) :  23.585921
+# Cosmosis pipeline took (seconds) :  23.523232
+# Cosmosis pipeline took (seconds) :  23.663941
+# Cosmosis pipeline took (seconds) :  23.626769
+# Cosmosis pipeline took (seconds) :  23.389228
+# Cosmosis pipeline took (seconds) :  23.603932
+# Cosmosis pipeline took (seconds) :  23.364849
+# Cosmosis pipeline took (seconds) :  23.427781
+# Cosmosis pipeline took (seconds) :  23.557534
+# Cosmosis pipeline took (seconds) :  23.331325
+# Cosmosis pipeline took (seconds) :  23.6792
+# Cosmosis pipeline took (seconds) :  23.530728
+# Cosmosis pipeline took (seconds) :  23.440142
+# Cosmosis pipeline took (seconds) :  23.570279
+# Cosmosis pipeline took (seconds) :  23.600455
+# Cosmosis pipeline took (seconds) :  23.417197
+# Cosmosis pipeline took (seconds) :  23.89843
+# Cosmosis pipeline took (seconds) :  23.547551
+# Cosmosis pipeline took (seconds) :  23.363253
+# Cosmosis pipeline took (seconds) :  23.419382
+# Cosmosis pipeline took (seconds) :  23.484365
+# Cosmosis pipeline took (seconds) :  23.553433
+# Cosmosis pipeline took (seconds) :  23.427255
+# Cosmosis pipeline took (seconds) :  23.66706
+# Cosmosis pipeline took (seconds) :  23.855586
+# Cosmosis pipeline took (seconds) :  23.627979
+# Cosmosis pipeline took (seconds) :  23.545277
+# Cosmosis pipeline took (seconds) :  23.516114
+# Cosmosis pipeline took (seconds) :  23.393923
+# Cosmosis pipeline took (seconds) :  23.59777
+# Cosmosis pipeline took (seconds) :  23.383554
+# Cosmosis pipeline took (seconds) :  23.612121
+# Cosmosis pipeline took (seconds) :  23.39374
+# Cosmosis pipeline took (seconds) :  23.536777
+# Cosmosis pipeline took (seconds) :  23.456455
+# Cosmosis pipeline took (seconds) :  23.534261
+# Cosmosis pipeline took (seconds) :  23.885869
+# Cosmosis pipeline took (seconds) :  23.63205
+# Cosmosis pipeline took (seconds) :  23.263145
+# Cosmosis pipeline took (seconds) :  23.380284
+# Cosmosis pipeline took (seconds) :  23.55432
+# Cosmosis pipeline took (seconds) :  23.613924
+# Cosmosis pipeline took (seconds) :  23.732348
+# Cosmosis pipeline took (seconds) :  23.644928
+# Cosmosis pipeline took (seconds) :  23.591692
+# Cosmosis pipeline took (seconds) :  23.493967
+# Cosmosis pipeline took (seconds) :  23.335275
+# Cosmosis pipeline took (seconds) :  23.500608
+# Cosmosis pipeline took (seconds) :  23.411093
+# Cosmosis pipeline took (seconds) :  23.42086
+# Cosmosis pipeline took (seconds) :  23.413806
+# Cosmosis pipeline took (seconds) :  23.518373
+# Cosmosis pipeline took (seconds) :  23.379044
+# Cosmosis pipeline took (seconds) :  23.499571
+# Cosmosis pipeline took (seconds) :  23.348907
+# Cosmosis pipeline took (seconds) :  23.529017
+# Cosmosis pipeline took (seconds) :  23.447419
+# Cosmosis pipeline took (seconds) :  23.438499
+# Cosmosis pipeline took (seconds) :  23.396001
+# Cosmosis pipeline took (seconds) :  23.61445
+# Cosmosis pipeline took (seconds) :  23.586095
+# Cosmosis pipeline took (seconds) :  23.640386
+# Cosmosis pipeline took (seconds) :  23.415382
+# Cosmosis pipeline took (seconds) :  23.556088
+# Cosmosis pipeline took (seconds) :  23.577007
+# Cosmosis pipeline took (seconds) :  23.446013
+# Cosmosis pipeline took (seconds) :  23.37793
+# Cosmosis pipeline took (seconds) :  23.386951
+# Cosmosis pipeline took (seconds) :  23.505123
+# Cosmosis pipeline took (seconds) :  23.559555
+ CHAIN #13 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 573.20 seconds.
+ CHAIN #13 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 576.16 seconds.
+ CHAIN #13 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 577.79 seconds.
+ CHAIN #13 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 597.92 seconds.
+ CHAIN #13 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2904.20 seconds.
+# Cosmosis pipeline took (seconds) :  23.609101
+# Cosmosis pipeline took (seconds) :  23.560372
+# Cosmosis pipeline took (seconds) :  23.348915
+# Cosmosis pipeline took (seconds) :  24.000101
+# Cosmosis pipeline took (seconds) :  23.620218
+# Cosmosis pipeline took (seconds) :  23.51395
+# Cosmosis pipeline took (seconds) :  23.608124
+# Cosmosis pipeline took (seconds) :  23.927079
+# Cosmosis pipeline took (seconds) :  23.354491
+# Cosmosis pipeline took (seconds) :  24.205167
+# Cosmosis pipeline took (seconds) :  23.659104
+# Cosmosis pipeline took (seconds) :  23.671244
+# Cosmosis pipeline took (seconds) :  23.612537
+# Cosmosis pipeline took (seconds) :  23.640186
+# Cosmosis pipeline took (seconds) :  23.383644
+# Cosmosis pipeline took (seconds) :  23.533327
+# Cosmosis pipeline took (seconds) :  24.251228
+# Cosmosis pipeline took (seconds) :  23.351027
+# Cosmosis pipeline took (seconds) :  23.480953
+# Cosmosis pipeline took (seconds) :  23.598179
+# Cosmosis pipeline took (seconds) :  23.462896
+# Cosmosis pipeline took (seconds) :  23.508343
+# Cosmosis pipeline took (seconds) :  23.367825
+# Cosmosis pipeline took (seconds) :  23.468484
+# Cosmosis pipeline took (seconds) :  23.768627
+# Cosmosis pipeline took (seconds) :  23.572388
+# Cosmosis pipeline took (seconds) :  23.591627
+# Cosmosis pipeline took (seconds) :  23.982124
+# Cosmosis pipeline took (seconds) :  23.775967
+# Cosmosis pipeline took (seconds) :  23.402924
+# Cosmosis pipeline took (seconds) :  24.287826
+# Cosmosis pipeline took (seconds) :  23.67084
+# Cosmosis pipeline took (seconds) :  23.670883
+# Cosmosis pipeline took (seconds) :  23.553962
+# Cosmosis pipeline took (seconds) :  23.689629
+# Cosmosis pipeline took (seconds) :  23.424142
+# Cosmosis pipeline took (seconds) :  23.656402
+# Cosmosis pipeline took (seconds) :  23.499644
+# Cosmosis pipeline took (seconds) :  23.473445
+# Cosmosis pipeline took (seconds) :  24.102322
+# Cosmosis pipeline took (seconds) :  19.047007
+# Cosmosis pipeline took (seconds) :  23.624953
+# Cosmosis pipeline took (seconds) :  23.91619
+# Cosmosis pipeline took (seconds) :  23.696482
+# Cosmosis pipeline took (seconds) :  23.620779
+# Cosmosis pipeline took (seconds) :  23.574395
+# Cosmosis pipeline took (seconds) :  23.844696
+# Cosmosis pipeline took (seconds) :  24.710147
+# Cosmosis pipeline took (seconds) :  23.557955
+# Cosmosis pipeline took (seconds) :  23.465917
+# Cosmosis pipeline took (seconds) :  23.555043
+# Cosmosis pipeline took (seconds) :  23.841225
+# Cosmosis pipeline took (seconds) :  23.71164
+# Cosmosis pipeline took (seconds) :  23.678323
+# Cosmosis pipeline took (seconds) :  23.26666
+# Cosmosis pipeline took (seconds) :  23.374335
+# Cosmosis pipeline took (seconds) :  23.56988
+# Cosmosis pipeline took (seconds) :  22.354249
+# Cosmosis pipeline took (seconds) :  23.695039
+# Cosmosis pipeline took (seconds) :  23.722492
+# Cosmosis pipeline took (seconds) :  23.80408
+# Cosmosis pipeline took (seconds) :  23.613597
+# Cosmosis pipeline took (seconds) :  23.528613
+# Cosmosis pipeline took (seconds) :  23.56343
+# Cosmosis pipeline took (seconds) :  23.74257
+# Cosmosis pipeline took (seconds) :  23.659221
+# Cosmosis pipeline took (seconds) :  23.640949
+# Cosmosis pipeline took (seconds) :  23.131758
+# Cosmosis pipeline took (seconds) :  23.689828
+# Cosmosis pipeline took (seconds) :  23.225455
+# Cosmosis pipeline took (seconds) :  23.145669
+# Cosmosis pipeline took (seconds) :  23.470572
+# Cosmosis pipeline took (seconds) :  23.39924
+# Cosmosis pipeline took (seconds) :  23.681707
+# Cosmosis pipeline took (seconds) :  23.475244
+# Cosmosis pipeline took (seconds) :  23.193205
+# Cosmosis pipeline took (seconds) :  23.362524
+# Cosmosis pipeline took (seconds) :  23.189353
+# Cosmosis pipeline took (seconds) :  23.846784
+# Cosmosis pipeline took (seconds) :  23.469355
+# Cosmosis pipeline took (seconds) :  23.514925
+# Cosmosis pipeline took (seconds) :  23.824207
+# Cosmosis pipeline took (seconds) :  23.628545
+# Cosmosis pipeline took (seconds) :  23.55541
+# Cosmosis pipeline took (seconds) :  23.425652
+# Cosmosis pipeline took (seconds) :  23.901532
+# Cosmosis pipeline took (seconds) :  23.48269
+# Cosmosis pipeline took (seconds) :  23.554956
+ CHAIN #9 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 647.40 seconds, while divergence encountered in 192 sample(s).
+ CHAIN #9 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 641.98 seconds.
+ CHAIN #9 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 634.31 seconds.
+ CHAIN #9 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 643.43 seconds.
+ CHAIN #9 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3201.77 seconds.
+# Cosmosis pipeline took (seconds) :  23.456194
+# Cosmosis pipeline took (seconds) :  23.371574
+# Cosmosis pipeline took (seconds) :  23.550725
+# Cosmosis pipeline took (seconds) :  23.29286
+# Cosmosis pipeline took (seconds) :  23.414995
+# Cosmosis pipeline took (seconds) :  23.439276
+# Cosmosis pipeline took (seconds) :  23.59197
+# Cosmosis pipeline took (seconds) :  23.037517
+# Cosmosis pipeline took (seconds) :  23.645524
+# Cosmosis pipeline took (seconds) :  23.757054
+# Cosmosis pipeline took (seconds) :  23.694911
+# Cosmosis pipeline took (seconds) :  23.442349
+# Cosmosis pipeline took (seconds) :  23.588965
+# Cosmosis pipeline took (seconds) :  23.543203
+# Cosmosis pipeline took (seconds) :  23.635925
+# Cosmosis pipeline took (seconds) :  23.522411
+# Cosmosis pipeline took (seconds) :  23.21955
+# Cosmosis pipeline took (seconds) :  23.661851
+# Cosmosis pipeline took (seconds) :  23.464887
+# Cosmosis pipeline took (seconds) :  23.653318
+# Cosmosis pipeline took (seconds) :  23.492403
+# Cosmosis pipeline took (seconds) :  23.861265
+# Cosmosis pipeline took (seconds) :  23.505665
+# Cosmosis pipeline took (seconds) :  23.550255
+# Cosmosis pipeline took (seconds) :  23.334766
+# Cosmosis pipeline took (seconds) :  23.40749
+# Cosmosis pipeline took (seconds) :  23.472199
+# Cosmosis pipeline took (seconds) :  23.7329
+# Cosmosis pipeline took (seconds) :  23.725852
+# Cosmosis pipeline took (seconds) :  23.459485
+# Cosmosis pipeline took (seconds) :  23.502962
+# Cosmosis pipeline took (seconds) :  23.624648
+# Cosmosis pipeline took (seconds) :  23.367227
+# Cosmosis pipeline took (seconds) :  23.673237
+# Cosmosis pipeline took (seconds) :  23.543366
+# Cosmosis pipeline took (seconds) :  23.539578
+# Cosmosis pipeline took (seconds) :  23.604303
+# Cosmosis pipeline took (seconds) :  23.158168
+# Cosmosis pipeline took (seconds) :  23.378467
+# Cosmosis pipeline took (seconds) :  23.476842
+# Cosmosis pipeline took (seconds) :  23.401383
+# Cosmosis pipeline took (seconds) :  23.479544
+# Cosmosis pipeline took (seconds) :  23.705534
+# Cosmosis pipeline took (seconds) :  23.564355
+# Cosmosis pipeline took (seconds) :  21.575906
+# Cosmosis pipeline took (seconds) :  23.485527
+# Cosmosis pipeline took (seconds) :  23.50489
+# Cosmosis pipeline took (seconds) :  23.568328
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.457794
+# Cosmosis pipeline took (seconds) :  23.451042
+# Cosmosis pipeline took (seconds) :  23.620715
+# Cosmosis pipeline took (seconds) :  23.487364
+# Cosmosis pipeline took (seconds) :  23.469252
+# Cosmosis pipeline took (seconds) :  23.631789
+# Cosmosis pipeline took (seconds) :  23.96583
+# Cosmosis pipeline took (seconds) :  23.870147
+# Cosmosis pipeline took (seconds) :  23.502015
+# Cosmosis pipeline took (seconds) :  23.499245
+# Cosmosis pipeline took (seconds) :  23.493123
+# Cosmosis pipeline took (seconds) :  23.524696
+# Cosmosis pipeline took (seconds) :  23.455704
+# Cosmosis pipeline took (seconds) :  23.535103
+# Cosmosis pipeline took (seconds) :  23.500127
+# Cosmosis pipeline took (seconds) :  23.508258
+# Cosmosis pipeline took (seconds) :  23.091214
+# Cosmosis pipeline took (seconds) :  23.281405
+# Cosmosis pipeline took (seconds) :  23.898776
+# Cosmosis pipeline took (seconds) :  23.533292
+# Cosmosis pipeline took (seconds) :  23.529156
+# Cosmosis pipeline took (seconds) :  23.627726
+# Cosmosis pipeline took (seconds) :  23.473761
+# Cosmosis pipeline took (seconds) :  23.506021
+# Cosmosis pipeline took (seconds) :  23.558487
+# Cosmosis pipeline took (seconds) :  23.298375
+# Cosmosis pipeline took (seconds) :  23.3655
+# Cosmosis pipeline took (seconds) :  23.338069
+# Cosmosis pipeline took (seconds) :  23.513146
+# Cosmosis pipeline took (seconds) :  23.482573
+# Cosmosis pipeline took (seconds) :  23.399005
+# Cosmosis pipeline took (seconds) :  23.438548
+# Cosmosis pipeline took (seconds) :  23.567883
+# Cosmosis pipeline took (seconds) :  23.476778
+# Cosmosis pipeline took (seconds) :  23.491382
+# Cosmosis pipeline took (seconds) :  23.393314
+# Cosmosis pipeline took (seconds) :  23.572328
+# Cosmosis pipeline took (seconds) :  23.384355
+# Cosmosis pipeline took (seconds) :  23.315494
+# Cosmosis pipeline took (seconds) :  23.436704
+ CHAIN #10 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 619.40 seconds.
+ CHAIN #10 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 586.93 seconds.
+ CHAIN #10 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 574.00 seconds.
+ CHAIN #10 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 573.71 seconds.
+ CHAIN #10 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2931.44 seconds.
+# Cosmosis pipeline took (seconds) :  23.476059
+# Cosmosis pipeline took (seconds) :  23.626341
+# Cosmosis pipeline took (seconds) :  23.507316
+# Cosmosis pipeline took (seconds) :  23.989847
+# Cosmosis pipeline took (seconds) :  23.570483
+# Cosmosis pipeline took (seconds) :  23.404935
+# Cosmosis pipeline took (seconds) :  23.46309
+# Cosmosis pipeline took (seconds) :  23.451109
+# Cosmosis pipeline took (seconds) :  23.85145
+# Cosmosis pipeline took (seconds) :  23.507403
+# Cosmosis pipeline took (seconds) :  23.329801
+# Cosmosis pipeline took (seconds) :  23.640559
+# Cosmosis pipeline took (seconds) :  23.511271
+# Cosmosis pipeline took (seconds) :  23.972074
+# Cosmosis pipeline took (seconds) :  23.89483
+# Cosmosis pipeline took (seconds) :  23.612082
+# Cosmosis pipeline took (seconds) :  23.468746
+# Cosmosis pipeline took (seconds) :  23.534146
+# Cosmosis pipeline took (seconds) :  23.348373
+# Cosmosis pipeline took (seconds) :  23.788869
+# Cosmosis pipeline took (seconds) :  23.7213
+# Cosmosis pipeline took (seconds) :  23.507154
+# Cosmosis pipeline took (seconds) :  23.74694
+# Cosmosis pipeline took (seconds) :  23.690453
+# Cosmosis pipeline took (seconds) :  23.450332
+# Cosmosis pipeline took (seconds) :  23.969356
+# Cosmosis pipeline took (seconds) :  23.499974
+# Cosmosis pipeline took (seconds) :  23.556085
+# Cosmosis pipeline took (seconds) :  23.632756
+# Cosmosis pipeline took (seconds) :  22.902222
+# Cosmosis pipeline took (seconds) :  23.517566
+# Cosmosis pipeline took (seconds) :  23.638458
+# Cosmosis pipeline took (seconds) :  23.640223
+# Cosmosis pipeline took (seconds) :  23.779342
+# Cosmosis pipeline took (seconds) :  23.445727
+# Cosmosis pipeline took (seconds) :  23.529384
+# Cosmosis pipeline took (seconds) :  24.807875
+# Cosmosis pipeline took (seconds) :  23.47825
+# Cosmosis pipeline took (seconds) :  23.376238
+# Cosmosis pipeline took (seconds) :  23.427707
+# Cosmosis pipeline took (seconds) :  23.543668
+# Cosmosis pipeline took (seconds) :  23.863067
+# Cosmosis pipeline took (seconds) :  23.504709
+# Cosmosis pipeline took (seconds) :  23.559357
+# Cosmosis pipeline took (seconds) :  23.53715
+# Cosmosis pipeline took (seconds) :  23.437043
+# Cosmosis pipeline took (seconds) :  23.69374
+# Cosmosis pipeline took (seconds) :  23.663332
+# Cosmosis pipeline took (seconds) :  23.369854
+# Cosmosis pipeline took (seconds) :  23.437273
+# Cosmosis pipeline took (seconds) :  23.431649
+# Cosmosis pipeline took (seconds) :  23.453324
+# Cosmosis pipeline took (seconds) :  24.066852
+# Cosmosis pipeline took (seconds) :  23.349185
+# Cosmosis pipeline took (seconds) :  23.680897
+# Cosmosis pipeline took (seconds) :  23.439396
+# Cosmosis pipeline took (seconds) :  23.742298
+# Cosmosis pipeline took (seconds) :  23.684276
+# Cosmosis pipeline took (seconds) :  23.47383
+# Cosmosis pipeline took (seconds) :  23.34473
+# Cosmosis pipeline took (seconds) :  23.555337
+# Cosmosis pipeline took (seconds) :  23.26889
+# Cosmosis pipeline took (seconds) :  23.509296
+# Cosmosis pipeline took (seconds) :  23.56776
+# Cosmosis pipeline took (seconds) :  23.73126
+# Cosmosis pipeline took (seconds) :  23.406594
+# Cosmosis pipeline took (seconds) :  23.389097
+# Cosmosis pipeline took (seconds) :  23.424469
+# Cosmosis pipeline took (seconds) :  23.732319
+# Cosmosis pipeline took (seconds) :  23.620642
+# Cosmosis pipeline took (seconds) :  23.437877
+# Cosmosis pipeline took (seconds) :  23.610555
+# Cosmosis pipeline took (seconds) :  23.342092
+# Cosmosis pipeline took (seconds) :  23.346457
+# Cosmosis pipeline took (seconds) :  23.457512
+# Cosmosis pipeline took (seconds) :  23.647726
+# Cosmosis pipeline took (seconds) :  23.869768
+# Cosmosis pipeline took (seconds) :  23.174542
+# Cosmosis pipeline took (seconds) :  23.878439
+# Cosmosis pipeline took (seconds) :  23.312942
+# Cosmosis pipeline took (seconds) :  23.708357
+# Cosmosis pipeline took (seconds) :  23.309293
+# Cosmosis pipeline took (seconds) :  23.558026
+# Cosmosis pipeline took (seconds) :  23.548731
+# Cosmosis pipeline took (seconds) :  23.567339
+# Cosmosis pipeline took (seconds) :  23.490402
+# Cosmosis pipeline took (seconds) :  23.714285
+# Cosmosis pipeline took (seconds) :  23.569463
+ CHAIN #11 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 534.15 seconds, while divergence encountered in 225 sample(s).
+ CHAIN #11 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 484.33 seconds, while divergence encountered in 127 sample(s).
+ CHAIN #11 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 475.42 seconds, while divergence encountered in 122 sample(s).
+ CHAIN #11 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 478.11 seconds, while divergence encountered in 128 sample(s).
+ CHAIN #11 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 2453.21 seconds.
+# Cosmosis pipeline took (seconds) :  23.710555
+# Cosmosis pipeline took (seconds) :  23.342136
+# Cosmosis pipeline took (seconds) :  23.528683
+# Cosmosis pipeline took (seconds) :  23.530421
+# Cosmosis pipeline took (seconds) :  23.661548
+# Cosmosis pipeline took (seconds) :  23.489672
+# Cosmosis pipeline took (seconds) :  24.133741
+# Cosmosis pipeline took (seconds) :  23.541643
+# Cosmosis pipeline took (seconds) :  23.671093
+# Cosmosis pipeline took (seconds) :  23.916575
+# Cosmosis pipeline took (seconds) :  22.540661
+# Cosmosis pipeline took (seconds) :  23.525451
+# Cosmosis pipeline took (seconds) :  23.471351
+# Cosmosis pipeline took (seconds) :  23.392172
+# Cosmosis pipeline took (seconds) :  23.156923
+# Cosmosis pipeline took (seconds) :  23.526294
+# Cosmosis pipeline took (seconds) :  23.545121
+# Cosmosis pipeline took (seconds) :  23.575256
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.600339
+# Cosmosis pipeline took (seconds) :  23.677229
+# Cosmosis pipeline took (seconds) :  23.671752
+# Cosmosis pipeline took (seconds) :  23.730497
+# Cosmosis pipeline took (seconds) :  23.491359
+# Cosmosis pipeline took (seconds) :  23.50644
+# Cosmosis pipeline took (seconds) :  23.427749
+# Cosmosis pipeline took (seconds) :  24.595589
+# Cosmosis pipeline took (seconds) :  23.306345
+# Cosmosis pipeline took (seconds) :  23.368135
+# Cosmosis pipeline took (seconds) :  23.850845
+# Cosmosis pipeline took (seconds) :  19.060424
+# Cosmosis pipeline took (seconds) :  23.54769
+# Cosmosis pipeline took (seconds) :  23.593229
+# Cosmosis pipeline took (seconds) :  23.368704
+# Cosmosis pipeline took (seconds) :  23.389698
+# Cosmosis pipeline took (seconds) :  23.520901
+# Cosmosis pipeline took (seconds) :  23.491551
+# Cosmosis pipeline took (seconds) :  21.633783
+# Cosmosis pipeline took (seconds) :  23.543913
+# Cosmosis pipeline took (seconds) :  23.507633
+# Cosmosis pipeline took (seconds) :  23.632609
+# Cosmosis pipeline took (seconds) :  23.793557
+# Cosmosis pipeline took (seconds) :  23.493079
+# Cosmosis pipeline took (seconds) :  23.489605
+# Cosmosis pipeline took (seconds) :  23.595485
+# Cosmosis pipeline took (seconds) :  23.58619
+# Cosmosis pipeline took (seconds) :  23.574594
+# Cosmosis pipeline took (seconds) :  23.314517
+# Cosmosis pipeline took (seconds) :  23.53948
+# Cosmosis pipeline took (seconds) :  23.386674
+# Cosmosis pipeline took (seconds) :  23.306637
+# Cosmosis pipeline took (seconds) :  23.581919
+# Cosmosis pipeline took (seconds) :  23.5205
+# Cosmosis pipeline took (seconds) :  23.196822
+# Cosmosis pipeline took (seconds) :  23.38935
+# Cosmosis pipeline took (seconds) :  23.509436
+# Cosmosis pipeline took (seconds) :  23.331876
+# Cosmosis pipeline took (seconds) :  23.352323
+# Cosmosis pipeline took (seconds) :  23.608183
+# Cosmosis pipeline took (seconds) :  23.414252
+# Cosmosis pipeline took (seconds) :  23.465256
+# Cosmosis pipeline took (seconds) :  23.425489
+# Cosmosis pipeline took (seconds) :  23.449227
+# Cosmosis pipeline took (seconds) :  23.362077
+# Cosmosis pipeline took (seconds) :  23.599007
+# Cosmosis pipeline took (seconds) :  23.181781
+# Cosmosis pipeline took (seconds) :  23.285962
+# Cosmosis pipeline took (seconds) :  23.445793
+# Cosmosis pipeline took (seconds) :  23.486483
+# Cosmosis pipeline took (seconds) :  23.562467
+# Cosmosis pipeline took (seconds) :  23.346396
+# Cosmosis pipeline took (seconds) :  23.396135
+# Cosmosis pipeline took (seconds) :  23.443914
+# Cosmosis pipeline took (seconds) :  23.481856
+# Cosmosis pipeline took (seconds) :  23.432111
+# Cosmosis pipeline took (seconds) :  23.57911
+# Cosmosis pipeline took (seconds) :  23.44073
+# Cosmosis pipeline took (seconds) :  23.307203
+# Cosmosis pipeline took (seconds) :  23.467819
+# Cosmosis pipeline took (seconds) :  23.366807
+# Cosmosis pipeline took (seconds) :  23.438162
+# Cosmosis pipeline took (seconds) :  23.428321
+# Cosmosis pipeline took (seconds) :  23.511998
+# Cosmosis pipeline took (seconds) :  23.325741
+# Cosmosis pipeline took (seconds) :  23.530159
+# Cosmosis pipeline took (seconds) :  23.456528
+# Cosmosis pipeline took (seconds) :  23.272956
+# Cosmosis pipeline took (seconds) :  23.557162
+# Cosmosis pipeline took (seconds) :  23.558943
+ CHAIN #4 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 613.59 seconds.
+ CHAIN #4 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 602.94 seconds.
+ CHAIN #4 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 591.30 seconds.
+ CHAIN #4 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 603.53 seconds.
+ CHAIN #4 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3010.04 seconds.
+# Cosmosis pipeline took (seconds) :  23.676383
+# Cosmosis pipeline took (seconds) :  23.588948
+# Cosmosis pipeline took (seconds) :  23.858277
+# Cosmosis pipeline took (seconds) :  23.095415
+# Cosmosis pipeline took (seconds) :  23.484495
+# Cosmosis pipeline took (seconds) :  23.673483
+# Cosmosis pipeline took (seconds) :  23.347896
+# Cosmosis pipeline took (seconds) :  23.495661
+# Cosmosis pipeline took (seconds) :  19.542846
+# Cosmosis pipeline took (seconds) :  23.845689
+# Cosmosis pipeline took (seconds) :  23.47594
+# Cosmosis pipeline took (seconds) :  23.460026
+# Cosmosis pipeline took (seconds) :  23.35968
+# Cosmosis pipeline took (seconds) :  23.598173
+# Cosmosis pipeline took (seconds) :  23.824641
+# Cosmosis pipeline took (seconds) :  23.500113
+# Cosmosis pipeline took (seconds) :  23.299054
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.556597
+# Cosmosis pipeline took (seconds) :  23.617485
+# Cosmosis pipeline took (seconds) :  23.947974
+# Cosmosis pipeline took (seconds) :  23.415647
+# Cosmosis pipeline took (seconds) :  23.743156
+# Cosmosis pipeline took (seconds) :  23.415032
+# Cosmosis pipeline took (seconds) :  23.696994
+# Cosmosis pipeline took (seconds) :  24.030952
+# Cosmosis pipeline took (seconds) :  22.555387
+# Cosmosis pipeline took (seconds) :  23.515443
+# Cosmosis pipeline took (seconds) :  23.507237
+# Cosmosis pipeline took (seconds) :  23.730777
+# Cosmosis pipeline took (seconds) :  23.594728
+# Cosmosis pipeline took (seconds) :  23.500204
+# Cosmosis pipeline took (seconds) :  23.476506
+# Cosmosis pipeline took (seconds) :  23.486014
+# Cosmosis pipeline took (seconds) :  23.414101
+# Cosmosis pipeline took (seconds) :  23.519319
+# Cosmosis pipeline took (seconds) :  23.579534
+# Cosmosis pipeline took (seconds) :  23.64601
+# Cosmosis pipeline took (seconds) :  23.805258
+# Cosmosis pipeline took (seconds) :  23.366378
+# Cosmosis pipeline took (seconds) :  23.776279
+# Cosmosis pipeline took (seconds) :  24.633521
+# Cosmosis pipeline took (seconds) :  23.737698
+# Cosmosis pipeline took (seconds) :  23.430715
+# Cosmosis pipeline took (seconds) :  23.586112
+# Cosmosis pipeline took (seconds) :  23.523588
+# Cosmosis pipeline took (seconds) :  23.709771
+# Cosmosis pipeline took (seconds) :  23.553404
+# Cosmosis pipeline took (seconds) :  23.287528
+# Cosmosis pipeline took (seconds) :  23.623561
+# Cosmosis pipeline took (seconds) :  23.55877
+# Cosmosis pipeline took (seconds) :  23.603688
+# Cosmosis pipeline took (seconds) :  23.505563
+# Cosmosis pipeline took (seconds) :  22.333045
+# Cosmosis pipeline took (seconds) :  23.697914
+# Cosmosis pipeline took (seconds) :  23.592427
+# Cosmosis pipeline took (seconds) :  23.727785
+# Cosmosis pipeline took (seconds) :  23.914202
+# Cosmosis pipeline took (seconds) :  23.483807
+# Cosmosis pipeline took (seconds) :  23.518438
+# Cosmosis pipeline took (seconds) :  23.841612
+# Cosmosis pipeline took (seconds) :  23.196073
+# Cosmosis pipeline took (seconds) :  24.022307
+# Cosmosis pipeline took (seconds) :  24.063245
+# Cosmosis pipeline took (seconds) :  23.491494
+# Cosmosis pipeline took (seconds) :  23.539877
+# Cosmosis pipeline took (seconds) :  23.510738
+# Cosmosis pipeline took (seconds) :  23.539162
+# Cosmosis pipeline took (seconds) :  23.270699
+# Cosmosis pipeline took (seconds) :  24.073963
+# Cosmosis pipeline took (seconds) :  23.692399
+# Cosmosis pipeline took (seconds) :  23.442566
+# Cosmosis pipeline took (seconds) :  23.569728
+# Cosmosis pipeline took (seconds) :  23.727513
+# Cosmosis pipeline took (seconds) :  23.609426
+# Cosmosis pipeline took (seconds) :  23.463038
+# Cosmosis pipeline took (seconds) :  23.429143
+# Cosmosis pipeline took (seconds) :  23.791919
+# Cosmosis pipeline took (seconds) :  23.305819
+# Cosmosis pipeline took (seconds) :  23.557935
+# Cosmosis pipeline took (seconds) :  23.21898
+# Cosmosis pipeline took (seconds) :  23.313717
+# Cosmosis pipeline took (seconds) :  23.344727
+# Cosmosis pipeline took (seconds) :  23.457851
+# Cosmosis pipeline took (seconds) :  23.481364
+# Cosmosis pipeline took (seconds) :  23.269094
+# Cosmosis pipeline took (seconds) :  23.725841
+# Cosmosis pipeline took (seconds) :  23.366033
+# Cosmosis pipeline took (seconds) :  23.556576
+ CHAIN #6 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 762.93 seconds, while divergence encountered in 147 sample(s).
+ CHAIN #6 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 857.27 seconds.
+ CHAIN #6 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 806.30 seconds.
+ CHAIN #6 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 778.01 seconds.
+ CHAIN #6 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3981.22 seconds.
+# Cosmosis pipeline took (seconds) :  23.840477
+# Cosmosis pipeline took (seconds) :  23.551029
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  25.09907
+# Cosmosis pipeline took (seconds) :  23.487192
+# Cosmosis pipeline took (seconds) :  23.468266
+# Cosmosis pipeline took (seconds) :  23.638177
+# Cosmosis pipeline took (seconds) :  23.531341
+# Cosmosis pipeline took (seconds) :  23.345399
+# Cosmosis pipeline took (seconds) :  23.465581
+# Cosmosis pipeline took (seconds) :  23.53963
+# Cosmosis pipeline took (seconds) :  23.266381
+# Cosmosis pipeline took (seconds) :  23.518484
+# Cosmosis pipeline took (seconds) :  23.432817
+# Cosmosis pipeline took (seconds) :  23.494759
+# Cosmosis pipeline took (seconds) :  23.304195
+# Cosmosis pipeline took (seconds) :  23.645757
+# Cosmosis pipeline took (seconds) :  23.546039
+# Cosmosis pipeline took (seconds) :  23.519302
+# Cosmosis pipeline took (seconds) :  23.607261
+# Cosmosis pipeline took (seconds) :  23.605633
+# Cosmosis pipeline took (seconds) :  23.495531
+# Cosmosis pipeline took (seconds) :  23.465769
+# Cosmosis pipeline took (seconds) :  23.234414
+# Cosmosis pipeline took (seconds) :  23.54002
+# Cosmosis pipeline took (seconds) :  23.292991
+# Cosmosis pipeline took (seconds) :  23.507655
+# Cosmosis pipeline took (seconds) :  23.156369
+# Cosmosis pipeline took (seconds) :  23.451872
+# Cosmosis pipeline took (seconds) :  23.465508
+# Cosmosis pipeline took (seconds) :  23.529314
+# Cosmosis pipeline took (seconds) :  23.597594
+# Cosmosis pipeline took (seconds) :  23.615186
+# Cosmosis pipeline took (seconds) :  23.525816
+# Cosmosis pipeline took (seconds) :  23.435096
+# Cosmosis pipeline took (seconds) :  23.441469
+# Cosmosis pipeline took (seconds) :  23.657619
+# Cosmosis pipeline took (seconds) :  23.477584
+# Cosmosis pipeline took (seconds) :  23.406466
+# Cosmosis pipeline took (seconds) :  23.670928
+# Cosmosis pipeline took (seconds) :  23.464569
+# Cosmosis pipeline took (seconds) :  22.936682
+# Cosmosis pipeline took (seconds) :  23.458509
+# Cosmosis pipeline took (seconds) :  23.381543
+# Cosmosis pipeline took (seconds) :  24.570401
+# Cosmosis pipeline took (seconds) :  23.490483
+# Cosmosis pipeline took (seconds) :  23.537769
+# Cosmosis pipeline took (seconds) :  23.2682
+# Cosmosis pipeline took (seconds) :  23.599767
+# Cosmosis pipeline took (seconds) :  23.604441
+# Cosmosis pipeline took (seconds) :  23.657355
+# Cosmosis pipeline took (seconds) :  23.425191
+# Cosmosis pipeline took (seconds) :  23.883609
+# Cosmosis pipeline took (seconds) :  23.403045
+# Cosmosis pipeline took (seconds) :  23.677357
+# Cosmosis pipeline took (seconds) :  23.464007
+# Cosmosis pipeline took (seconds) :  23.277493
+# Cosmosis pipeline took (seconds) :  23.370089
+# Cosmosis pipeline took (seconds) :  21.767433
+# Cosmosis pipeline took (seconds) :  23.610095
+# Cosmosis pipeline took (seconds) :  23.734138
+# Cosmosis pipeline took (seconds) :  23.49669
+# Cosmosis pipeline took (seconds) :  23.524177
+# Cosmosis pipeline took (seconds) :  23.533436
+# Cosmosis pipeline took (seconds) :  23.572476
+# Cosmosis pipeline took (seconds) :  23.486052
+# Cosmosis pipeline took (seconds) :  23.539097
+# Cosmosis pipeline took (seconds) :  23.563204
+# Cosmosis pipeline took (seconds) :  23.574232
+# Cosmosis pipeline took (seconds) :  23.67901
+# Cosmosis pipeline took (seconds) :  23.559188
+# Cosmosis pipeline took (seconds) :  23.477735
+# Cosmosis pipeline took (seconds) :  23.66143
+# Cosmosis pipeline took (seconds) :  23.460821
+# Cosmosis pipeline took (seconds) :  23.642523
+# Cosmosis pipeline took (seconds) :  23.56636
+# Cosmosis pipeline took (seconds) :  23.689966
+# Cosmosis pipeline took (seconds) :  23.395101
+# Cosmosis pipeline took (seconds) :  23.518982
+# Cosmosis pipeline took (seconds) :  23.806114
+# Cosmosis pipeline took (seconds) :  23.519238
+# Cosmosis pipeline took (seconds) :  19.134011
+# Cosmosis pipeline took (seconds) :  23.708319
+# Cosmosis pipeline took (seconds) :  23.375274
+# Cosmosis pipeline took (seconds) :  23.6764
+# Cosmosis pipeline took (seconds) :  23.41013
+# Cosmosis pipeline took (seconds) :  23.480029
+# Cosmosis pipeline took (seconds) :  23.463698
+# Cosmosis pipeline took (seconds) :  23.630425
+ CHAIN #7 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 657.86 seconds.
+ CHAIN #7 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 671.75 seconds.
+ CHAIN #7 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 667.19 seconds.
+ CHAIN #7 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 667.56 seconds.
+ CHAIN #7 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3320.45 seconds.
+# Cosmosis pipeline took (seconds) :  23.644011
+# Cosmosis pipeline took (seconds) :  23.566505
+# Cosmosis pipeline took (seconds) :  23.914995
+# Cosmosis pipeline took (seconds) :  23.54014
+# Cosmosis pipeline took (seconds) :  23.693604
+# Cosmosis pipeline took (seconds) :  23.469661
+# Cosmosis pipeline took (seconds) :  23.426
+# Cosmosis pipeline took (seconds) :  23.75066
+# Cosmosis pipeline took (seconds) :  23.407578
+# Cosmosis pipeline took (seconds) :  23.171273
+# Cosmosis pipeline took (seconds) :  23.91953
+# Cosmosis pipeline took (seconds) :  23.475092
+# Cosmosis pipeline took (seconds) :  23.654764
+# Cosmosis pipeline took (seconds) :  23.60296
+# Cosmosis pipeline took (seconds) :  23.63134
+# Cosmosis pipeline took (seconds) :  23.451504
+# Cosmosis pipeline took (seconds) :  23.602697
+# Cosmosis pipeline took (seconds) :  23.415208
+# Cosmosis pipeline took (seconds) :  23.596988
+# Cosmosis pipeline took (seconds) :  23.432211
+# Cosmosis pipeline took (seconds) :  23.548317
+# Cosmosis pipeline took (seconds) :  23.808844
+# Cosmosis pipeline took (seconds) :  23.52825
+# Cosmosis pipeline took (seconds) :  24.023278
+# Cosmosis pipeline took (seconds) :  23.714668
+# Cosmosis pipeline took (seconds) :  23.678411
+# Cosmosis pipeline took (seconds) :  23.747178
+# Cosmosis pipeline took (seconds) :  23.652567
+# Cosmosis pipeline took (seconds) :  23.829207
+# Cosmosis pipeline took (seconds) :  23.426956
+# Cosmosis pipeline took (seconds) :  23.763512
+# Cosmosis pipeline took (seconds) :  23.449105
+# Cosmosis pipeline took (seconds) :  23.506119
+# Cosmosis pipeline took (seconds) :  23.442266
+# Cosmosis pipeline took (seconds) :  23.524947
+# Cosmosis pipeline took (seconds) :  23.564317
+# Cosmosis pipeline took (seconds) :  23.938582
+# Cosmosis pipeline took (seconds) :  23.467647
+# Cosmosis pipeline took (seconds) :  23.326171
+# Cosmosis pipeline took (seconds) :  23.480343
+# Cosmosis pipeline took (seconds) :  23.689108
+# Cosmosis pipeline took (seconds) :  23.149314
+# Cosmosis pipeline took (seconds) :  23.502924
+# Cosmosis pipeline took (seconds) :  23.687469
+# Cosmosis pipeline took (seconds) :  23.539283
+# Cosmosis pipeline took (seconds) :  23.624713
+# Cosmosis pipeline took (seconds) :  23.700502
+# Cosmosis pipeline took (seconds) :  23.415657
+# Cosmosis pipeline took (seconds) :  24.008766
+# Cosmosis pipeline took (seconds) :  23.782891
+# Cosmosis pipeline took (seconds) :  23.132709
+# Cosmosis pipeline took (seconds) :  23.516858
+# Cosmosis pipeline took (seconds) :  23.986347
+# Cosmosis pipeline took (seconds) :  23.500843
+# Cosmosis pipeline took (seconds) :  23.418263
+# Cosmosis pipeline took (seconds) :  24.085437
+# Cosmosis pipeline took (seconds) :  23.4451
+# Cosmosis pipeline took (seconds) :  23.675027
+# Cosmosis pipeline took (seconds) :  23.627275
+# Cosmosis pipeline took (seconds) :  23.422895
+# Cosmosis pipeline took (seconds) :  23.506055
+# Cosmosis pipeline took (seconds) :  23.556526
+# Cosmosis pipeline took (seconds) :  23.681858
+# Cosmosis pipeline took (seconds) :  23.416708
+# Cosmosis pipeline took (seconds) :  23.536979
+# Cosmosis pipeline took (seconds) :  23.562152
+# Cosmosis pipeline took (seconds) :  23.2769
+# Cosmosis pipeline took (seconds) :  23.663826
+# Cosmosis pipeline took (seconds) :  23.501638
+# Cosmosis pipeline took (seconds) :  23.475398
+# Cosmosis pipeline took (seconds) :  23.765695
+# Cosmosis pipeline took (seconds) :  23.940462
+# Cosmosis pipeline took (seconds) :  23.568044
+# Cosmosis pipeline took (seconds) :  23.497154
+# Cosmosis pipeline took (seconds) :  23.932819
+# Cosmosis pipeline took (seconds) :  23.296616
+# Cosmosis pipeline took (seconds) :  23.502965
+# Cosmosis pipeline took (seconds) :  23.579357
+# Cosmosis pipeline took (seconds) :  23.492466
+# Cosmosis pipeline took (seconds) :  23.45283
+# Cosmosis pipeline took (seconds) :  23.802461
+# Cosmosis pipeline took (seconds) :  23.522143
+# Cosmosis pipeline took (seconds) :  24.66837
+# Cosmosis pipeline took (seconds) :  23.852662
+# Cosmosis pipeline took (seconds) :  23.600403
+# Cosmosis pipeline took (seconds) :  23.633742
+# Cosmosis pipeline took (seconds) :  23.60559
+# Cosmosis pipeline took (seconds) :  23.381795
+ CHAIN #13 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 663.72 seconds, while divergence encountered in 200 sample(s).
+ CHAIN #13 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 685.89 seconds.
+ CHAIN #13 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 685.88 seconds.
+ CHAIN #13 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 681.14 seconds.
+ CHAIN #13 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3389.89 seconds.
+# Cosmosis pipeline took (seconds) :  23.809425
+# Cosmosis pipeline took (seconds) :  24.278961
+# Cosmosis pipeline took (seconds) :  23.899122
+# Cosmosis pipeline took (seconds) :  23.359129
+# Cosmosis pipeline took (seconds) :  24.140994
+# Cosmosis pipeline took (seconds) :  23.488105
+# Cosmosis pipeline took (seconds) :  19.531058
+# Cosmosis pipeline took (seconds) :  23.653341
+# Cosmosis pipeline took (seconds) :  23.52514
+# Cosmosis pipeline took (seconds) :  23.403106
+# Cosmosis pipeline took (seconds) :  23.313886
+# Cosmosis pipeline took (seconds) :  23.684021
+# Cosmosis pipeline took (seconds) :  23.494426
+# Cosmosis pipeline took (seconds) :  23.402578
+# Cosmosis pipeline took (seconds) :  23.327548
+# Cosmosis pipeline took (seconds) :  23.297886
+# Cosmosis pipeline took (seconds) :  23.466767
+# Cosmosis pipeline took (seconds) :  23.553428
+# Cosmosis pipeline took (seconds) :  24.700037
+# Cosmosis pipeline took (seconds) :  23.217516
+# Cosmosis pipeline took (seconds) :  23.300889
+# Cosmosis pipeline took (seconds) :  23.472464
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.548463
+# Cosmosis pipeline took (seconds) :  23.330775
+# Cosmosis pipeline took (seconds) :  23.635263
+# Cosmosis pipeline took (seconds) :  23.469407
+# Cosmosis pipeline took (seconds) :  23.287677
+# Cosmosis pipeline took (seconds) :  23.382324
+# Cosmosis pipeline took (seconds) :  23.524977
+# Cosmosis pipeline took (seconds) :  23.27576
+# Cosmosis pipeline took (seconds) :  23.492024
+# Cosmosis pipeline took (seconds) :  23.412165
+# Cosmosis pipeline took (seconds) :  23.412735
+# Cosmosis pipeline took (seconds) :  23.4279
+# Cosmosis pipeline took (seconds) :  23.578188
+# Cosmosis pipeline took (seconds) :  23.530105
+# Cosmosis pipeline took (seconds) :  23.566073
+# Cosmosis pipeline took (seconds) :  23.510831
+# Cosmosis pipeline took (seconds) :  23.749097
+# Cosmosis pipeline took (seconds) :  23.576154
+# Cosmosis pipeline took (seconds) :  23.558342
+# Cosmosis pipeline took (seconds) :  23.546976
+# Cosmosis pipeline took (seconds) :  23.661456
+# Cosmosis pipeline took (seconds) :  23.432066
+# Cosmosis pipeline took (seconds) :  23.631273
+# Cosmosis pipeline took (seconds) :  23.464434
+# Cosmosis pipeline took (seconds) :  23.652709
+# Cosmosis pipeline took (seconds) :  23.635638
+# Cosmosis pipeline took (seconds) :  23.676371
+# Cosmosis pipeline took (seconds) :  23.243894
+# Cosmosis pipeline took (seconds) :  23.601016
+# Cosmosis pipeline took (seconds) :  23.429734
+# Cosmosis pipeline took (seconds) :  23.681211
+# Cosmosis pipeline took (seconds) :  23.552192
+# Cosmosis pipeline took (seconds) :  23.555527
+# Cosmosis pipeline took (seconds) :  23.334825
+# Cosmosis pipeline took (seconds) :  23.312202
+# Cosmosis pipeline took (seconds) :  23.693152
+# Cosmosis pipeline took (seconds) :  23.389491
+# Cosmosis pipeline took (seconds) :  23.754112
+# Cosmosis pipeline took (seconds) :  23.409605
+# Cosmosis pipeline took (seconds) :  23.542122
+# Cosmosis pipeline took (seconds) :  23.404824
+# Cosmosis pipeline took (seconds) :  23.334882
+# Cosmosis pipeline took (seconds) :  23.703013
+# Cosmosis pipeline took (seconds) :  23.629219
+# Cosmosis pipeline took (seconds) :  23.464306
+# Cosmosis pipeline took (seconds) :  23.143592
+# Cosmosis pipeline took (seconds) :  23.844315
+# Cosmosis pipeline took (seconds) :  23.42157
+# Cosmosis pipeline took (seconds) :  23.572296
+# Cosmosis pipeline took (seconds) :  23.530069
+# Cosmosis pipeline took (seconds) :  23.47111
+# Cosmosis pipeline took (seconds) :  23.537629
+# Cosmosis pipeline took (seconds) :  23.390687
+# Cosmosis pipeline took (seconds) :  23.548292
+# Cosmosis pipeline took (seconds) :  23.365202
+# Cosmosis pipeline took (seconds) :  23.52893
+# Cosmosis pipeline took (seconds) :  23.621211
+# Cosmosis pipeline took (seconds) :  23.535718
+# Cosmosis pipeline took (seconds) :  23.302171
+# Cosmosis pipeline took (seconds) :  23.440072
+# Cosmosis pipeline took (seconds) :  23.458282
+# Cosmosis pipeline took (seconds) :  23.512137
+# Cosmosis pipeline took (seconds) :  23.478431
+# Cosmosis pipeline took (seconds) :  23.41728
+# Cosmosis pipeline took (seconds) :  23.354578
+# Cosmosis pipeline took (seconds) :  23.484198
+ CHAIN #9 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 665.07 seconds.
+ CHAIN #9 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 682.27 seconds.
+ CHAIN #9 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 680.73 seconds.
+ CHAIN #9 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 681.74 seconds.
+ CHAIN #9 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3403.78 seconds.
+# Cosmosis pipeline took (seconds) :  23.288008
+# Cosmosis pipeline took (seconds) :  23.508906
+# Cosmosis pipeline took (seconds) :  23.449021
+# Cosmosis pipeline took (seconds) :  23.649393
+# Cosmosis pipeline took (seconds) :  18.991229
+# Cosmosis pipeline took (seconds) :  23.51035
+# Cosmosis pipeline took (seconds) :  23.416165
+# Cosmosis pipeline took (seconds) :  23.684585
+# Cosmosis pipeline took (seconds) :  23.667035
+# Cosmosis pipeline took (seconds) :  23.382406
+# Cosmosis pipeline took (seconds) :  23.427999
+# Cosmosis pipeline took (seconds) :  23.495934
+# Cosmosis pipeline took (seconds) :  23.505562
+# Cosmosis pipeline took (seconds) :  23.3945
+# Cosmosis pipeline took (seconds) :  24.148302
+# Cosmosis pipeline took (seconds) :  23.436735
+# Cosmosis pipeline took (seconds) :  23.590821
+# Cosmosis pipeline took (seconds) :  23.499082
+# Cosmosis pipeline took (seconds) :  23.589429
+# Cosmosis pipeline took (seconds) :  23.509958
+# Cosmosis pipeline took (seconds) :  23.629415
+# Cosmosis pipeline took (seconds) :  23.526969
+# Cosmosis pipeline took (seconds) :  23.397823
+# Cosmosis pipeline took (seconds) :  23.625924
+# Cosmosis pipeline took (seconds) :  23.544783
+# Cosmosis pipeline took (seconds) :  23.801142
+# Cosmosis pipeline took (seconds) :  24.150351
+# Cosmosis pipeline took (seconds) :  23.691509
+# Cosmosis pipeline took (seconds) :  23.756116
+# Cosmosis pipeline took (seconds) :  23.582698
+# Cosmosis pipeline took (seconds) :  23.525012
+# Cosmosis pipeline took (seconds) :  23.624336
+# Cosmosis pipeline took (seconds) :  23.204323
+# Cosmosis pipeline took (seconds) :  23.474209
+# Cosmosis pipeline took (seconds) :  23.669211
+# Cosmosis pipeline took (seconds) :  23.41852
+# Cosmosis pipeline took (seconds) :  23.745386
+# Cosmosis pipeline took (seconds) :  23.593062
+# Cosmosis pipeline took (seconds) :  23.49824
+# Cosmosis pipeline took (seconds) :  24.585317
+# Cosmosis pipeline took (seconds) :  23.489479
+# Cosmosis pipeline took (seconds) :  23.530163
+# Cosmosis pipeline took (seconds) :  23.85683
+# Cosmosis pipeline took (seconds) :  23.742289
+# Cosmosis pipeline took (seconds) :  23.765828
+# Cosmosis pipeline took (seconds) :  23.366967
+# Cosmosis pipeline took (seconds) :  23.444563
+# Cosmosis pipeline took (seconds) :  23.374878
+# Cosmosis pipeline took (seconds) :  23.605013
+# Cosmosis pipeline took (seconds) :  23.368837
+# Cosmosis pipeline took (seconds) :  23.292373
+# Cosmosis pipeline took (seconds) :  23.342967
+# Cosmosis pipeline took (seconds) :  23.381045
+# Cosmosis pipeline took (seconds) :  23.419511
+# Cosmosis pipeline took (seconds) :  23.581056
+# Cosmosis pipeline took (seconds) :  23.866436
+# Cosmosis pipeline took (seconds) :  23.678955
+# Cosmosis pipeline took (seconds) :  23.747669
+# Cosmosis pipeline took (seconds) :  23.461826
+# Cosmosis pipeline took (seconds) :  23.507306
+# Cosmosis pipeline took (seconds) :  23.575922
+# Cosmosis pipeline took (seconds) :  23.367175
+# Cosmosis pipeline took (seconds) :  23.621381
+# Cosmosis pipeline took (seconds) :  23.928407
+# Cosmosis pipeline took (seconds) :  23.37241
+# Cosmosis pipeline took (seconds) :  23.612417
+# Cosmosis pipeline took (seconds) :  23.533133
+# Cosmosis pipeline took (seconds) :  23.479753
+# Cosmosis pipeline took (seconds) :  23.378399
+# Cosmosis pipeline took (seconds) :  23.502454
+# Cosmosis pipeline took (seconds) :  23.577268
+# Cosmosis pipeline took (seconds) :  23.332014
+# Cosmosis pipeline took (seconds) :  23.326678
+# Cosmosis pipeline took (seconds) :  23.50595
+# Cosmosis pipeline took (seconds) :  23.629369
+# Cosmosis pipeline took (seconds) :  23.658485
+# Cosmosis pipeline took (seconds) :  23.305323
+# Cosmosis pipeline took (seconds) :  24.04615
+# Cosmosis pipeline took (seconds) :  23.511945
+# Cosmosis pipeline took (seconds) :  23.540562
+# Cosmosis pipeline took (seconds) :  23.480555
+# Cosmosis pipeline took (seconds) :  23.579643
+# Cosmosis pipeline took (seconds) :  23.978247
+# Cosmosis pipeline took (seconds) :  23.318226
+# Cosmosis pipeline took (seconds) :  23.519837
+# Cosmosis pipeline took (seconds) :  23.777075
+# Cosmosis pipeline took (seconds) :  23.403179
+# Cosmosis pipeline took (seconds) :  23.536857
+ CHAIN #5 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 732.68 seconds, while divergence encountered in 190 sample(s).
+ CHAIN #5 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 768.64 seconds.
+ CHAIN #5 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 773.28 seconds.
+ CHAIN #5 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 778.56 seconds.
+ CHAIN #5 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3829.19 seconds.
+# Cosmosis pipeline took (seconds) :  23.771511
+# Cosmosis pipeline took (seconds) :  23.626015
+# Cosmosis pipeline took (seconds) :  23.45437
+# Cosmosis pipeline took (seconds) :  23.472481
+# Cosmosis pipeline took (seconds) :  23.385
+# Cosmosis pipeline took (seconds) :  23.589591
+# Cosmosis pipeline took (seconds) :  18.932889
+# Cosmosis pipeline took (seconds) :  22.754761
+# Cosmosis pipeline took (seconds) :  23.452792
+# Cosmosis pipeline took (seconds) :  23.474427
+# Cosmosis pipeline took (seconds) :  23.606643
+# Cosmosis pipeline took (seconds) :  23.527478
+# Cosmosis pipeline took (seconds) :  24.255173
+# Cosmosis pipeline took (seconds) :  23.7447
+# Cosmosis pipeline took (seconds) :  23.532474
+# Cosmosis pipeline took (seconds) :  23.432894
+# Cosmosis pipeline took (seconds) :  23.663665
+# Cosmosis pipeline took (seconds) :  23.405641
+# Cosmosis pipeline took (seconds) :  23.548035
+# Cosmosis pipeline took (seconds) :  23.454069
+# Cosmosis pipeline took (seconds) :  23.137105
+# Cosmosis pipeline took (seconds) :  23.42282
+# Cosmosis pipeline took (seconds) :  23.550722
+# Cosmosis pipeline took (seconds) :  23.28308
+# Cosmosis pipeline took (seconds) :  23.582835
+# Cosmosis pipeline took (seconds) :  23.673916
+# Cosmosis pipeline took (seconds) :  23.411757
+# Cosmosis pipeline took (seconds) :  23.479071
+# Cosmosis pipeline took (seconds) :  23.517155
+# Cosmosis pipeline took (seconds) :  23.832808
+# Cosmosis pipeline took (seconds) :  23.467968
+# Cosmosis pipeline took (seconds) :  23.649224
+# Cosmosis pipeline took (seconds) :  23.335174
+# Cosmosis pipeline took (seconds) :  23.449164
+# Cosmosis pipeline took (seconds) :  23.391429
+# Cosmosis pipeline took (seconds) :  23.687728
+# Cosmosis pipeline took (seconds) :  23.520663
+# Cosmosis pipeline took (seconds) :  23.28558
+# Cosmosis pipeline took (seconds) :  23.465273
+Warning : w0+wa>-1/3
+# Cosmosis pipeline took (seconds) :  24.609709
+# Cosmosis pipeline took (seconds) :  23.701808
+# Cosmosis pipeline took (seconds) :  23.420238
+# Cosmosis pipeline took (seconds) :  23.441791
+# Cosmosis pipeline took (seconds) :  23.631675
+# Cosmosis pipeline took (seconds) :  23.982437
+# Cosmosis pipeline took (seconds) :  23.863244
+# Cosmosis pipeline took (seconds) :  23.686774
+# Cosmosis pipeline took (seconds) :  23.468029
+# Cosmosis pipeline took (seconds) :  23.493754
+# Cosmosis pipeline took (seconds) :  23.60685
+# Cosmosis pipeline took (seconds) :  23.555847
+# Cosmosis pipeline took (seconds) :  23.415455
+# Cosmosis pipeline took (seconds) :  23.545771
+# Cosmosis pipeline took (seconds) :  23.407581
+# Cosmosis pipeline took (seconds) :  23.547114
+# Cosmosis pipeline took (seconds) :  23.518078
+# Cosmosis pipeline took (seconds) :  24.484879
+# Cosmosis pipeline took (seconds) :  23.580827
+# Cosmosis pipeline took (seconds) :  23.444599
+# Cosmosis pipeline took (seconds) :  23.60848
+# Cosmosis pipeline took (seconds) :  23.388244
+# Cosmosis pipeline took (seconds) :  23.54507
+# Cosmosis pipeline took (seconds) :  23.439106
+# Cosmosis pipeline took (seconds) :  23.547702
+# Cosmosis pipeline took (seconds) :  23.572749
+# Cosmosis pipeline took (seconds) :  23.493331
+# Cosmosis pipeline took (seconds) :  23.573403
+# Cosmosis pipeline took (seconds) :  23.530469
+# Cosmosis pipeline took (seconds) :  23.471823
+# Cosmosis pipeline took (seconds) :  23.431681
+# Cosmosis pipeline took (seconds) :  23.470484
+# Cosmosis pipeline took (seconds) :  23.609993
+# Cosmosis pipeline took (seconds) :  23.634197
+# Cosmosis pipeline took (seconds) :  23.559489
+# Cosmosis pipeline took (seconds) :  23.345869
+# Cosmosis pipeline took (seconds) :  23.486212
+# Cosmosis pipeline took (seconds) :  23.575356
+# Cosmosis pipeline took (seconds) :  23.237391
+# Cosmosis pipeline took (seconds) :  23.431648
+# Cosmosis pipeline took (seconds) :  23.165393
+# Cosmosis pipeline took (seconds) :  23.49204
+# Cosmosis pipeline took (seconds) :  23.381245
+# Cosmosis pipeline took (seconds) :  23.227733
+# Cosmosis pipeline took (seconds) :  23.308404
+# Cosmosis pipeline took (seconds) :  23.363393
+# Cosmosis pipeline took (seconds) :  23.557396
+# Cosmosis pipeline took (seconds) :  23.52885
+# Cosmosis pipeline took (seconds) :  23.550525
+ CHAIN #8 : sampling proceeding [ 2000 / 10000 ], last 2000 samples used 710.70 seconds.
+ CHAIN #8 : sampling proceeding [ 4000 / 10000 ], last 2000 samples used 749.11 seconds.
+ CHAIN #8 : sampling proceeding [ 6000 / 10000 ], last 2000 samples used 750.79 seconds.
+ CHAIN #8 : sampling proceeding [ 8000 / 10000 ], last 2000 samples used 749.58 seconds.
+ CHAIN #8 : sampling finished [ 10000 / 10000 ], obtained 10000 samples in 3710.44 seconds.
+Will calculate f(z) and d(z) in 101 bins (0.000000:10.000000:0.100000)
+Will extend growth calculation using 20 logarithmically spaced z-bins to zmax = 1200.000000 
+Will calculate f(z) and d(z) in 101 bins (0.000000:10.000000:0.100000)
+Will extend growth calculation using 20 logarithmically spaced z-bins to zmax = 1200.000000 
+
+____________________________________________________________________
+Job Resource Usage Summary for 11626109.pbspl1.nas.nasa.gov
+
+    CPU Time Used            : 40:36:14
+    Real Memory Used         : 3992964kb
+    Walltime Used            : 03:20:12
+    Exit Status              : 0
+
+    Number of CPUs Requested : 28
+    Walltime Requested       : 08:00:00
+
+    Execution Queue          : normal
+    Charged To               : s1733
+
+    Job Stopped              : Wed Aug 25 11:48:51 2021
+____________________________________________________________________

@@ -185,7 +185,7 @@
         contains
 
         SUBROUTINE calculate_transfer(input_OMEga, input_OMEgal, omeganu, omegab, h, t_cmb, &
-            & input_N_Nu, kmin, kmax, numk, transfer, k_arr, sigma_8) !todo Lukas
+            & input_N_Nu, kmin, kmax, numk, transfer, k_arr, sigma_8) !Lukas
       !input_OMEga , input_OMEgal , omeganu , omegab, h , t_cmb , input_N_Nu, kmax , numk, Z 
       ! parameters: Omega_0, Omega_Lambda, Omega_nu, Omega_b, h, T_cmb, N_nu, k_max (h Mpc^{-1}) (default 10), numk #pts per decade (default 50), Z redshift for transfer function, 
   !*--TFMDM180

@@ -1,0 +1,34 @@
+#PBS -S /bin/bash
+#PBS -N bf_run3_6x2pt
+#PBS -m abe
+#PBS -M ljw232@cornell.edu
+#PBS -l select=1:ncpus=28:mpiprocs=14:model=bro
+#PBS -l place=scatter:excl
+#PBS -l walltime=08:00:00
+#PBS -q normal
+#PBS -koed
+​
+# Load modules
+source /usr/local/lib/global.profile
+module load mpi-hpe/mpt.2.21 comp-intel/2018.3.222 python3/3.7.0
+
+# Lukas
+source /nasa/jupyter/4.4/miniconda/etc/profile.d/conda.sh
+conda activate cosmosis
+# Source cosmosis config
+source $HOME/cosmosis/config/setup-pleiades-cosmosis
+#
+# ​Cyrille
+# Source cosmosis config
+# source $HOME/cosmosis/config/setup-my-cosmosis
+
+export RUN_FOLDER=$PBS_O_WORKDIR
+export RUN_NAME="${PBS_O_WORKDIR##*/}"
+
+cd $RUN_FOLDER/..
+sh check_versions.sh
+
+export OMP_NUM_THREADS=2
+export DATAFILE=6x2pt_Roman_SO_v1_2_bf26108.fits
+
+python3 run_bayesfast.py
