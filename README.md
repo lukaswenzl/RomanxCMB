@@ -106,13 +106,13 @@ First create a datavector.
 cosmosis modules/RomanxCMB/create_datavector_gaussian_covariance.ini
 ```
 
-Run the test sampler which calculates one likelihood and outputs all observables into a folder named 6x2pt_Roman_SO_gaussian
+Run the test sampler which calculates one likelihood and outputs all observables into a folder named 6x2pt_Roman_SO_gaussian. In the ini file in line 20 all the modules used are listed in order. 
 
 ```
 cosmosis modules/RomanxCMB/params.ini
 ```
 
-It is in principle simple to then run parameter inference using various samplers. One example is provided using polychord. However, doing so requires significant computational resources. To test this one can change the values and prior files to only vary a small number of parameters to test it on a laptop.
+It is in principle simple to then run parameter inference using various samplers. One example is provided using polychord. However, doing so requires significant computational resources. To test this on a laptop one can change the values and prior files to only vary a small number of parameters.
 
 
 ```
