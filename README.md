@@ -23,7 +23,7 @@ This repo contains a range of modules that could be useful for other application
 * Cosmosis wrapper for Eisenstein & Hu (1998, astro-ph/9710252) (eisenstein_hu_cdm folder)
 * Modules to calculate the effects of a range of modified gravity models on the growth and CMB lensing kernel
 * Modules to sample over sigma8 and sigma8_of_z  (sample_sigma8 and sample_sigma8_of_z folders)
-* An implementation of the Intrinsic Alignment model in Krause, Eifler & Blazek 2016 
+* An implementation of the Intrinsic Alignment model in Krause, Eifler & Blazek 2016 (la_model folder)
 * various small helpful scrips in miscellaneous folder 
 
 
