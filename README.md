@@ -90,7 +90,7 @@ We provide a shared folder with the non-gaussian contributions to the covariance
 The folder can be found under https://drive.google.com/drive/folders/102bFeT5nDoF8aKmel2shVDkLQH5l53af?usp=sharing (created in 2022, should be functional for at least a few years.) 
 
 
-## Run single sample
+## Run forecast
 
 Ini files specify the full pipeline to calculate the observables based on a set of input parameters. Making use of a pre-calculated data vector and covariance matrix cosmosis also calculates the likelihood. For a forecast the fiducial data vector and the estimated covariance matrix are used.
 
