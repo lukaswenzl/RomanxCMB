@@ -59,7 +59,7 @@ git clone <link to this repo>
 
 
 
-To compile the fortran and c codes contained in this repo together with the rest of cosmosis add the RomanxCMB folder: open the Makefile in the modules folder and add the Folder to it. The final file should look like this:
+To compile the fortran and c codes contained in this repo together with the rest of cosmosis add the RomanxCMB folder: open the Makefile in the modules folder and add the folder to it. The final file should look like this:
 
 ```
 include ${COSMOSIS_SRC_DIR}/config/compilers.mk
@@ -92,21 +92,21 @@ The folder can be found under https://drive.google.com/drive/folders/102bFeT5nDo
 
 ## Run forecast
 
-Ini files specify the full pipeline to calculate the observables based on a set of input parameters. Making use of a pre-calculated data vector and covariance matrix cosmosis also calculates the likelihood. For a forecast the fiducial data vector and the estimated covariance matrix are used.
+Ini files specify the full pipeline to calculate the observables based on a set of input parameters. Making use of a pre-calculated data vector and covariance matrix, cosmosis also calculates the likelihood. For a forecast the fiducial data vector and the estimated covariance matrix are used.
 
-To create the datavector for a <scenario> run the corresponding create_datavetor_<scenario>.ini file. Then, run the pipeline with the corresponding params_<scenario>.ini file.
+To create the datavector for a scenario run the corresponding create_datavetor_scenario.ini file. Then, run the pipeline with the corresponding params_scenario.ini file.
 
 In the paper we consider 3 survey scenarios: HLS optimistic corresponds to no extension; HLS conservative corresponds to the _pessim extension; Wide scenario corresponds to the _wide extension.
 
-To make the code run without downloading the large files reference above the example below only calculate the gaussian covariance matrix.
+To make the code run without downloading the large files referenced above the example below only calculates the gaussian covariance matrix.
 
-First create a datavector.
+First create a datavector
 
 ```
 cosmosis modules/RomanxCMB/create_datavector_gaussian_covariance.ini
 ```
 
-Run the test sampler which calculates one likelihood and outputs all observables into a folder named 6x2pt_Roman_SO_gaussian. In the ini file in line 20 all the modules used are listed in order. 
+Then, run the test sampler which calculates one likelihood and outputs all observables into a folder named 6x2pt_Roman_SO_gaussian. In the ini file in line 20 all the modules used are listed in order. 
 
 ```
 cosmosis modules/RomanxCMB/params.ini
